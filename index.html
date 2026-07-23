@@ -241,24 +241,10 @@
         let chartInstance = null;
         let unsubscribeListeners = [];
 
-        // CUSTOM SORTING ARRAY FOR VEHICLE CATEGORIES
-        const categoryOrder = [
-            "জিপ", 
-            "পিকআপ", 
-            "৩টন", 
-            "ফ্রিজার ভ্যান", 
-            "কোস্টার", 
-            "মোটরসাইকেল", 
-            "ওয়াটার ট্রেইলার"
-        ];
-
+        const categoryOrder = ["জিপ", "পিকআপ", "৩টন", "ফ্রিজার ভ্যান", "কোস্টার", "মোটরসাইকেল", "ওয়াটার ট্রেইলার"];
         const sortCategories = (a, b) => {
-            let indexA = categoryOrder.indexOf(a);
-            let indexB = categoryOrder.indexOf(b);
-            // If category is not in our defined array, push it to the bottom
-            if (indexA === -1) indexA = 999;
-            if (indexB === -1) indexB = 999;
-            // If both are not in array, sort alphabetically
+            let indexA = categoryOrder.indexOf(a); let indexB = categoryOrder.indexOf(b);
+            if (indexA === -1) indexA = 999; if (indexB === -1) indexB = 999;
             if (indexA === 999 && indexB === 999) return a.localeCompare(b);
             return indexA - indexB;
         };
@@ -306,8 +292,7 @@
         function setupDataListeners() {
             clearDataListeners();
             unsubscribeListeners.push(onSnapshot(collection(db, 'artifacts', APP_ID, 'public', 'data', 'vehicles'), snap => { 
-                vehicles = snap.docs.map(d => ({ ...d.data(), id: d.id })); 
-                updateUI(); 
+                vehicles = snap.docs.map(d => ({ ...d.data(), id: d.id })); updateUI(); 
             }));
             unsubscribeListeners.push(onSnapshot(collection(db, 'artifacts', APP_ID, 'public', 'data', 'maintenanceLog'), snap => { 
                 maintenanceLog = snap.docs.map(d => ({ ...d.data(), id: d.id })).sort((a,b) => {
@@ -408,75 +393,52 @@
         function formatDate(dStr) { if(!dStr) return ''; return new Date(dStr).toLocaleDateString('bn-BD', { day: 'numeric', month: 'short', year: 'numeric' }); }
 
         // ==========================================
-        // PDF ENGINE
-       // ==========================================
-        // BUG FIX: PERFECT 100% WORKING PDF ENGINE
+        // 100% BULLETPROOF PDF ENGINE (No CSS Hacks)
         // ==========================================
         function generatePDF(htmlContent, fileName) {
             window.showToast("পিডিএফ প্রস্তুত হচ্ছে, অপেক্ষা করুন...");
             
-            // একটি নতুন কন্টেইনার তৈরি করছি যা দৃশ্যমান হবে না কিন্তু DOM-এ থাকবে
-            const container = document.createElement('div');
-            // visibility: hidden ব্যবহার করছি, opacity বা display: none নয়
-            // এটি নিশ্চিত করবে যে ব্রাউজার এটিকে পেইন্ট করবে কিন্তু ইউজার দেখবে না
-            container.style.position = 'absolute';
-            container.style.top = '0';
-            container.style.left = '0';
-            container.style.width = '794px'; 
-            container.style.visibility = 'hidden'; 
-            container.style.backgroundColor = 'white';
-            // নিশ্চিত করছি যে এটি মূল পেজের কন্টেন্টের ওপরে উঠবে না বা জায়গা নষ্ট করবে না
-            container.style.height = '1px';
-            container.style.overflow = 'visible';
-            
-            container.innerHTML = htmlContent;
-            
-            document.body.appendChild(container);
+            // আমরা কোনো hidden, opacity বা viewport hack ব্যবহার করবো না।
+            // সরাসরি html2pdf কে এলিমেন্ট (element) হিসেবে HTML দেব।
+            const element = document.createElement('div');
+            element.innerHTML = htmlContent;
 
             const opt = { 
-                margin: 0, 
-                filename: fileName, 
-                image: { type: 'jpeg', quality: 1.0 }, 
-                html2canvas: { 
-                    scale: 2, 
-                    useCORS: true, 
-                    windowWidth: 794,
-                    // windowHeight সেট করছি যাতে পুরো কন্টেন্ট ক্যাপচার হয়
-                    windowHeight: container.scrollHeight 
-                }, 
-                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } 
+                margin:       0.3, 
+                filename:     fileName, 
+                image:        { type: 'jpeg', quality: 1.0 }, 
+                html2canvas:  { scale: 2, useCORS: true, logging: false }, 
+                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' } 
             };
             
-            // সামান্য ডিলে (Delay) দিচ্ছি যাতে ব্রাউজার DOM রেন্ডার করার সময় পায়
             setTimeout(() => {
-                html2pdf().set(opt).from(container).save().then(() => {
-                    document.body.removeChild(container);
+                html2pdf().set(opt).from(element).save().then(() => {
                     window.showToast("পিডিএফ সফলভাবে ডাউনলোড হয়েছে!");
                 }).catch(err => {
-                    if(document.body.contains(container)) document.body.removeChild(container);
                     console.error("PDF Error:", err);
                     window.showToast("পিডিএফ তৈরিতে সমস্যা হয়েছে!", true);
                 });
-            }, 800); // 800ms delay for safety
+            }, 800); // 800ms delay to ensure all assets are loaded properly
         }
 
+        // Clean & Robust PDF Template without any absolute positioning or height constraints
         const getPDFTemplate = (title, subtitle, tableHeaders, tableRows) => `
-            <div style="width: 794px; min-height: 1122px; padding: 40px; box-sizing: border-box; position: relative; font-family:'Hind Siliguri', sans-serif; color:#1e293b; background: white; margin: 0;">
-                <div style="position: absolute; top: 400px; left: 50%; transform: translate(-50%, -50%) rotate(-35deg); font-size: 80px; color: rgba(5, 150, 105, 0.06); font-weight: bold; white-space: nowrap; z-index: 0; pointer-events: none;">CHARGING NINE</div>
-                <div style="position: relative; z-index: 10;">
-                    <div style="text-align:center; border-bottom:3px solid #059669; padding-bottom:15px; margin-bottom:20px">
-                        <h2 style="color:#059669; font-size:24px; margin:0">৯ ইস্ট বেঙ্গল রেজিমেন্ট</h2>
-                        <p style="margin:5px 0 0 0; font-size:16px; font-weight:bold;">${title}</p>
-                        <p style="margin:5px 0 0 0; font-size:12px; color:#64748b">তারিখ: ${formatDate(new Date().toISOString())}</p>
-                    </div>
-                    ${subtitle ? `<div style="background:#f8fafc; padding:15px; border-radius:8px; margin-bottom:20px; border:1px solid #e2e8f0">${subtitle}</div>` : ''}
-                    <table style="width:100%; text-align:left; border-collapse:collapse; font-size:14px">
-                        <thead><tr style="background:#f1f5f9">${tableHeaders}</tr></thead>
-                        <tbody>${tableRows}</tbody>
-                    </table>
-                    <div style="margin-top:60px; text-align:right">
-                        <p style="border-top:1px solid #000; display:inline-block; padding-top:5px; margin:0">এমটি এনসিও / অফিসার স্বাক্ষর</p>
-                    </div>
+            <div style="font-family:'Hind Siliguri', sans-serif; color:#1e293b; background: white; padding: 10px;">
+                <div style="text-align:center; border-bottom:3px solid #059669; padding-bottom:15px; margin-bottom:20px">
+                    <h2 style="color:#059669; font-size:24px; margin:0">৯ ইস্ট বেঙ্গল রেজিমেন্ট</h2>
+                    <p style="margin:5px 0 0 0; font-size:16px; font-weight:bold;">${title}</p>
+                    <p style="margin:5px 0 0 0; font-size:12px; color:#64748b">তারিখ: ${formatDate(new Date().toISOString())}</p>
+                </div>
+                ${subtitle ? `<div style="background:#f8fafc; padding:15px; border-radius:8px; margin-bottom:20px; border:1px solid #e2e8f0; font-size: 14px;">${subtitle}</div>` : ''}
+                <table style="width:100%; text-align:left; border-collapse:collapse; font-size:14px">
+                    <thead><tr style="background:#f1f5f9">${tableHeaders}</tr></thead>
+                    <tbody>${tableRows}</tbody>
+                </table>
+                <div style="margin-top:50px; text-align:right">
+                    <p style="border-top:1px solid #000; display:inline-block; padding-top:5px; margin:0; font-size: 14px;">এমটি এনসিও / অফিসার স্বাক্ষর</p>
+                </div>
+                <div style="text-align:center; margin-top:40px; font-size:24px; color:#cbd5e1; font-weight:bold; letter-spacing: 5px;">
+                    CHARGING NINE
                 </div>
             </div>`;
 
@@ -543,7 +505,7 @@
             const grouped = {}; overdueItemsData.forEach(item => { if(!grouped[item.typeName]) grouped[item.typeName] = []; grouped[item.typeName].push(item); });
             Object.keys(grouped).sort().forEach(type => {
                 rows += `<tr><td colspan="4" style="padding:8px 10px; background-color:#fee2e2; color:#991b1b; font-weight:bold; text-align:center; border-bottom:1px solid #fecaca;">কাজ: ${type}</td></tr>`;
-                grouped[type].forEach(item => { rows += `<tr><td style="padding:12px;border-bottom:1px solid #e2e8f0;font-weight:bold;">${item.vehicleBa} <br><span style="font-weight:normal;font-size:11px;color:#64748b">(${item.type})</span></td><td style="padding:12px;border-bottom:1px solid #e2e8f0; font-weight:bold; font-size:12px;">${item.currentKm} KM</td><td style="padding:12px;border-bottom:1px solid #e2e8f0">${formatDate(item.nextDate)} <br> <span style="font-size:11px">(${item.nextKm} KM)</span></td><td style="padding:12px;border-bottom:1px solid #e2e8f0;color:#dc2626;font-weight:bold;">${item.reason}</td></tr>`; });
+                grouped[type].forEach(item => { rows += `<tr><td style="padding:10px;border-bottom:1px solid #e2e8f0;font-weight:bold;">${item.vehicleBa} <br><span style="font-weight:normal;font-size:11px;color:#64748b">(${item.type})</span></td><td style="padding:10px;border-bottom:1px solid #e2e8f0; font-weight:bold;">${item.currentKm} KM</td><td style="padding:10px;border-bottom:1px solid #e2e8f0">${formatDate(item.nextDate)} <br> <span style="font-size:11px">(${item.nextKm} KM)</span></td><td style="padding:10px;border-bottom:1px solid #e2e8f0;color:#dc2626;font-weight:bold;">${item.reason}</td></tr>`; });
             });
             if(overdueItemsData.length === 0) rows = `<tr><td colspan="4" style="padding:15px;text-align:center;">কোনো ওভারডিউ কাজ নেই</td></tr>`;
             const headers = `<th style="padding:10px; border-bottom:2px solid #fca5a5; background:#fee2e2; color:#991b1b;">গাড়ি (ধরন)</th><th style="padding:10px; border-bottom:2px solid #fca5a5; background:#fee2e2; color:#991b1b;">বর্তমান মিটার</th><th style="padding:10px; border-bottom:2px solid #fca5a5; background:#fee2e2; color:#991b1b;">লক্ষ্যমাত্রা (তারিখ ও কি.মি)</th><th style="padding:10px; border-bottom:2px solid #fca5a5; background:#fee2e2; color:#991b1b;">ওভারডিউ স্ট্যাটাস</th>`;
@@ -585,7 +547,7 @@
             const grouped = {}; upcomingItemsData.forEach(item => { if(!grouped[item.typeName]) grouped[item.typeName] = []; grouped[item.typeName].push(item); });
             Object.keys(grouped).sort().forEach(type => {
                 rows += `<tr><td colspan="4" style="padding:8px 10px; background-color:#fef3c7; color:#92400e; font-weight:bold; text-align:center; border-bottom:1px solid #fde68a;">কাজ: ${type}</td></tr>`;
-                grouped[type].forEach(item => { rows += `<tr><td style="padding:12px;border-bottom:1px solid #e2e8f0;font-weight:bold;">${item.vehicleBa} <br><span style="font-weight:normal;font-size:11px;color:#64748b">(${item.type})</span></td><td style="padding:12px;border-bottom:1px solid #e2e8f0; font-weight:bold; font-size:12px;">${item.currentKm} KM</td><td style="padding:12px;border-bottom:1px solid #e2e8f0">${formatDate(item.nextDate)} <br> <span style="font-size:11px">(${item.nextKm} KM)</span></td><td style="padding:12px;border-bottom:1px solid #e2e8f0;color:#d97706;font-weight:bold;">${item.reason}</td></tr>`; });
+                grouped[type].forEach(item => { rows += `<tr><td style="padding:10px;border-bottom:1px solid #e2e8f0;font-weight:bold;">${item.vehicleBa} <br><span style="font-weight:normal;font-size:11px;color:#64748b">(${item.type})</span></td><td style="padding:10px;border-bottom:1px solid #e2e8f0; font-weight:bold;">${item.currentKm} KM</td><td style="padding:10px;border-bottom:1px solid #e2e8f0">${formatDate(item.nextDate)} <br> <span style="font-size:11px">(${item.nextKm} KM)</span></td><td style="padding:10px;border-bottom:1px solid #e2e8f0;color:#d97706;font-weight:bold;">${item.reason}</td></tr>`; });
             });
             if(upcomingItemsData.length === 0) rows = `<tr><td colspan="4" style="padding:15px;text-align:center;">কোনো আসন্ন কাজ নেই</td></tr>`;
             const headers = `<th style="padding:10px; border-bottom:2px solid #fcd34d; background:#fef3c7; color:#92400e;">গাড়ি (ধরন)</th><th style="padding:10px; border-bottom:2px solid #fcd34d; background:#fef3c7; color:#92400e;">বর্তমান মিটার</th><th style="padding:10px; border-bottom:2px solid #fcd34d; background:#fef3c7; color:#92400e;">লক্ষ্যমাত্রা (তারিখ ও কি.মি)</th><th style="padding:10px; border-bottom:2px solid #fcd34d; background:#fef3c7; color:#92400e;">আসন্ন স্ট্যাটাস</th>`;
@@ -596,7 +558,7 @@
         window.downloadVehicleReport = (vId) => {
             const v = vehicles.find(x => x.id === vId); 
             const logs = maintenanceLog.filter(m => m.vehicleId === vId).sort((a,b) => new Date(b.doneDate) - new Date(a.doneDate));
-            let rows = logs.map(m => `<tr><td style="padding:12px; border-bottom:1px solid #e2e8f0;">${formatDate(m.doneDate)}</td><td style="padding:12px; border-bottom:1px solid #e2e8f0; font-weight:bold;">${m.typeName}</td><td style="padding:12px; border-bottom:1px solid #e2e8f0;">${m.doneKm} KM</td><td style="padding:12px; border-bottom:1px solid #e2e8f0; color:#dc2626;">${formatDate(m.nextDate)}</td><td style="padding:12px; border-bottom:1px solid #e2e8f0; color:#dc2626;">${m.nextKm} KM</td></tr>`).join('');
+            let rows = logs.map(m => `<tr><td style="padding:10px; border-bottom:1px solid #e2e8f0;">${formatDate(m.doneDate)}</td><td style="padding:10px; border-bottom:1px solid #e2e8f0; font-weight:bold;">${m.typeName}</td><td style="padding:10px; border-bottom:1px solid #e2e8f0;">${m.doneKm} KM</td><td style="padding:10px; border-bottom:1px solid #e2e8f0; color:#dc2626;">${formatDate(m.nextDate)}</td><td style="padding:10px; border-bottom:1px solid #e2e8f0; color:#dc2626;">${m.nextKm} KM</td></tr>`).join('');
             if(logs.length === 0) rows = `<tr><td colspan="5" style="padding:15px; text-align:center; color:#64748b;">কোনো রেকর্ড নেই</td></tr>`;
             
             const subtitle = `<table style="width:100%"><tr><td style="text-align:left;"><strong>বিএ নম্বর:</strong> ${v.baNo}</td><td style="text-align:center;"><strong>গাড়ির ধরন:</strong> ${v.type}</td><td style="text-align:right;"><strong>বর্তমান মিটার:</strong> ${v.currentKm || 0} KM</td></tr></table>`;
