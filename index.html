@@ -338,12 +338,25 @@
         const watermarkHTML = `<div style="position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%) rotate(-35deg); font-size: 80px; color: rgba(5, 150, 105, 0.06); font-weight: bold; white-space: nowrap; z-index: 0; pointer-events: none;">CHARGING NINE</div>`;
 
         function generatePDF(htmlContent, fileName) {
-            window.showToast("পিডিএফ প্রস্তুত হচ্ছে...");
-            const div = document.createElement('div'); div.innerHTML = htmlContent; 
-            div.style.position = 'absolute'; div.style.top = '-9999px'; div.style.width = '794px'; div.style.backgroundColor = 'white';
-            document.body.appendChild(div);
-            const opt = { margin: [0.5, 0.4, 0.5, 0.4], filename: fileName, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true, logging: false }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } };
-            setTimeout(() => { html2pdf().set(opt).from(div).save().then(() => { document.body.removeChild(div); window.showToast("পিডিএফ ডাউনলোড সম্পন্ন হয়েছে!"); }).catch(err => { document.body.removeChild(div); window.showToast("পিডিএফ তৈরিতে সমস্যা হয়েছে!", true); }); }, 300);
+            window.showToast("পিডিএফ প্রস্তুত হচ্ছে, দয়া করে অপেক্ষা করুন...");
+            
+            const opt = { 
+                margin:       [0.5, 0.4, 0.5, 0.4], 
+                filename:     fileName, 
+                image:        { type: 'jpeg', quality: 1.0 }, 
+                html2canvas:  { scale: 2, useCORS: true }, 
+                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' } 
+            };
+            
+            // সরাসরি htmlContent থেকে পিডিএফ তৈরি করা হচ্ছে (লুকানোর ঝামেলা ছাড়া)
+            html2pdf().set(opt).from(htmlContent).save()
+                .then(() => { 
+                    window.showToast("পিডিএফ সফলভাবে ডাউনলোড হয়েছে!"); 
+                })
+                .catch(err => { 
+                    console.error("PDF Error:", err); 
+                    window.showToast("পিডিএফ তৈরিতে সমস্যা হয়েছে!", true); 
+                });
         }
 
         window.openAllVehiclesModal = () => {
