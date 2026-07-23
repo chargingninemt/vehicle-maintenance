@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>9 EB MT Tracker Final</title>
+    <title>9 EB MT Tracker</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -16,14 +16,11 @@
         
         .nav-mobile-active { color: #10b981; } 
         .nav-mobile-active i { transform: scale(1.1); transition: transform 0.2s; }
-        
         .nav-desktop-active { border-bottom: 3px solid #10b981; color: #047857; font-weight: 700; background-color: #f0fdf4; }
-        
         .hide-scroll::-webkit-scrollbar { display: none; }
         .grad-primary { background: linear-gradient(135deg, #059669 0%, #10b981 100%); }
         .grad-danger { background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); }
-        
-        .clickable-card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); cursor: pointer; }
+        .clickable-card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); cursor: pointer; }
         
         .login-bg { background: linear-gradient(rgba(16, 185, 129, 0.9), rgba(5, 150, 105, 0.9)), url('https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&q=80&w=1000') center/cover; }
     </style>
@@ -144,11 +141,11 @@
                         <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
                             <div class="p-5 border-b border-slate-50 bg-slate-50/50"><h2 class="font-bold text-slate-800"><i class="fa-solid fa-wrench text-blue-500 mr-2"></i>নতুন কাজ এন্ট্রি</h2></div>
                             <form id="form-maintenance" class="p-5 space-y-4">
-                                <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">গাড়ি নির্বাচন</label><select id="maint-vehicle" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500"></select></div>
-                                <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">কাজের ধরন</label><select id="maint-type" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500"></select></div>
+                                <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1.5">গাড়ি নির্বাচন</label><select id="maint-vehicle" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500"></select></div>
+                                <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1.5">কাজের ধরন</label><select id="maint-type" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500"></select></div>
                                 <div class="grid grid-cols-2 gap-3">
-                                    <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">তারিখ</label><input type="date" id="maint-date" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500"></div>
-                                    <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">বর্তমান কি.মি</label><input type="number" id="maint-km" placeholder="KM" required min="0" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500"></div>
+                                    <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1.5">তারিখ</label><input type="date" id="maint-date" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500"></div>
+                                    <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1.5">বর্তমান কি.মি</label><input type="number" id="maint-km" placeholder="KM" required min="0" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500"></div>
                                 </div>
                                 <button type="submit" class="w-full grad-primary text-white font-bold py-3.5 rounded-xl mt-2 shadow-lg active:scale-95 transition-transform"><i class="fa-solid fa-check-circle mr-2"></i> রেকর্ড সেভ করুন</button>
                             </form>
@@ -226,14 +223,14 @@
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxqbZMefch2yyYbn5i0E9EFAO1Phe7tf4rH22GTmlbOkxzZM-x7r01_XYT68uZWtKDjtA/exec"; 
         
         let firebaseConfig = {
-            apiKey: AIzaSyBF4ebAsfoKgd9wgNIeNJ9QRKpMSXr-w9g,
+            apiKey: "AIzaSyBF4ebAsfoKgd9wgNIeNJ9QRKpMSXr-w9g",
             authDomain: "nine-eb-mt-final.firebaseapp.com",
             projectId: "nine-eb-mt-final",
             storageBucket: "nine-eb-mt-final.firebasestorage.app",
             messagingSenderId: "527316462114",
             appId: "1:527316462114:web:563dd9bd8069daf91f787b"
         };
-        const APP_ID = '9eb-tracker-final-v1';
+        const APP_ID = '9eb-tracker-final-v1'; // Generic App ID for the new project
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -467,44 +464,10 @@
                 let maintStatus = '<span class="text-[10px] md:text-xs text-slate-400">কোনো রেকর্ড নেই</span>';
                 if(latestMaint) maintStatus = `<div class="text-[10px] md:text-xs text-slate-600"><span class="font-bold">শেষ কাজ:</span> ${latestMaint.typeName} <span class="text-slate-400">(${latestMaint.doneKm} KM)</span></div>`;
                 
-                return `
-                <div class="vehicle-card bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-col gap-3 hover:shadow-md transition" data-ba="${v.baNo}">
-                    <div class="flex justify-between items-start border-b border-slate-50 pb-3">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 md:w-12 md:h-12 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center text-lg"><i class="fa-solid fa-truck"></i></div>
-                            <div>
-                                <h3 class="font-bold text-slate-800 text-lg leading-none mb-1">${v.baNo}</h3>
-                                <span class="text-[10px] uppercase font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded tracking-wider">${v.type}</span>
-                            </div>
-                        </div>
-                        <div class="flex gap-1.5">
-                            <button onclick="window.downloadVehicleReport('${v.id}')" class="w-8 h-8 bg-indigo-50 text-indigo-500 rounded-lg hover:bg-indigo-500 hover:text-white transition flex items-center justify-center" title="পিডিএফ ডাউনলোড"><i class="fa-solid fa-file-pdf"></i></button>
-                            <button onclick="window.deleteVehicle('${v.id}')" class="w-8 h-8 bg-red-50 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition flex items-center justify-center" title="গাড়িটি মুছে ফেলুন"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    </div>
-                    <div class="flex justify-between items-center pt-1">
-                        <div>
-                            <span class="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-1 rounded-md shadow-sm inline-block mb-1.5"><i class="fa-solid fa-gauge-high mr-1"></i> ${v.currentKm || 0} কি.মি</span>
-                            ${maintStatus}
-                        </div>
-                        <button onclick="window.openKmModal('${v.id}', '${v.baNo}', ${v.currentKm || 0})" class="bg-slate-800 hover:bg-slate-700 text-white px-3 py-2 rounded-lg text-xs font-bold active:scale-95 transition whitespace-nowrap shadow-md">
-                            মিটার আপডেট
-                        </button>
-                    </div>
-                </div>`;
+                return `<div class="vehicle-card bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-col gap-3 hover:shadow-md transition" data-ba="${v.baNo}"><div class="flex justify-between items-start border-b border-slate-50 pb-3"><div class="flex items-center gap-3"><div class="w-10 h-10 md:w-12 md:h-12 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center text-lg"><i class="fa-solid fa-truck"></i></div><div><h3 class="font-bold text-slate-800 text-lg leading-none mb-1">${v.baNo}</h3><span class="text-[10px] uppercase font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded tracking-wider">${v.type}</span></div></div><div class="flex gap-1.5"><button onclick="window.downloadVehicleReport('${v.id}')" class="w-8 h-8 bg-indigo-50 text-indigo-500 rounded-lg hover:bg-indigo-500 hover:text-white transition flex items-center justify-center" title="পিডিএফ ডাউনলোড"><i class="fa-solid fa-file-pdf"></i></button><button onclick="window.deleteVehicle('${v.id}')" class="w-8 h-8 bg-red-50 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition flex items-center justify-center" title="গাড়িটি মুছে ফেলুন"><i class="fa-solid fa-trash"></i></button></div></div><div class="flex justify-between items-center pt-1"><div><span class="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-1 rounded-md shadow-sm inline-block mb-1.5"><i class="fa-solid fa-gauge-high mr-1"></i> ${v.currentKm || 0} কি.মি</span>${maintStatus}</div><button onclick="window.openKmModal('${v.id}', '${v.baNo}', ${v.currentKm || 0})" class="bg-slate-800 hover:bg-slate-700 text-white px-3 py-2 rounded-lg text-xs font-bold active:scale-95 transition whitespace-nowrap shadow-md">মিটার আপডেট</button></div></div>`;
             }).join('');
 
-            document.getElementById('maintenance-history-list').innerHTML = maintenanceLog.map(m => `
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex justify-between items-center hover:shadow-md transition">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center text-slate-500"><i class="fa-solid fa-wrench"></i></div>
-                        <div>
-                            <h4 class="font-bold text-slate-800 text-sm md:text-base">${m.vehicleBa} <span class="text-[10px] font-normal text-slate-500 bg-slate-100 px-1 rounded ml-1">${m.typeName}</span></h4>
-                            <p class="text-xs text-slate-500 mt-0.5"><i class="fa-regular fa-calendar mr-1"></i>${formatDate(m.doneDate)} <span class="mx-1">|</span> <i class="fa-solid fa-gauge-high mr-1"></i>${m.doneKm} KM</p>
-                        </div>
-                    </div>
-                    <button onclick="window.deleteMaintenance('${m.id}')" class="text-red-400 hover:text-white hover:bg-red-500 p-2.5 rounded-lg transition"><i class="fa-solid fa-trash-can"></i></button>
-                </div>`).join('');
+            document.getElementById('maintenance-history-list').innerHTML = maintenanceLog.map(m => `<div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex justify-between items-center hover:shadow-md transition"><div class="flex items-center gap-3"><div class="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center text-slate-500"><i class="fa-solid fa-wrench"></i></div><div><h4 class="font-bold text-slate-800 text-sm md:text-base">${m.vehicleBa} <span class="text-[10px] font-normal text-slate-500 bg-slate-100 px-1 rounded ml-1">${m.typeName}</span></h4><p class="text-xs text-slate-500 mt-0.5"><i class="fa-regular fa-calendar mr-1"></i>${formatDate(m.doneDate)} <span class="mx-1">|</span> <i class="fa-solid fa-gauge-high mr-1"></i>${m.doneKm} KM</p></div></div><button onclick="window.deleteMaintenance('${m.id}')" class="text-red-400 hover:text-white hover:bg-red-500 p-2.5 rounded-lg transition"><i class="fa-solid fa-trash-can"></i></button></div>`).join('');
             
             window.filterVehicles();
         }
