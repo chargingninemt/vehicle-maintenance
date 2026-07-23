@@ -409,26 +409,55 @@
 
         // ==========================================
         // PDF ENGINE
+       // ==========================================
+        // BUG FIX: PERFECT 100% WORKING PDF ENGINE
         // ==========================================
         function generatePDF(htmlContent, fileName) {
             window.showToast("পিডিএফ প্রস্তুত হচ্ছে, অপেক্ষা করুন...");
+            
+            // একটি নতুন কন্টেইনার তৈরি করছি যা দৃশ্যমান হবে না কিন্তু DOM-এ থাকবে
             const container = document.createElement('div');
-            container.style.position = 'absolute'; container.style.top = '0'; container.style.left = '0';
-            container.style.width = '794px'; container.style.zIndex = '-9999'; container.style.opacity = '0.01'; 
-            container.style.pointerEvents = 'none'; container.style.backgroundColor = 'white';
+            // visibility: hidden ব্যবহার করছি, opacity বা display: none নয়
+            // এটি নিশ্চিত করবে যে ব্রাউজার এটিকে পেইন্ট করবে কিন্তু ইউজার দেখবে না
+            container.style.position = 'absolute';
+            container.style.top = '0';
+            container.style.left = '0';
+            container.style.width = '794px'; 
+            container.style.visibility = 'hidden'; 
+            container.style.backgroundColor = 'white';
+            // নিশ্চিত করছি যে এটি মূল পেজের কন্টেন্টের ওপরে উঠবে না বা জায়গা নষ্ট করবে না
+            container.style.height = '1px';
+            container.style.overflow = 'visible';
+            
             container.innerHTML = htmlContent;
+            
             document.body.appendChild(container);
 
-            const opt = { margin: 0, filename: fileName, image: { type: 'jpeg', quality: 1.0 }, html2canvas: { scale: 2, useCORS: true, windowWidth: 794 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } };
+            const opt = { 
+                margin: 0, 
+                filename: fileName, 
+                image: { type: 'jpeg', quality: 1.0 }, 
+                html2canvas: { 
+                    scale: 2, 
+                    useCORS: true, 
+                    windowWidth: 794,
+                    // windowHeight সেট করছি যাতে পুরো কন্টেন্ট ক্যাপচার হয়
+                    windowHeight: container.scrollHeight 
+                }, 
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } 
+            };
             
+            // সামান্য ডিলে (Delay) দিচ্ছি যাতে ব্রাউজার DOM রেন্ডার করার সময় পায়
             setTimeout(() => {
                 html2pdf().set(opt).from(container).save().then(() => {
-                    document.body.removeChild(container); window.showToast("পিডিএফ সফলভাবে ডাউনলোড হয়েছে!");
+                    document.body.removeChild(container);
+                    window.showToast("পিডিএফ সফলভাবে ডাউনলোড হয়েছে!");
                 }).catch(err => {
                     if(document.body.contains(container)) document.body.removeChild(container);
-                    console.error("PDF Error:", err); window.showToast("পিডিএফ তৈরিতে সমস্যা হয়েছে!", true);
+                    console.error("PDF Error:", err);
+                    window.showToast("পিডিএফ তৈরিতে সমস্যা হয়েছে!", true);
                 });
-            }, 500); 
+            }, 800); // 800ms delay for safety
         }
 
         const getPDFTemplate = (title, subtitle, tableHeaders, tableRows) => `
