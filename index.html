@@ -133,7 +133,7 @@
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><i class="fa-solid fa-magnifying-glass text-slate-400"></i></div>
                                 <input type="text" id="search-vehicle" onkeyup="window.filterVehicles()" placeholder="বিএ নম্বর দিয়ে খুঁজুন..." class="w-full pl-9 pr-4 py-2.5 bg-white border border-slate-200 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 outline-none transition text-sm">
                             </div>
-                            <!-- NEW QUICK KM BUTTON -->
+                            <!-- QUICK KM BUTTON -->
                             <button onclick="window.openQuickKmModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2.5 rounded-lg text-sm font-bold active:scale-95 transition shadow-md whitespace-nowrap"><i class="fa-solid fa-gauge-high mr-1"></i> দ্রুত মিটার</button>
                             <button onclick="document.getElementById('add-veh-modal').classList.remove('hidden')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2.5 rounded-lg text-sm font-bold active:scale-95 transition shadow-md whitespace-nowrap"><i class="fa-solid fa-plus mr-1"></i> নতুন গাড়ি</button>
                         </div>
@@ -249,7 +249,7 @@
     
     <div id="km-update-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 transition-opacity bg-slate-900/60"><div class="bg-white w-full max-w-sm rounded-2xl p-6 shadow-2xl border-t-4 border-emerald-500"><div class="flex justify-between items-center mb-2"><h3 class="font-bold text-lg text-slate-800">মিটার রিডিং আপডেট</h3><button onclick="window.closeKmModal()" class="text-slate-400"><i class="fa-solid fa-xmark text-xl"></i></button></div><p class="text-sm font-bold text-emerald-600 mb-5 bg-emerald-50 inline-block px-3 py-1 rounded-md" id="km-modal-bano"></p><form id="form-km-update" class="space-y-4"><input type="hidden" id="km-update-vid"><div><label class="block text-xs font-bold text-slate-500 mb-1.5">গাড়ির বর্তমান কিলোমিটার</label><input type="number" id="km-update-val" required min="0" class="w-full px-4 py-4 bg-slate-50 border border-slate-300 rounded-xl text-2xl font-bold text-center"></div><button type="submit" class="w-full bg-emerald-600 text-white font-bold py-3.5 rounded-xl mt-2">আপডেট করুন</button></form></div></div>
     
-    <!-- NEW QUICK KM UPDATE MODAL -->
+    <!-- QUICK KM UPDATE MODAL -->
     <div id="quick-km-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 transition-opacity bg-slate-900/60"><div class="bg-white w-full max-w-sm rounded-2xl p-6 shadow-2xl border-t-4 border-emerald-500"><div class="flex justify-between items-center mb-4"><h3 class="font-bold text-lg text-slate-800"><i class="fa-solid fa-gauge-high mr-2 text-emerald-500"></i>দ্রুত মিটার আপডেট</h3><button onclick="window.closeQuickKmModal()" class="text-slate-400"><i class="fa-solid fa-xmark text-xl"></i></button></div><form id="form-quick-km" class="space-y-4"><div><label class="block text-xs font-bold text-slate-500 mb-1.5">গাড়ি নির্বাচন করুন</label><select id="quick-km-vehicle" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500"></select></div><div><label class="block text-xs font-bold text-slate-500 mb-1.5">বর্তমান কিলোমিটার</label><input type="number" id="quick-km-val" required min="0" placeholder="KM" class="w-full px-4 py-4 bg-slate-50 border border-slate-300 rounded-xl text-2xl font-bold text-center focus:ring-2 focus:ring-emerald-500"></div><button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 transition text-white font-bold py-3.5 rounded-xl mt-2 shadow-md">আপডেট করুন</button></form></div></div>
 
     <div id="toast-container" class="fixed top-16 left-1/2 transform -translate-x-1/2 z-[9999] flex flex-col gap-2 w-11/12 max-w-sm pointer-events-none"></div>
@@ -409,7 +409,6 @@
             });
         };
 
-        // Modal for Single Vehicle KM
         window.openKmModal = (id, ba, km) => { document.getElementById('km-update-vid').value=id; document.getElementById('km-modal-bano').innerHTML=`<i class="fa-solid fa-truck-side mr-1"></i> BA No: ${ba}`; document.getElementById('km-update-val').value=km||''; document.getElementById('km-update-modal').classList.remove('hidden'); };
         window.closeKmModal = () => document.getElementById('km-update-modal').classList.add('hidden');
 
@@ -419,7 +418,7 @@
             if(vIndex > -1) { vehicles[vIndex].currentKm = newKm; try { await setDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'vehicles', vId), vehicles[vIndex]); window.showToast('মিটার আপডেট হয়েছে!'); window.manualSyncToSheets(); window.closeKmModal(); } catch(err) { window.showToast('আপডেট ফেইল', true); } }
         });
 
-        // NEW: QUICK KM UPDATE MODAL
+        // QUICK KM UPDATE MODAL
         window.openQuickKmModal = () => {
             const select = document.getElementById('quick-km-vehicle');
             select.innerHTML = '<option value="" disabled selected>গাড়ি নির্বাচন করুন...</option>' + vehicles.map(v => `<option value="${v.id}">${v.baNo} (${v.type})</option>`).join('');
@@ -456,7 +455,6 @@
         document.getElementById('form-vehicle').addEventListener('submit', (e) => { 
             e.preventDefault(); const baNo = document.getElementById('veh-ba').value.trim(); 
             
-            // DUPLICATE CHECK: VEHICLE
             if (vehicles.some(v => v.baNo.toLowerCase() === baNo.toLowerCase())) {
                 return window.showToast('এই বিএ নম্বরের গাড়িটি আগে যুক্ত করা হয়েছে!', true); 
             }
@@ -466,12 +464,10 @@
             e.target.reset(); document.getElementById('add-veh-modal').classList.add('hidden'); 
         });
         
-        // NEW ADD RECORD
         document.getElementById('form-maintenance').addEventListener('submit', async (e) => { 
             e.preventDefault(); 
             const vId = document.getElementById('maint-vehicle').value, rId = document.getElementById('maint-type').value, dStr = document.getElementById('maint-date').value, km = parseInt(document.getElementById('maint-km').value); 
             
-            // DUPLICATE CHECK: MAINTENANCE
             const isDuplicate = maintenanceLog.some(m => m.vehicleId === vId && m.typeId === rId && m.doneDate === dStr);
             if (isDuplicate) {
                 return window.showToast('এই গাড়ির জন্য একই তারিখে এই কাজের এন্ট্রিটি ইতিমধ্যে দেওয়া হয়েছে!', true);
@@ -493,7 +489,6 @@
             e.preventDefault(); 
             const rName = document.getElementById('rule-name').value.trim();
             
-            // DUPLICATE CHECK: TASK RULE
             if (taskRules.some(r => r.name.toLowerCase() === rName.toLowerCase())) {
                 return window.showToast('এই কাজের নিয়মটি ইতিমধ্যে যুক্ত করা আছে!', true);
             }
@@ -506,7 +501,6 @@
             e.preventDefault(); 
             const vtName = document.getElementById('vtype-name').value.trim();
             
-            // DUPLICATE CHECK: VEHICLE TYPE
             if (vehicleTypes.some(vt => vt.name.toLowerCase() === vtName.toLowerCase())) {
                 return window.showToast('এই ধরনটি ইতিমধ্যে যুক্ত করা আছে!', true);
             }
@@ -522,9 +516,6 @@
         
         const handleDbDelete = async (cName, id) => { await deleteDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', cName, id)); window.manualSyncToSheets(); window.showToast('সফলভাবে মুছে ফেলা হয়েছে'); };
 
-        // ==========================================
-        // EDIT SYSTEM LOGIC 
-        // ==========================================
         window.editRule = (id) => {
             const r = taskRules.find(x => x.id === id);
             if(!r) return;
@@ -542,7 +533,6 @@
             const newMonths = parseInt(document.getElementById('edit-rule-months').value);
             const newKm = parseInt(document.getElementById('edit-rule-km').value);
 
-            // DUPLICATE CHECK: EDIT RULE
             if (taskRules.some(r => r.id !== id && r.name.toLowerCase() === newName.toLowerCase())) {
                 return window.showToast('এই নামের আরেকটি নিয়ম ইতিমধ্যে আছে!', true);
             }
@@ -585,7 +575,6 @@
             const id = document.getElementById('edit-vtype-id').value;
             const newName = document.getElementById('edit-vtype-name').value.trim();
 
-            // DUPLICATE CHECK: EDIT VEHICLE TYPE
             if (vehicleTypes.some(vt => vt.id !== id && vt.name.toLowerCase() === newName.toLowerCase())) {
                 return window.showToast('এই ধরনটি ইতিমধ্যে যুক্ত করা আছে!', true);
             }
@@ -615,7 +604,6 @@
             const newBa = document.getElementById('edit-veh-ba').value.trim();
             const newType = document.getElementById('edit-veh-type').value;
             
-            // DUPLICATE CHECK: EDIT VEHICLE
             if (vehicles.some(v => v.id !== id && v.baNo.toLowerCase() === newBa.toLowerCase())) {
                 return window.showToast('এই বিএ নম্বরের অন্য একটি গাড়ি ইতিমধ্যে আছে!', true);
             }
@@ -656,7 +644,6 @@
             const dStr = document.getElementById('edit-maint-date').value;
             const km = parseInt(document.getElementById('edit-maint-km').value);
 
-            // DUPLICATE CHECK: EDIT MAINTENANCE
             const isDuplicate = maintenanceLog.some(m => m.id !== id && m.vehicleId === vId && m.typeId === rId && m.doneDate === dStr);
             if (isDuplicate) {
                 return window.showToast('এই গাড়ির জন্য একই তারিখে এই কাজের এন্ট্রি ইতিমধ্যে আছে!', true);
@@ -711,23 +698,46 @@
         }
 
         // ==========================================
-        // ROBUST PDF ENGINE
+        // ROBUST PDF ENGINE - BUG FIXED
         // ==========================================
         function generatePDF(htmlContent, fileName) {
             window.showToast("পিডিএফ প্রস্তুত হচ্ছে, অপেক্ষা করুন...");
+            
+            // Fix: Create a hidden temporary container to hold the HTML content.
+            // This prevents html2canvas from capturing the current scroll offset of the window.
+            const tempContainer = document.createElement('div');
+            tempContainer.innerHTML = htmlContent;
+            tempContainer.style.position = 'absolute';
+            tempContainer.style.top = '0';
+            tempContainer.style.left = '-9999px'; // Hide off-screen
+            tempContainer.style.width = '794px';  // Fix A4 width
+            tempContainer.style.backgroundColor = 'white';
+            tempContainer.style.zIndex = '-9999';
+            document.body.appendChild(tempContainer);
+
             const opt = { 
                 margin: 0, 
                 filename: fileName, 
                 image: { type: 'jpeg', quality: 1.0 }, 
-                html2canvas: { scale: 2, useCORS: true }, 
+                html2canvas: { 
+                    scale: 2, 
+                    useCORS: true,
+                    scrollY: 0, // Critical Fix: Forces canvas to start from top
+                    scrollX: 0,
+                    windowY: 0
+                }, 
                 jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } 
             };
             
-            html2pdf().set(opt).from(htmlContent).save().then(() => {
+            html2pdf().set(opt).from(tempContainer).save().then(() => {
                 window.showToast("পিডিএফ সফলভাবে ডাউনলোড হয়েছে!");
+                document.body.removeChild(tempContainer); // Clean up container
             }).catch(err => {
                 console.error("PDF Error:", err); 
                 window.showToast("পিডিএফ তৈরিতে সমস্যা হয়েছে!", true);
+                if (document.body.contains(tempContainer)) {
+                    document.body.removeChild(tempContainer); // Clean up container on error
+                }
             });
         }
 
