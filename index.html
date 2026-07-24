@@ -169,10 +169,10 @@
                         <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
                             <h4 class="font-bold text-slate-700 mb-3 border-b pb-2">কাজের নিয়ম যুক্ত করুন</h4>
                             <form id="form-rule" class="space-y-3 mb-4">
-                                <input type="text" id="rule-name" placeholder="কাজের নাম" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm">
+                                <input type="text" id="rule-name" placeholder="কাজের নাম (যেমন: কুল্যান্ট)" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm">
                                 <div class="flex gap-2">
-                                    <input type="number" id="rule-months" placeholder="মাস" required min="1" class="w-1/2 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm">
-                                    <input type="number" id="rule-km" placeholder="কি.মি" required min="0" class="w-1/2 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm">
+                                    <input type="number" id="rule-months" placeholder="মাস (যেমন: ৩৬)" required min="1" class="w-1/2 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm">
+                                    <input type="number" id="rule-km" placeholder="কি.মি (যেমন: ৬০০০০)" required min="0" class="w-1/2 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm">
                                 </div>
                                 <button type="submit" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-xl text-sm transition">যোগ করুন</button>
                             </form>
@@ -206,7 +206,7 @@
         </nav>
     </div>
 
-    <!-- Details and PDF Modals -->
+    <!-- Modals -->
     <div id="all-vehicles-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 transition-opacity bg-slate-900/70"><div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh]"><div class="flex justify-between items-center p-5 border-b border-slate-100 bg-slate-50 rounded-t-2xl"><h3 class="font-bold text-lg text-slate-800"><i class="fa-solid fa-list-ul text-emerald-600 mr-2"></i>সকল যানবাহনের তালিকা</h3><button onclick="document.getElementById('all-vehicles-modal').classList.add('hidden')" class="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center text-slate-600"><i class="fa-solid fa-xmark"></i></button></div><div class="overflow-y-auto p-5 flex-1"><table class="w-full text-left border-collapse text-sm"><thead><tr class="bg-slate-100 text-slate-600"><th class="p-3 border-b border-slate-200 text-center">ক্র.নং</th><th class="p-3 border-b border-slate-200">বিএ নম্বর</th><th class="p-3 border-b border-slate-200">ধরন</th><th class="p-3 border-b border-slate-200 text-right">বর্তমান কি.মি</th></tr></thead><tbody id="all-vehicles-tbody" class="divide-y divide-slate-100"></tbody></table></div><div class="p-5 border-t border-slate-100 bg-slate-50 rounded-b-2xl flex justify-end"><button onclick="window.downloadAllVehiclesReport()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-6 rounded-xl shadow-md"><i class="fa-solid fa-file-pdf mr-2"></i>পিডিএফ ডাউনলোড</button></div></div></div>
     <div id="overdue-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 transition-opacity bg-slate-900/70"><div class="bg-white w-full max-w-3xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh]"><div class="flex justify-between items-center p-5 border-b border-slate-100 bg-red-50 rounded-t-2xl"><h3 class="font-bold text-lg text-red-800"><i class="fa-solid fa-triangle-exclamation mr-2"></i>ওভারডিউ কাজের তালিকা</h3><button onclick="document.getElementById('overdue-modal').classList.add('hidden')" class="w-8 h-8 bg-red-200 rounded-full flex items-center justify-center text-red-800"><i class="fa-solid fa-xmark"></i></button></div><div class="overflow-y-auto p-5 flex-1"><table class="w-full text-left border-collapse text-sm"><thead><tr class="bg-slate-100 text-slate-600"><th class="p-3 border-b border-slate-200">গাড়ি (ধরন)</th><th class="p-3 border-b border-slate-200">বর্তমান মিটার</th><th class="p-3 border-b border-slate-200">লক্ষ্যমাত্রা (তারিখ ও কি.মি)</th><th class="p-3 border-b border-slate-200 text-red-600">স্ট্যাটাস</th></tr></thead><tbody id="overdue-tbody" class="divide-y divide-slate-100"></tbody></table></div><div class="p-5 border-t border-slate-100 bg-slate-50 rounded-b-2xl flex justify-end"><button onclick="window.downloadOverdueReport()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 px-6 rounded-xl shadow-md"><i class="fa-solid fa-file-pdf mr-2"></i>পিডিএফ ডাউনলোড</button></div></div></div>
     <div id="upcoming-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 transition-opacity bg-slate-900/70"><div class="bg-white w-full max-w-3xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh]"><div class="flex justify-between items-center p-5 border-b border-slate-100 bg-amber-50 rounded-t-2xl"><h3 class="font-bold text-lg text-amber-800"><i class="fa-solid fa-clock mr-2"></i>আসন্ন কাজের তালিকা</h3><button onclick="document.getElementById('upcoming-modal').classList.add('hidden')" class="w-8 h-8 bg-amber-200 rounded-full flex items-center justify-center text-amber-800"><i class="fa-solid fa-xmark"></i></button></div><div class="overflow-y-auto p-5 flex-1"><table class="w-full text-left border-collapse text-sm"><thead><tr class="bg-slate-100 text-slate-600"><th class="p-3 border-b border-slate-200">গাড়ি (ধরন)</th><th class="p-3 border-b border-slate-200">বর্তমান মিটার</th><th class="p-3 border-b border-slate-200">লক্ষ্যমাত্রা (তারিখ ও কি.মি)</th><th class="p-3 border-b border-slate-200 text-amber-600">স্ট্যাটাস</th></tr></thead><tbody id="upcoming-tbody" class="divide-y divide-slate-100"></tbody></table></div><div class="p-5 border-t border-slate-100 bg-slate-50 rounded-b-2xl flex justify-end"><button onclick="window.downloadUpcomingReport()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 px-6 rounded-xl shadow-md"><i class="fa-solid fa-file-pdf mr-2"></i>পিডিএফ ডাউনলোড</button></div></div></div>
@@ -362,14 +362,11 @@
                 updateUI(); 
             }));
             
-            // Global sorting by DoneDate for logical calculations (Overdue/History)
+            // Global sorting by timestamp for exact history accuracy
             unsubscribeListeners.push(onSnapshot(collection(db, 'artifacts', APP_ID, 'public', 'data', 'maintenanceLog'), snap => { 
                 maintenanceLog = snap.docs.map(d => ({ ...d.data(), id: d.id })).sort((a,b) => {
-                    const dateA = new Date(a.doneDate).getTime();
-                    const dateB = new Date(b.doneDate).getTime();
-                    if (dateA !== dateB) return dateB - dateA; 
-                    const timeA = a.timestamp || parseInt(a.id.split('_')[1]) || 0;
-                    const timeB = b.timestamp || parseInt(b.id.split('_')[1]) || 0;
+                    const timeA = a.timestamp || parseInt(a.id.split('_')[1]) || new Date(a.doneDate).getTime();
+                    const timeB = b.timestamp || parseInt(b.id.split('_')[1]) || new Date(b.doneDate).getTime();
                     return timeB - timeA;
                 }); 
                 updateUI(); 
@@ -441,7 +438,6 @@
             const newId = 'rec_' + Date.now();
             handleDbWrite('maintenanceLog', newId, { id: newId, vehicleId: vId, vehicleBa: vData.baNo, typeId: rId, typeName: rule.name, doneDate: dStr, doneKm: km, nextDate: nextDateTarget, nextKm: nextKmTarget, timestamp: Date.now() }, 'রেকর্ড সেভ হয়েছে'); 
             e.target.reset(); 
-            // Removed auto-redirect to dashboard so user can add multiple logs and see them on the right.
         });
         
         document.getElementById('form-rule').addEventListener('submit', (e)=>{ 
@@ -615,13 +611,22 @@
         };
 
         function formatDate(dStr) { if(!dStr) return ''; return new Date(dStr).toLocaleDateString('bn-BD', { day: 'numeric', month: 'short', year: 'numeric' }); }
+        
+        // Compact DD-MM-YY formatting for tables (Matches Handwritten Image)
+        function formatShortDate(dStr) {
+            if(!dStr) return '';
+            const d = new Date(dStr);
+            const dd = String(d.getDate()).padStart(2, '0');
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const yy = String(d.getFullYear()).slice(-2);
+            return `${dd}-${mm}-${yy}`;
+        }
 
         // ==========================================
         // ROBUST PDF ENGINE
         // ==========================================
         function generatePDF(htmlContent, fileName) {
             window.showToast("পিডিএফ প্রস্তুত হচ্ছে, অপেক্ষা করুন...");
-            
             const opt = { 
                 margin: 0, 
                 filename: fileName, 
@@ -638,6 +643,7 @@
             });
         }
 
+        // Generic Template
         const getPDFTemplate = (title, subtitle, tableHeaders, tableRows) => `
             <div style="width: 794px; min-height: 1122px; padding: 40px; box-sizing: border-box; position: relative; font-family:'Hind Siliguri', sans-serif; color:#1e293b; background: white; margin: 0;">
                 <style>@import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap');</style>
@@ -658,6 +664,87 @@
                     </div>
                 </div>
             </div>`;
+
+        // SPECIFIC GRID TEMPLATE (MIMICS HANDWRITTEN REGISTER)
+        const getRegisterPDFTemplate = (title, tableHeaders, tableRows) => `
+            <div style="width: 794px; min-height: 1122px; padding: 30px; box-sizing: border-box; position: relative; font-family:'Hind Siliguri', sans-serif; color:#000; background: white; margin: 0;">
+                <style>@import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap');</style>
+                <div style="position: absolute; top: 400px; left: 50%; transform: translate(-50%, -50%) rotate(-35deg); font-size: 80px; color: rgba(5, 150, 105, 0.04); font-weight: bold; white-space: nowrap; z-index: 0; pointer-events: none;">CHARGING NINE</div>
+                <div style="position: relative; z-index: 10;">
+                    <div style="text-align:center; margin-bottom:20px;">
+                        <h2 style="font-size:24px; margin:0; font-weight: bold; border-bottom: 2px solid #000; display: inline-block; padding-bottom: 3px;">${title}</h2>
+                    </div>
+                    <table style="width:100%; text-align:left; border-collapse:collapse; font-size:13px; border: 2px solid #000;">
+                        <thead><tr style="border-bottom: 2px solid #000;">${tableHeaders}</tr></thead>
+                        <tbody>${tableRows}</tbody>
+                    </table>
+                </div>
+            </div>`;
+
+        // ==========================================
+        // NEW FEATURE: DOWNLOAD SPECIFIC TASK REGISTER PDF
+        // ==========================================
+        window.downloadTaskRegisterReport = (taskId) => {
+            const rule = taskRules.find(r => r.id === taskId);
+            if (!rule) return;
+
+            let rows = '';
+            let sl = 1;
+
+            // Sort vehicles by category just like All Vehicles view
+            const grouped = {}; 
+            vehicles.forEach(v => { if(!grouped[v.type]) grouped[v.type] = []; grouped[v.type].push(v); });
+            
+            Object.keys(grouped).sort(sortCategories).forEach(type => {
+                grouped[type].forEach(v => {
+                    // Get latest log for this specific task
+                    const vLogs = maintenanceLog.filter(m => m.vehicleId === v.id && m.typeId === taskId).sort((a,b) => new Date(b.doneDate) - new Date(a.doneDate));
+                    const latestLog = vLogs.length > 0 ? vLogs[0] : null;
+
+                    if (latestLog) {
+                        rows += `
+                            <tr>
+                                <td style="padding:6px; border:1px solid #000; text-align:center; font-weight:bold;">${sl++}</td>
+                                <td style="padding:6px; border:1px solid #000; font-weight:bold; font-size:14px;">${v.baNo}</td>
+                                <td style="padding:6px; border:1px solid #000; text-align:center;">${formatShortDate(latestLog.doneDate)}</td>
+                                <td style="padding:6px; border:1px solid #000; text-align:center;">${latestLog.doneKm}</td>
+                                <td style="padding:6px; border:1px solid #000; text-align:center; color:#059669; font-weight:bold;">${formatShortDate(latestLog.nextDate)}</td>
+                                <td style="padding:6px; border:1px solid #000; text-align:center; color:#059669; font-weight:bold;">${latestLog.nextKm}</td>
+                                <td style="padding:6px; border:1px solid #000;"></td>
+                            </tr>
+                        `;
+                    } else {
+                        rows += `
+                            <tr>
+                                <td style="padding:6px; border:1px solid #000; text-align:center; font-weight:bold;">${sl++}</td>
+                                <td style="padding:6px; border:1px solid #000; font-weight:bold; font-size:14px;">${v.baNo}</td>
+                                <td style="padding:6px; border:1px solid #000; text-align:center; color:#94a3b8;" colspan="4">কোনো কাজ রেকর্ড করা হয়নি</td>
+                                <td style="padding:6px; border:1px solid #000;"></td>
+                            </tr>
+                        `;
+                    }
+                });
+            });
+
+            if (vehicles.length === 0) {
+                rows = `<tr><td colspan="7" style="padding:15px; text-align:center;">কোনো গাড়ি নেই</td></tr>`;
+            }
+
+            const headers = `
+                <th style="padding:8px; border:1px solid #000; text-align:center;">ক্র.নং</th>
+                <th style="padding:8px; border:1px solid #000;">বিএ নং</th>
+                <th style="padding:8px; border:1px solid #000; text-align:center;">বর্তমান তারিখ</th>
+                <th style="padding:8px; border:1px solid #000; text-align:center;">বদলীর কি.মি</th>
+                <th style="padding:8px; border:1px solid #000; text-align:center;">পরবর্তী তারিখ</th>
+                <th style="padding:8px; border:1px solid #000; text-align:center;">বদলীর কি.মি</th>
+                <th style="padding:8px; border:1px solid #000; text-align:center;">মন্তব্য</th>
+            `;
+
+            const title = `${rule.name} - ${rule.months} মাস / ${rule.km} কি.মি`;
+            const htmlContent = getRegisterPDFTemplate(title, headers, rows);
+            generatePDF(htmlContent, `Register_${rule.name}.pdf`);
+        };
+
 
         // ==========================================
         window.openVehicleDetailsModal = (vId) => {
@@ -830,7 +917,12 @@
 
         window.downloadVehicleReport = (vId) => {
             const v = vehicles.find(x => x.id === vId); 
-            const logs = maintenanceLog.filter(m => m.vehicleId === vId);
+            const logs = maintenanceLog.filter(m => m.vehicleId === vId).sort((a,b) => {
+                const dateA = new Date(a.doneDate).getTime();
+                const dateB = new Date(b.doneDate).getTime();
+                if (dateA !== dateB) return dateB - dateA;
+                return b.id.localeCompare(a.id);
+            });
             
             let rows = logs.map(m => `<tr><td style="padding:10px; border-bottom:1px solid #e2e8f0;">${formatDate(m.doneDate)}</td><td style="padding:10px; border-bottom:1px solid #e2e8f0; font-weight:bold;">${m.typeName}</td><td style="padding:10px; border-bottom:1px solid #e2e8f0;">${m.doneKm} KM</td><td style="padding:10px; border-bottom:1px solid #e2e8f0; color:#dc2626;">${formatDate(m.nextDate)}</td><td style="padding:10px; border-bottom:1px solid #e2e8f0; color:#dc2626;">${m.nextKm} KM</td></tr>`).join('');
             if(logs.length === 0) rows = `<tr><td colspan="5" style="padding:15px; text-align:center; color:#64748b;">কোনো রেকর্ড নেই</td></tr>`;
@@ -846,9 +938,21 @@
             document.getElementById('maint-type').innerHTML = '<option value="" disabled selected>কাজের ধরন নির্বাচন করুন...</option>' + taskRules.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
             document.getElementById('veh-type').innerHTML = vehicleTypes.map(v => `<option value="${v.name}">${v.name}</option>`).join('');
             
-            document.getElementById('rules-list').innerHTML = taskRules.map(r => `<li class="flex justify-between items-center py-2.5 border-b border-slate-100 last:border-0"><div><p class="font-bold text-slate-700">${r.name}</p><p class="text-xs text-slate-500">${r.months} মাস | ${r.km}KM</p></div><div class="flex gap-1.5"><button onclick="window.editRule('${r.id}')" class="text-blue-400 hover:text-blue-600 bg-blue-50 p-2 rounded-lg transition" title="এডিট"><i class="fa-solid fa-pen"></i></button><button onclick="window.deleteRule('${r.id}')" class="text-red-400 hover:text-red-600 bg-red-50 p-2 rounded-lg transition" title="ডিলিট"><i class="fa-solid fa-trash-can"></i></button></div></li>`).join('');
+            // NEW UI: ADDED PDF REGISTER BUTTON IN RULES LIST
+            document.getElementById('rules-list').innerHTML = taskRules.map(r => `
+                <li class="flex justify-between items-center py-2.5 border-b border-slate-100 last:border-0">
+                    <div>
+                        <p class="font-bold text-slate-700">${r.name}</p>
+                        <p class="text-xs text-slate-500">${r.months} মাস | ${r.km}KM</p>
+                    </div>
+                    <div class="flex gap-1.5">
+                        <button onclick="window.downloadTaskRegisterReport('${r.id}')" class="text-emerald-500 hover:text-white hover:bg-emerald-600 bg-emerald-50 p-2 rounded-lg transition" title="রেজিস্টার পিডিএফ"><i class="fa-solid fa-file-pdf"></i></button>
+                        <button onclick="window.editRule('${r.id}')" class="text-blue-400 hover:text-white hover:bg-blue-500 bg-blue-50 p-2 rounded-lg transition" title="এডিট"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="window.deleteRule('${r.id}')" class="text-red-400 hover:text-white hover:bg-red-500 bg-red-50 p-2 rounded-lg transition" title="ডিলিট"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>
+                </li>`).join('');
             
-            document.getElementById('vtypes-list').innerHTML = vehicleTypes.map(v => `<li class="flex justify-between items-center py-2.5 border-b border-slate-100 last:border-0"><p class="font-bold text-slate-700">${v.name}</p><div class="flex gap-1.5"><button onclick="window.editVehicleType('${v.id}')" class="text-blue-400 hover:text-blue-600 bg-blue-50 p-2 rounded-lg transition" title="এডিট"><i class="fa-solid fa-pen"></i></button><button onclick="window.deleteVehicleType('${v.id}')" class="text-red-400 hover:text-red-600 bg-red-50 p-2 rounded-lg transition" title="ডিলিট"><i class="fa-solid fa-trash-can"></i></button></div></li>`).join('');
+            document.getElementById('vtypes-list').innerHTML = vehicleTypes.map(v => `<li class="flex justify-between items-center py-2.5 border-b border-slate-100 last:border-0"><p class="font-bold text-slate-700">${v.name}</p><div class="flex gap-1.5"><button onclick="window.editVehicleType('${v.id}')" class="text-blue-400 hover:text-white hover:bg-blue-500 bg-blue-50 p-2 rounded-lg transition" title="এডিট"><i class="fa-solid fa-pen"></i></button><button onclick="window.deleteVehicleType('${v.id}')" class="text-red-400 hover:text-white hover:bg-red-500 bg-red-50 p-2 rounded-lg transition" title="ডিলিট"><i class="fa-solid fa-trash-can"></i></button></div></li>`).join('');
 
             document.getElementById('stat-total-vehicles').innerText = vehicles.length;
             
@@ -942,11 +1046,10 @@
             });
             document.getElementById('vehicles-container').innerHTML = vHtml || '<p class="text-center text-slate-400 w-full">কোনো গাড়ি নেই</p>';
 
-            // FIX: "Recent History" sorting. Now sorted purely by exact time the entry was added/edited!
             const recentHistoryList = [...maintenanceLog].sort((a,b) => {
-                const tA = a.timestamp || parseInt(a.id.split('_')[1]) || 0;
-                const tB = b.timestamp || parseInt(b.id.split('_')[1]) || 0;
-                return tB - tA; // Newest additions at the top
+                const tA = a.timestamp || parseInt(a.id.split('_')[1]) || new Date(a.doneDate).getTime();
+                const tB = b.timestamp || parseInt(b.id.split('_')[1]) || new Date(b.doneDate).getTime();
+                return tB - tA;
             });
 
             document.getElementById('maintenance-history-list').innerHTML = recentHistoryList.slice(0, 50).map(m => `<div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex justify-between items-center hover:shadow-md transition"><div class="flex items-center gap-3"><div class="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center text-slate-500"><i class="fa-solid fa-wrench"></i></div><div><h4 class="font-bold text-slate-800 text-sm md:text-base">${m.vehicleBa} <span class="text-[10px] font-normal text-slate-500 bg-slate-100 px-1 rounded ml-1">${m.typeName}</span></h4><p class="text-xs text-slate-500 mt-0.5"><i class="fa-regular fa-calendar mr-1"></i>${formatDate(m.doneDate)} <span class="mx-1">|</span> <i class="fa-solid fa-gauge-high mr-1"></i>${m.doneKm} KM</p></div></div><div class="flex gap-1.5"><button onclick="window.editMaintenance('${m.id}')" class="text-blue-400 hover:text-white hover:bg-blue-500 p-2.5 rounded-lg transition" title="এডিট"><i class="fa-solid fa-pen"></i></button><button onclick="window.deleteMaintenance('${m.id}')" class="text-red-400 hover:text-white hover:bg-red-500 p-2.5 rounded-lg transition" title="ডিলিট"><i class="fa-solid fa-trash-can"></i></button></div></div>`).join('');
