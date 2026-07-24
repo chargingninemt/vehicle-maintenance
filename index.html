@@ -149,8 +149,8 @@
                                 <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1.5">গাড়ি নির্বাচন</label><select id="maint-vehicle" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500"></select></div>
                                 <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1.5">কাজের ধরন</label><select id="maint-type" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500"></select></div>
                                 <div class="grid grid-cols-2 gap-3">
-                                    <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1.5">তারিখ</label><input type="date" id="maint-date" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500"></div>
-                                    <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1.5">বর্তমান কি.মি</label><input type="number" id="maint-km" placeholder="KM" required min="0" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500"></div>
+                                    <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1.5">কাজ করার তারিখ</label><input type="date" id="maint-date" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500"></div>
+                                    <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1.5">সর্বশেষ বদলি কি.মি</label><input type="number" id="maint-km" placeholder="KM" required min="0" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500"></div>
                                 </div>
                                 <button type="submit" class="w-full grad-primary text-white font-bold py-3.5 rounded-xl mt-2 shadow-lg active:scale-95 transition-transform"><i class="fa-solid fa-check-circle mr-2"></i> রেকর্ড সেভ করুন</button>
                             </form>
@@ -206,13 +206,11 @@
         </nav>
     </div>
 
-    <!-- Modals List (Same structure, enhanced PDF rendering and fixed sorting logic) -->
-    <!-- PDF modals -->
+    <!-- Details and PDF Modals -->
     <div id="all-vehicles-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 transition-opacity bg-slate-900/70"><div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh]"><div class="flex justify-between items-center p-5 border-b border-slate-100 bg-slate-50 rounded-t-2xl"><h3 class="font-bold text-lg text-slate-800"><i class="fa-solid fa-list-ul text-emerald-600 mr-2"></i>সকল যানবাহনের তালিকা</h3><button onclick="document.getElementById('all-vehicles-modal').classList.add('hidden')" class="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center text-slate-600"><i class="fa-solid fa-xmark"></i></button></div><div class="overflow-y-auto p-5 flex-1"><table class="w-full text-left border-collapse text-sm"><thead><tr class="bg-slate-100 text-slate-600"><th class="p-3 border-b border-slate-200 text-center">ক্র.নং</th><th class="p-3 border-b border-slate-200">বিএ নম্বর</th><th class="p-3 border-b border-slate-200">ধরন</th><th class="p-3 border-b border-slate-200 text-right">বর্তমান কি.মি</th></tr></thead><tbody id="all-vehicles-tbody" class="divide-y divide-slate-100"></tbody></table></div><div class="p-5 border-t border-slate-100 bg-slate-50 rounded-b-2xl flex justify-end"><button onclick="window.downloadAllVehiclesReport()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-6 rounded-xl shadow-md"><i class="fa-solid fa-file-pdf mr-2"></i>পিডিএফ ডাউনলোড</button></div></div></div>
     <div id="overdue-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 transition-opacity bg-slate-900/70"><div class="bg-white w-full max-w-3xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh]"><div class="flex justify-between items-center p-5 border-b border-slate-100 bg-red-50 rounded-t-2xl"><h3 class="font-bold text-lg text-red-800"><i class="fa-solid fa-triangle-exclamation mr-2"></i>ওভারডিউ কাজের তালিকা</h3><button onclick="document.getElementById('overdue-modal').classList.add('hidden')" class="w-8 h-8 bg-red-200 rounded-full flex items-center justify-center text-red-800"><i class="fa-solid fa-xmark"></i></button></div><div class="overflow-y-auto p-5 flex-1"><table class="w-full text-left border-collapse text-sm"><thead><tr class="bg-slate-100 text-slate-600"><th class="p-3 border-b border-slate-200">গাড়ি (ধরন)</th><th class="p-3 border-b border-slate-200">বর্তমান মিটার</th><th class="p-3 border-b border-slate-200">লক্ষ্যমাত্রা (তারিখ ও কি.মি)</th><th class="p-3 border-b border-slate-200 text-red-600">স্ট্যাটাস</th></tr></thead><tbody id="overdue-tbody" class="divide-y divide-slate-100"></tbody></table></div><div class="p-5 border-t border-slate-100 bg-slate-50 rounded-b-2xl flex justify-end"><button onclick="window.downloadOverdueReport()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 px-6 rounded-xl shadow-md"><i class="fa-solid fa-file-pdf mr-2"></i>পিডিএফ ডাউনলোড</button></div></div></div>
     <div id="upcoming-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 transition-opacity bg-slate-900/70"><div class="bg-white w-full max-w-3xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh]"><div class="flex justify-between items-center p-5 border-b border-slate-100 bg-amber-50 rounded-t-2xl"><h3 class="font-bold text-lg text-amber-800"><i class="fa-solid fa-clock mr-2"></i>আসন্ন কাজের তালিকা</h3><button onclick="document.getElementById('upcoming-modal').classList.add('hidden')" class="w-8 h-8 bg-amber-200 rounded-full flex items-center justify-center text-amber-800"><i class="fa-solid fa-xmark"></i></button></div><div class="overflow-y-auto p-5 flex-1"><table class="w-full text-left border-collapse text-sm"><thead><tr class="bg-slate-100 text-slate-600"><th class="p-3 border-b border-slate-200">গাড়ি (ধরন)</th><th class="p-3 border-b border-slate-200">বর্তমান মিটার</th><th class="p-3 border-b border-slate-200">লক্ষ্যমাত্রা (তারিখ ও কি.মি)</th><th class="p-3 border-b border-slate-200 text-amber-600">স্ট্যাটাস</th></tr></thead><tbody id="upcoming-tbody" class="divide-y divide-slate-100"></tbody></table></div><div class="p-5 border-t border-slate-100 bg-slate-50 rounded-b-2xl flex justify-end"><button onclick="window.downloadUpcomingReport()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 px-6 rounded-xl shadow-md"><i class="fa-solid fa-file-pdf mr-2"></i>পিডিএফ ডাউনলোড</button></div></div></div>
     
-    <!-- Vehicle Specific Details Modal -->
     <div id="vehicle-details-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 transition-opacity bg-slate-900/70">
         <div class="bg-white w-full max-w-3xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh]">
             <div class="flex justify-between items-center p-5 border-b border-slate-100 bg-blue-50 rounded-t-2xl">
@@ -225,7 +223,7 @@
             <div class="overflow-y-auto p-5 flex-1">
                 <h4 class="font-bold text-slate-700 mb-3 border-b border-slate-100 pb-2"><i class="fa-solid fa-clock-rotate-left mr-2 text-slate-400"></i>লিপিবদ্ধ কাজের তালিকা (হিস্ট্রি)</h4>
                 <div id="vd-history-list" class="space-y-3">
-                    <!-- History items injected here -->
+                    <!-- History injected here -->
                 </div>
             </div>
             <div class="p-5 border-t border-slate-100 bg-slate-50 rounded-b-2xl flex justify-end">
@@ -241,7 +239,7 @@
     
     <div id="edit-veh-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 transition-opacity bg-slate-900/60"><div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl"><div class="flex justify-between items-center mb-5"><h3 class="font-bold text-lg text-slate-800">গাড়ি আপডেট</h3><button onclick="document.getElementById('edit-veh-modal').classList.add('hidden')" class="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500"><i class="fa-solid fa-xmark"></i></button></div><form id="form-edit-vehicle" class="space-y-4"><input type="hidden" id="edit-veh-id"><div><label class="block text-xs font-bold text-slate-500 mb-1.5">বিএ নম্বর (BA No)</label><input type="text" id="edit-veh-ba" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"></div><div><label class="block text-xs font-bold text-slate-500 mb-1.5">গাড়ির ধরন</label><select id="edit-veh-type" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"></select></div><button type="submit" class="w-full bg-blue-600 text-white font-bold py-3.5 rounded-xl shadow-md mt-2">আপডেট করুন</button></form></div></div>
 
-    <div id="edit-maint-modal" class="hidden fixed inset-0 z-[110] flex items-center justify-center p-4 transition-opacity bg-slate-900/60"><div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl"><div class="flex justify-between items-center mb-5"><h3 class="font-bold text-lg text-slate-800">কাজের রেকর্ড আপডেট</h3><button onclick="document.getElementById('edit-maint-modal').classList.add('hidden')" class="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500"><i class="fa-solid fa-xmark"></i></button></div><form id="form-edit-maint" class="space-y-4"><input type="hidden" id="edit-maint-id"><div><label class="block text-xs font-bold text-slate-500 mb-1.5">কাজের ধরন</label><select id="edit-maint-type" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"></select></div><div class="grid grid-cols-2 gap-3"><div><label class="block text-xs font-bold text-slate-500 mb-1.5">তারিখ</label><input type="date" id="edit-maint-date" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"></div><div><label class="block text-xs font-bold text-slate-500 mb-1.5">কি.মি</label><input type="number" id="edit-maint-km" required min="0" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"></div></div><button type="submit" class="w-full bg-blue-600 text-white font-bold py-3.5 rounded-xl shadow-md mt-2">আপডেট করুন</button></form></div></div>
+    <div id="edit-maint-modal" class="hidden fixed inset-0 z-[110] flex items-center justify-center p-4 transition-opacity bg-slate-900/60"><div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl"><div class="flex justify-between items-center mb-5"><h3 class="font-bold text-lg text-slate-800">কাজের রেকর্ড আপডেট</h3><button onclick="document.getElementById('edit-maint-modal').classList.add('hidden')" class="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500"><i class="fa-solid fa-xmark"></i></button></div><form id="form-edit-maint" class="space-y-4"><input type="hidden" id="edit-maint-id"><div><label class="block text-xs font-bold text-slate-500 mb-1.5">কাজের ধরন</label><select id="edit-maint-type" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"></select></div><div class="grid grid-cols-2 gap-3"><div><label class="block text-xs font-bold text-slate-500 mb-1.5">কাজ করার তারিখ</label><input type="date" id="edit-maint-date" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"></div><div><label class="block text-xs font-bold text-slate-500 mb-1.5">সর্বশেষ বদলি কি.মি</label><input type="number" id="edit-maint-km" required min="0" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"></div></div><button type="submit" class="w-full bg-blue-600 text-white font-bold py-3.5 rounded-xl shadow-md mt-2">আপডেট করুন</button></form></div></div>
 
     <div id="edit-rule-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 transition-opacity bg-slate-900/60"><div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl"><div class="flex justify-between items-center mb-5"><h3 class="font-bold text-lg text-slate-800">নিয়ম আপডেট</h3><button onclick="document.getElementById('edit-rule-modal').classList.add('hidden')" class="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500"><i class="fa-solid fa-xmark"></i></button></div><form id="form-edit-rule" class="space-y-4"><input type="hidden" id="edit-rule-id"><div><label class="block text-xs font-bold text-slate-500 mb-1.5">কাজের নাম</label><input type="text" id="edit-rule-name" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"></div><div class="grid grid-cols-2 gap-3"><div><label class="block text-xs font-bold text-slate-500 mb-1.5">মাস</label><input type="number" id="edit-rule-months" required min="1" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"></div><div><label class="block text-xs font-bold text-slate-500 mb-1.5">কি.মি</label><input type="number" id="edit-rule-km" required min="0" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"></div></div><button type="submit" class="w-full bg-blue-600 text-white font-bold py-3.5 rounded-xl shadow-md mt-2">আপডেট করুন</button></form></div></div>
 
@@ -259,7 +257,7 @@
         import { getFirestore, collection, onSnapshot, doc, setDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // ==========================================
-        // CONFIGS: Canvas Environment Integration
+        // CONFIGS
         // ==========================================
         let firebaseConfig = {
             apiKey: "AIzaSyBF4ebAsfoKgd9wgNIeNJ9QRKpMSXr-w9g",
@@ -271,7 +269,6 @@
         };
         let APP_ID = '9eb-tracker-final-v1';
         
-        // Canvas Auto-Setup for Preview
         const isCanvas = typeof __firebase_config !== 'undefined';
         if (isCanvas) {
             firebaseConfig = JSON.parse(__firebase_config);
@@ -283,7 +280,6 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Auto-login for Canvas environment so preview works perfectly
         if(isCanvas) {
             const initAuth = async () => {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
@@ -299,6 +295,16 @@
         let chartInstance = null;
         let unsubscribeListeners = [];
         let currentOpenVehicleId = null; 
+
+        // EXACT DATE CALCULATION LOGIC
+        const calculateNextDateExact = (dateStr, addedMonths) => {
+            const d = new Date(dateStr);
+            d.setMonth(d.getMonth() + parseInt(addedMonths)); // Exact exact date addition
+            const yr = d.getFullYear();
+            const mo = String(d.getMonth() + 1).padStart(2, '0');
+            const da = String(d.getDate()).padStart(2, '0');
+            return `${yr}-${mo}-${da}`;
+        };
 
         const categoryOrder = ["জিপ", "পিকআপ", "৩টন", "৩ টন", "ফ্রিজার ভ্যান", "ফ্রিজার", "কোস্টার", "মোটরসাইকেল", "ওয়াটার ট্রেইলার", "ওয়াটার ট্রেইলার"];
         const sortCategories = (a, b) => {
@@ -320,7 +326,7 @@
             setTimeout(()=>t.remove(), 3000);
         };
 
-        // --- AUTHENTICATION LOGIC ---
+        // --- AUTH LOGIC ---
         const loginScreen = document.getElementById('login-screen');
         const mainApp = document.getElementById('main-app');
         const loginBtn = document.getElementById('login-btn');
@@ -356,15 +362,14 @@
                 updateUI(); 
             }));
             
-            // FIX: Strongest Sorting Logic for Maintenance Logs
+            // Global sorting by DoneDate for logical calculations (Overdue/History)
             unsubscribeListeners.push(onSnapshot(collection(db, 'artifacts', APP_ID, 'public', 'data', 'maintenanceLog'), snap => { 
                 maintenanceLog = snap.docs.map(d => ({ ...d.data(), id: d.id })).sort((a,b) => {
                     const dateA = new Date(a.doneDate).getTime();
                     const dateB = new Date(b.doneDate).getTime();
                     if (dateA !== dateB) return dateB - dateA; 
-                    // If dates are equal, sort by Timestamp ID (latest ID first)
-                    const timeA = parseInt(a.id.split('_')[1]) || 0;
-                    const timeB = parseInt(b.id.split('_')[1]) || 0;
+                    const timeA = a.timestamp || parseInt(a.id.split('_')[1]) || 0;
+                    const timeB = b.timestamp || parseInt(b.id.split('_')[1]) || 0;
                     return timeB - timeA;
                 }); 
                 updateUI(); 
@@ -422,17 +427,21 @@
             e.target.reset(); document.getElementById('add-veh-modal').classList.add('hidden'); 
         });
         
+        // NEW ADD RECORD
         document.getElementById('form-maintenance').addEventListener('submit', async (e) => { 
             e.preventDefault(); 
             const vId = document.getElementById('maint-vehicle').value, rId = document.getElementById('maint-type').value, dStr = document.getElementById('maint-date').value, km = parseInt(document.getElementById('maint-km').value); 
             const rule = taskRules.find(r => r.id === rId); const vData = vehicles.find(v => v.id === vId); 
-            const nextDate = new Date(dStr); nextDate.setMonth(nextDate.getMonth() + parseInt(rule.months)); const nextKmTarget = km + parseInt(rule.km); 
+            
+            const nextDateTarget = calculateNextDateExact(dStr, rule.months);
+            const nextKmTarget = km + parseInt(rule.km); // Target KM = Last Done KM + Rule KM
             
             if((vData.currentKm || 0) < km) { vData.currentKm = km; await setDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'vehicles', vData.id), vData); } 
             
             const newId = 'rec_' + Date.now();
-            handleDbWrite('maintenanceLog', newId, { id: newId, vehicleId: vId, vehicleBa: vData.baNo, typeId: rId, typeName: rule.name, doneDate: dStr, doneKm: km, nextDate: nextDate.toISOString().split('T')[0], nextKm: nextKmTarget }, 'রেকর্ড সেভ হয়েছে'); 
-            e.target.reset(); window.switchTab('dashboard'); 
+            handleDbWrite('maintenanceLog', newId, { id: newId, vehicleId: vId, vehicleBa: vData.baNo, typeId: rId, typeName: rule.name, doneDate: dStr, doneKm: km, nextDate: nextDateTarget, nextKm: nextKmTarget, timestamp: Date.now() }, 'রেকর্ড সেভ হয়েছে'); 
+            e.target.reset(); 
+            // Removed auto-redirect to dashboard so user can add multiple logs and see them on the right.
         });
         
         document.getElementById('form-rule').addEventListener('submit', (e)=>{ 
@@ -453,7 +462,7 @@
         const handleDbDelete = async (cName, id) => { await deleteDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', cName, id)); window.manualSyncToSheets(); window.showToast('সফলভাবে মুছে ফেলা হয়েছে'); };
 
         // ==========================================
-        // EDIT SYSTEM LOGIC
+        // EDIT SYSTEM LOGIC 
         // ==========================================
         window.editRule = (id) => {
             const r = taskRules.find(x => x.id === id);
@@ -465,16 +474,34 @@
             document.getElementById('edit-rule-modal').classList.remove('hidden');
         };
 
+        // Edit Rule - Automatically recalculates existing logs for this rule
         document.getElementById('form-edit-rule').addEventListener('submit', async (e) => {
             e.preventDefault();
             const id = document.getElementById('edit-rule-id').value;
+            const newName = document.getElementById('edit-rule-name').value;
+            const newMonths = parseInt(document.getElementById('edit-rule-months').value);
+            const newKm = parseInt(document.getElementById('edit-rule-km').value);
+
             try {
                 await updateDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'taskRules', id), {
-                    name: document.getElementById('edit-rule-name').value,
-                    months: parseInt(document.getElementById('edit-rule-months').value),
-                    km: parseInt(document.getElementById('edit-rule-km').value)
+                    name: newName,
+                    months: newMonths,
+                    km: newKm
                 });
-                window.showToast('নিয়ম আপডেট হয়েছে');
+                
+                const mLogsToUpdate = maintenanceLog.filter(m => m.typeId === id);
+                for(let m of mLogsToUpdate) {
+                    const updatedNextDate = calculateNextDateExact(m.doneDate, newMonths);
+                    const updatedNextKm = m.doneKm + newKm;
+                    await updateDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'maintenanceLog', m.id), {
+                        typeName: newName,
+                        nextDate: updatedNextDate,
+                        nextKm: updatedNextKm,
+                        timestamp: Date.now() // updating timestamp brings it to the top
+                    });
+                }
+
+                window.showToast('নিয়ম এবং পূর্বের রেকর্ড আপডেট হয়েছে!');
                 document.getElementById('edit-rule-modal').classList.add('hidden');
                 window.manualSyncToSheets();
             } catch(err) { window.showToast('আপডেট ফেইল', true); }
@@ -553,8 +580,7 @@
             const m = maintenanceLog.find(x => x.id === id);
             const rule = taskRules.find(r => r.id === rId);
 
-            const nextDate = new Date(dStr);
-            nextDate.setMonth(nextDate.getMonth() + parseInt(rule.months));
+            const nextDateTarget = calculateNextDateExact(dStr, rule.months);
             const nextKmTarget = km + parseInt(rule.km);
 
             try {
@@ -563,8 +589,9 @@
                     typeName: rule.name,
                     doneDate: dStr,
                     doneKm: km,
-                    nextDate: nextDate.toISOString().split('T')[0],
-                    nextKm: nextKmTarget
+                    nextDate: nextDateTarget,
+                    nextKm: nextKmTarget,
+                    timestamp: Date.now() // Updating timestamp bumps this record to the top of Recent History
                 });
                 
                 const v = vehicles.find(x => x.id === m.vehicleId);
@@ -590,52 +617,36 @@
         function formatDate(dStr) { if(!dStr) return ''; return new Date(dStr).toLocaleDateString('bn-BD', { day: 'numeric', month: 'short', year: 'numeric' }); }
 
         // ==========================================
-        // PDF ENGINE (FIXED OPACITY BUG)
+        // ROBUST PDF ENGINE
         // ==========================================
         function generatePDF(htmlContent, fileName) {
             window.showToast("পিডিএফ প্রস্তুত হচ্ছে, অপেক্ষা করুন...");
-            const container = document.createElement('div');
             
-            // FIX: Removed opacity to avoid html2canvas blank render bug.
-            // Pushing it far off-screen ensures it stays visible to html2pdf but hidden to user.
-            container.style.position = 'fixed';
-            container.style.top = '0';
-            container.style.left = '200vw'; 
-            container.style.width = '794px';
-            container.style.backgroundColor = 'white';
-            container.style.zIndex = '-1';
-            
-            container.innerHTML = htmlContent;
-            document.body.appendChild(container);
-
             const opt = { 
                 margin: 0, 
                 filename: fileName, 
                 image: { type: 'jpeg', quality: 1.0 }, 
-                html2canvas: { scale: 2, useCORS: true, windowWidth: 794 }, 
+                html2canvas: { scale: 2, useCORS: true }, 
                 jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } 
             };
             
-            setTimeout(() => {
-                html2pdf().set(opt).from(container).save().then(() => {
-                    if(document.body.contains(container)) document.body.removeChild(container);
-                    window.showToast("পিডিএফ সফলভাবে ডাউনলোড হয়েছে!");
-                }).catch(err => {
-                    if(document.body.contains(container)) document.body.removeChild(container);
-                    console.error("PDF Error:", err); 
-                    window.showToast("পিডিএফ তৈরিতে সমস্যা হয়েছে!", true);
-                });
-            }, 300); 
+            html2pdf().set(opt).from(htmlContent).save().then(() => {
+                window.showToast("পিডিএফ সফলভাবে ডাউনলোড হয়েছে!");
+            }).catch(err => {
+                console.error("PDF Error:", err); 
+                window.showToast("পিডিএফ তৈরিতে সমস্যা হয়েছে!", true);
+            });
         }
 
         const getPDFTemplate = (title, subtitle, tableHeaders, tableRows) => `
             <div style="width: 794px; min-height: 1122px; padding: 40px; box-sizing: border-box; position: relative; font-family:'Hind Siliguri', sans-serif; color:#1e293b; background: white; margin: 0;">
+                <style>@import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap');</style>
                 <div style="position: absolute; top: 400px; left: 50%; transform: translate(-50%, -50%) rotate(-35deg); font-size: 80px; color: rgba(5, 150, 105, 0.06); font-weight: bold; white-space: nowrap; z-index: 0; pointer-events: none;">CHARGING NINE</div>
                 <div style="position: relative; z-index: 10;">
                     <div style="text-align:center; border-bottom:3px solid #059669; padding-bottom:15px; margin-bottom:20px">
                         <h2 style="color:#059669; font-size:24px; margin:0">৯ ইস্ট বেঙ্গল রেজিমেন্ট</h2>
                         <p style="margin:5px 0 0 0; font-size:16px; font-weight:bold;">${title}</p>
-                        <p style="margin:5px 0 0 0; font-size:12px; color:#64748b">তারিখ: ${formatDate(new Date().toISOString())}</p>
+                        <p style="margin:5px 0 0 0; font-size:12px; color:#64748b">তারিখ: ${formatDate(new Date().toISOString().split('T')[0])}</p>
                     </div>
                     ${subtitle ? `<div style="background:#f8fafc; padding:15px; border-radius:8px; margin-bottom:20px; border:1px solid #e2e8f0">${subtitle}</div>` : ''}
                     <table style="width:100%; text-align:left; border-collapse:collapse; font-size:14px">
@@ -668,7 +679,6 @@
             document.getElementById('vd-title').innerHTML = `<i class="fa-solid fa-truck mr-2 text-blue-500"></i>বিএ নম্বর: ${v.baNo}`;
             document.getElementById('vd-subtitle').innerHTML = `গাড়ির ধরন: <span class="bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded uppercase">${v.type}</span> &nbsp;|&nbsp; বর্তমান মিটার: <span class="font-bold text-emerald-600">${v.currentKm || 0} KM</span>`;
             
-            // Using global sorted maintenanceLog
             const logs = maintenanceLog.filter(m => m.vehicleId === currentOpenVehicleId);
 
             const listContainer = document.getElementById('vd-history-list');
@@ -682,8 +692,8 @@
                             <div>
                                 <h4 class="font-bold text-slate-800 text-sm">${m.typeName}</h4>
                                 <p class="text-xs text-slate-500 mt-0.5">
-                                    কাজ সম্পন্ন: <strong>${formatDate(m.doneDate)}</strong> (${m.doneKm} KM)<br>
-                                    <span class="text-red-500 font-medium">পরবর্তী লক্ষ্যমাত্রা: ${formatDate(m.nextDate)} (${m.nextKm} KM)</span>
+                                    সর্বশেষ কাজ: <strong>${formatDate(m.doneDate)}</strong> (${m.doneKm} KM)<br>
+                                    <span class="text-emerald-600 font-medium mt-1 inline-block">পরবর্তী টার্গেট: ${formatDate(m.nextDate)} <i class="fa-solid fa-arrow-right-long text-[10px] mx-1"></i> ${m.nextKm} KM</span>
                                 </p>
                             </div>
                         </div>
@@ -732,7 +742,6 @@
         let overdueItemsData = [];
         window.openOverdueModal = () => {
             const today = new Date(); const latestRecords = {};
-            // Finding the latest unique records per vehicle-task
             maintenanceLog.forEach(m => {
                 const key = `${m.vehicleId}_${m.typeId}`;
                 if (!latestRecords[key]) latestRecords[key] = m;
@@ -777,7 +786,6 @@
         let upcomingItemsData = [];
         window.openUpcomingModal = () => {
             const today = new Date(); const latestRecords = {};
-            // Using global sorted list
             maintenanceLog.forEach(m => {
                 const key = `${m.vehicleId}_${m.typeId}`;
                 if (!latestRecords[key]) latestRecords[key] = m;
@@ -859,18 +867,44 @@
             Object.values(latestRecords).forEach(m => {
                 const v = vehicles.find(x => x.id === m.vehicleId); if(!v) return;
                 const currentKm = v.currentKm || 0;
-                const diffDays = Math.ceil((new Date(m.nextDate) - today) / (1000 * 60 * 60 * 24)); const kmRemaining = m.nextKm - currentKm;
+                const diffDays = Math.ceil((new Date(m.nextDate) - today) / (1000 * 60 * 60 * 24)); 
+                const kmRemaining = m.nextKm - currentKm;
+                
                 const isOverdue = diffDays <= 0 || kmRemaining <= 0;
                 const isUpcoming = !isOverdue && ((diffDays > 0 && diffDays <= 30) || (kmRemaining > 0 && kmRemaining <= 500));
 
                 if (isOverdue) {
                     overdueTaskCount++; vehicleStatusMap[v.id] = 'OVERDUE';
-                    let reason = (diffDays <= 0 && kmRemaining <= 0) ? "তারিখ ও কি.মি. উভয় পার হয়েছে!" : (kmRemaining <= 0 ? `<i class="fa-solid fa-gauge-high"></i> ${Math.abs(kmRemaining)} কি.মি. বেশি চলেছে!` : `<i class="fa-regular fa-calendar-xmark"></i> ${Math.abs(diffDays)} দিন ওভারডিউ!`);
-                    alerts.innerHTML += `<div class="bg-white border border-red-100 p-4 rounded-xl shadow-sm mb-3 flex gap-3 hover:shadow-md transition"><div class="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center text-red-500 shrink-0"><i class="fa-solid fa-triangle-exclamation"></i></div><div class="flex-1"><h4 class="font-bold text-slate-800 text-sm md:text-base">${m.vehicleBa} <span class="text-xs text-red-600 bg-red-50 px-2 py-0.5 rounded ml-1">${m.typeName}</span></h4><p class="text-xs font-bold text-red-600 mt-1">${reason}</p><p class="text-[10px] md:text-xs text-slate-500 mt-1">লক্ষ্যমাত্রা: <span class="font-semibold text-slate-700">${m.nextKm} KM</span> | বর্তমান: <span class="font-semibold text-slate-700">${currentKm} KM</span></p></div></div>`;
+                    let reason = (diffDays <= 0 && kmRemaining <= 0) ? "তারিখ ও কি.মি. উভয় পার হয়েছে!" : (kmRemaining <= 0 ? `<i class="fa-solid fa-gauge-high"></i> টার্গেট থেকে ${Math.abs(kmRemaining)} কি.মি. বেশি চলেছে!` : `<i class="fa-regular fa-calendar-xmark"></i> টার্গেট ডেট থেকে ${Math.abs(diffDays)} দিন ওভারডিউ!`);
+                    
+                    alerts.innerHTML += `
+                    <div class="bg-white border border-red-100 p-4 rounded-xl shadow-sm mb-3 flex gap-3 hover:shadow-md transition">
+                        <div class="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center text-red-500 shrink-0"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                        <div class="flex-1">
+                            <h4 class="font-bold text-slate-800 text-sm md:text-base">${m.vehicleBa} <span class="text-xs text-red-600 bg-red-50 px-2 py-0.5 rounded ml-1">${m.typeName}</span></h4>
+                            <p class="text-xs font-bold text-red-600 mt-1">${reason}</p>
+                            <div class="text-[10px] md:text-[11px] text-slate-500 mt-2 bg-slate-50 p-2 rounded-lg border border-slate-100">
+                                সর্বশেষ বদলি: <span class="font-semibold text-slate-700">${m.doneKm} KM</span> | টার্গেট লক্ষ্যমাত্রা: <span class="font-semibold text-slate-700">${m.nextKm} KM</span><br>
+                                গাড়ির বর্তমান রানিং: <span class="font-bold text-red-600">${currentKm} KM</span>
+                            </div>
+                        </div>
+                    </div>`;
                 } else if (isUpcoming) {
                     upcomingTaskCount++; if(vehicleStatusMap[v.id] !== 'OVERDUE') vehicleStatusMap[v.id] = 'UPCOMING';
                     let reason = (kmRemaining > 0 && kmRemaining <= 500) && (diffDays > 0 && diffDays <= 30) ? `আর ${diffDays} দিন বা ${kmRemaining} কি.মি.` : ((kmRemaining > 0 && kmRemaining <= 500) ? `আর মাত্র ${kmRemaining} কি.মি. বাকি` : `আর মাত্র ${diffDays} দিন বাকি`);
-                    alerts.innerHTML += `<div class="bg-white border border-amber-100 p-4 rounded-xl shadow-sm mb-3 flex gap-3 hover:shadow-md transition"><div class="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center text-amber-500 shrink-0"><i class="fa-solid fa-clock"></i></div><div class="flex-1"><h4 class="font-bold text-slate-800 text-sm md:text-base">${m.vehicleBa} <span class="text-xs text-amber-600 bg-amber-50 px-2 py-0.5 rounded ml-1">${m.typeName}</span></h4><p class="text-xs font-bold text-amber-600 mt-1">${reason}</p><p class="text-[10px] md:text-xs text-slate-500 mt-1">লক্ষ্যমাত্রা: <span class="font-semibold text-slate-700">${m.nextKm} KM</span> | বর্তমান: <span class="font-semibold text-slate-700">${currentKm} KM</span></p></div></div>`;
+                    
+                    alerts.innerHTML += `
+                    <div class="bg-white border border-amber-100 p-4 rounded-xl shadow-sm mb-3 flex gap-3 hover:shadow-md transition">
+                        <div class="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center text-amber-500 shrink-0"><i class="fa-solid fa-clock"></i></div>
+                        <div class="flex-1">
+                            <h4 class="font-bold text-slate-800 text-sm md:text-base">${m.vehicleBa} <span class="text-xs text-amber-600 bg-amber-50 px-2 py-0.5 rounded ml-1">${m.typeName}</span></h4>
+                            <p class="text-xs font-bold text-amber-600 mt-1">${reason}</p>
+                            <div class="text-[10px] md:text-[11px] text-slate-500 mt-2 bg-slate-50 p-2 rounded-lg border border-slate-100">
+                                সর্বশেষ বদলি: <span class="font-semibold text-slate-700">${m.doneKm} KM</span> | টার্গেট লক্ষ্যমাত্রা: <span class="font-semibold text-slate-700">${m.nextKm} KM</span><br>
+                                গাড়ির বর্তমান রানিং: <span class="font-bold text-amber-600">${currentKm} KM</span>
+                            </div>
+                        </div>
+                    </div>`;
                 }
             });
 
@@ -908,7 +942,14 @@
             });
             document.getElementById('vehicles-container').innerHTML = vHtml || '<p class="text-center text-slate-400 w-full">কোনো গাড়ি নেই</p>';
 
-            document.getElementById('maintenance-history-list').innerHTML = maintenanceLog.slice(0, 50).map(m => `<div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex justify-between items-center hover:shadow-md transition"><div class="flex items-center gap-3"><div class="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center text-slate-500"><i class="fa-solid fa-wrench"></i></div><div><h4 class="font-bold text-slate-800 text-sm md:text-base">${m.vehicleBa} <span class="text-[10px] font-normal text-slate-500 bg-slate-100 px-1 rounded ml-1">${m.typeName}</span></h4><p class="text-xs text-slate-500 mt-0.5"><i class="fa-regular fa-calendar mr-1"></i>${formatDate(m.doneDate)} <span class="mx-1">|</span> <i class="fa-solid fa-gauge-high mr-1"></i>${m.doneKm} KM</p></div></div><div class="flex gap-1.5"><button onclick="window.editMaintenance('${m.id}')" class="text-blue-400 hover:text-white hover:bg-blue-500 p-2.5 rounded-lg transition" title="এডিট"><i class="fa-solid fa-pen"></i></button><button onclick="window.deleteMaintenance('${m.id}')" class="text-red-400 hover:text-white hover:bg-red-500 p-2.5 rounded-lg transition" title="ডিলিট"><i class="fa-solid fa-trash-can"></i></button></div></div>`).join('');
+            // FIX: "Recent History" sorting. Now sorted purely by exact time the entry was added/edited!
+            const recentHistoryList = [...maintenanceLog].sort((a,b) => {
+                const tA = a.timestamp || parseInt(a.id.split('_')[1]) || 0;
+                const tB = b.timestamp || parseInt(b.id.split('_')[1]) || 0;
+                return tB - tA; // Newest additions at the top
+            });
+
+            document.getElementById('maintenance-history-list').innerHTML = recentHistoryList.slice(0, 50).map(m => `<div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex justify-between items-center hover:shadow-md transition"><div class="flex items-center gap-3"><div class="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center text-slate-500"><i class="fa-solid fa-wrench"></i></div><div><h4 class="font-bold text-slate-800 text-sm md:text-base">${m.vehicleBa} <span class="text-[10px] font-normal text-slate-500 bg-slate-100 px-1 rounded ml-1">${m.typeName}</span></h4><p class="text-xs text-slate-500 mt-0.5"><i class="fa-regular fa-calendar mr-1"></i>${formatDate(m.doneDate)} <span class="mx-1">|</span> <i class="fa-solid fa-gauge-high mr-1"></i>${m.doneKm} KM</p></div></div><div class="flex gap-1.5"><button onclick="window.editMaintenance('${m.id}')" class="text-blue-400 hover:text-white hover:bg-blue-500 p-2.5 rounded-lg transition" title="এডিট"><i class="fa-solid fa-pen"></i></button><button onclick="window.deleteMaintenance('${m.id}')" class="text-red-400 hover:text-white hover:bg-red-500 p-2.5 rounded-lg transition" title="ডিলিট"><i class="fa-solid fa-trash-can"></i></button></div></div>`).join('');
             
             if(currentOpenVehicleId && !document.getElementById('vehicle-details-modal').classList.contains('hidden')) {
                 renderVehicleDetails();
