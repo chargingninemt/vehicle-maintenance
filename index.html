@@ -128,12 +128,14 @@
                 <section id="sec-vehicles" class="hidden animate-fade-in">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-5">
                         <h3 class="font-bold text-slate-800 text-lg"><i class="fa-solid fa-truck-fleet text-blue-500 mr-2"></i>রেজিমেন্টের গাড়ি ও কি.মি স্ট্যাটাস</h3>
-                        <div class="flex gap-2 w-full md:w-auto">
-                            <div class="relative flex-1 md:w-64">
+                        <div class="flex flex-wrap gap-2 w-full md:w-auto">
+                            <div class="relative flex-1 min-w-[150px]">
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><i class="fa-solid fa-magnifying-glass text-slate-400"></i></div>
                                 <input type="text" id="search-vehicle" onkeyup="window.filterVehicles()" placeholder="বিএ নম্বর দিয়ে খুঁজুন..." class="w-full pl-9 pr-4 py-2.5 bg-white border border-slate-200 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 outline-none transition text-sm">
                             </div>
-                            <button onclick="document.getElementById('add-veh-modal').classList.remove('hidden')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg text-sm font-bold active:scale-95 transition shadow-md whitespace-nowrap"><i class="fa-solid fa-plus mr-1"></i> নতুন গাড়ি</button>
+                            <!-- NEW QUICK KM BUTTON -->
+                            <button onclick="window.openQuickKmModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2.5 rounded-lg text-sm font-bold active:scale-95 transition shadow-md whitespace-nowrap"><i class="fa-solid fa-gauge-high mr-1"></i> দ্রুত মিটার</button>
+                            <button onclick="document.getElementById('add-veh-modal').classList.remove('hidden')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2.5 rounded-lg text-sm font-bold active:scale-95 transition shadow-md whitespace-nowrap"><i class="fa-solid fa-plus mr-1"></i> নতুন গাড়ি</button>
                         </div>
                     </div>
                     <!-- Container for grouping -->
@@ -239,7 +241,7 @@
     
     <div id="edit-veh-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 transition-opacity bg-slate-900/60"><div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl"><div class="flex justify-between items-center mb-5"><h3 class="font-bold text-lg text-slate-800">গাড়ি আপডেট</h3><button onclick="document.getElementById('edit-veh-modal').classList.add('hidden')" class="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500"><i class="fa-solid fa-xmark"></i></button></div><form id="form-edit-vehicle" class="space-y-4"><input type="hidden" id="edit-veh-id"><div><label class="block text-xs font-bold text-slate-500 mb-1.5">বিএ নম্বর (BA No)</label><input type="text" id="edit-veh-ba" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"></div><div><label class="block text-xs font-bold text-slate-500 mb-1.5">গাড়ির ধরন</label><select id="edit-veh-type" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"></select></div><button type="submit" class="w-full bg-blue-600 text-white font-bold py-3.5 rounded-xl shadow-md mt-2">আপডেট করুন</button></form></div></div>
 
-    <div id="edit-maint-modal" class="hidden fixed inset-0 z-[110] flex items-center justify-center p-4 transition-opacity bg-slate-900/60"><div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl"><div class="flex justify-between items-center mb-5"><h3 class="font-bold text-lg text-slate-800">কাজের রেকর্ড আপডেট</h3><button onclick="document.getElementById('edit-maint-modal').classList.add('hidden')" class="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500"><i class="fa-solid fa-xmark"></i></button></div><form id="form-edit-maint" class="space-y-4"><input type="hidden" id="edit-maint-id"><div><label class="block text-xs font-bold text-slate-500 mb-1.5">কাজের ধরন</label><select id="edit-maint-type" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"></select></div><div class="grid grid-cols-2 gap-3"><div><label class="block text-xs font-bold text-slate-500 mb-1.5">কাজ করার তারিখ</label><input type="date" id="edit-maint-date" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"></div><div><label class="block text-xs font-bold text-slate-500 mb-1.5">সর্বশেষ বদলি কি.মি</label><input type="number" id="edit-maint-km" required min="0" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"></div></div><button type="submit" class="w-full bg-blue-600 text-white font-bold py-3.5 rounded-xl shadow-md mt-2">আপডেট করুন</button></form></div></div>
+    <div id="edit-maint-modal" class="hidden fixed inset-0 z-[110] flex items-center justify-center p-4 transition-opacity bg-slate-900/60"><div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl"><div class="flex justify-between items-center mb-5"><h3 class="font-bold text-lg text-slate-800">কাজের রেকর্ড আপডেট</h3><button onclick="document.getElementById('edit-maint-modal').classList.add('hidden')" class="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500"><i class="fa-solid fa-xmark"></i></button></div><form id="form-edit-maint" class="space-y-4"><input type="hidden" id="edit-maint-id"><input type="hidden" id="edit-maint-vid"><div><label class="block text-xs font-bold text-slate-500 mb-1.5">কাজের ধরন</label><select id="edit-maint-type" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"></select></div><div class="grid grid-cols-2 gap-3"><div><label class="block text-xs font-bold text-slate-500 mb-1.5">কাজ করার তারিখ</label><input type="date" id="edit-maint-date" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"></div><div><label class="block text-xs font-bold text-slate-500 mb-1.5">সর্বশেষ বদলি কি.মি</label><input type="number" id="edit-maint-km" required min="0" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"></div></div><button type="submit" class="w-full bg-blue-600 text-white font-bold py-3.5 rounded-xl shadow-md mt-2">আপডেট করুন</button></form></div></div>
 
     <div id="edit-rule-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 transition-opacity bg-slate-900/60"><div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl"><div class="flex justify-between items-center mb-5"><h3 class="font-bold text-lg text-slate-800">নিয়ম আপডেট</h3><button onclick="document.getElementById('edit-rule-modal').classList.add('hidden')" class="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500"><i class="fa-solid fa-xmark"></i></button></div><form id="form-edit-rule" class="space-y-4"><input type="hidden" id="edit-rule-id"><div><label class="block text-xs font-bold text-slate-500 mb-1.5">কাজের নাম</label><input type="text" id="edit-rule-name" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"></div><div class="grid grid-cols-2 gap-3"><div><label class="block text-xs font-bold text-slate-500 mb-1.5">মাস</label><input type="number" id="edit-rule-months" required min="1" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"></div><div><label class="block text-xs font-bold text-slate-500 mb-1.5">কি.মি</label><input type="number" id="edit-rule-km" required min="0" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"></div></div><button type="submit" class="w-full bg-blue-600 text-white font-bold py-3.5 rounded-xl shadow-md mt-2">আপডেট করুন</button></form></div></div>
 
@@ -247,6 +249,9 @@
     
     <div id="km-update-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 transition-opacity bg-slate-900/60"><div class="bg-white w-full max-w-sm rounded-2xl p-6 shadow-2xl border-t-4 border-emerald-500"><div class="flex justify-between items-center mb-2"><h3 class="font-bold text-lg text-slate-800">মিটার রিডিং আপডেট</h3><button onclick="window.closeKmModal()" class="text-slate-400"><i class="fa-solid fa-xmark text-xl"></i></button></div><p class="text-sm font-bold text-emerald-600 mb-5 bg-emerald-50 inline-block px-3 py-1 rounded-md" id="km-modal-bano"></p><form id="form-km-update" class="space-y-4"><input type="hidden" id="km-update-vid"><div><label class="block text-xs font-bold text-slate-500 mb-1.5">গাড়ির বর্তমান কিলোমিটার</label><input type="number" id="km-update-val" required min="0" class="w-full px-4 py-4 bg-slate-50 border border-slate-300 rounded-xl text-2xl font-bold text-center"></div><button type="submit" class="w-full bg-emerald-600 text-white font-bold py-3.5 rounded-xl mt-2">আপডেট করুন</button></form></div></div>
     
+    <!-- NEW QUICK KM UPDATE MODAL -->
+    <div id="quick-km-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 transition-opacity bg-slate-900/60"><div class="bg-white w-full max-w-sm rounded-2xl p-6 shadow-2xl border-t-4 border-emerald-500"><div class="flex justify-between items-center mb-4"><h3 class="font-bold text-lg text-slate-800"><i class="fa-solid fa-gauge-high mr-2 text-emerald-500"></i>দ্রুত মিটার আপডেট</h3><button onclick="window.closeQuickKmModal()" class="text-slate-400"><i class="fa-solid fa-xmark text-xl"></i></button></div><form id="form-quick-km" class="space-y-4"><div><label class="block text-xs font-bold text-slate-500 mb-1.5">গাড়ি নির্বাচন করুন</label><select id="quick-km-vehicle" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500"></select></div><div><label class="block text-xs font-bold text-slate-500 mb-1.5">বর্তমান কিলোমিটার</label><input type="number" id="quick-km-val" required min="0" placeholder="KM" class="w-full px-4 py-4 bg-slate-50 border border-slate-300 rounded-xl text-2xl font-bold text-center focus:ring-2 focus:ring-emerald-500"></div><button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 transition text-white font-bold py-3.5 rounded-xl mt-2 shadow-md">আপডেট করুন</button></form></div></div>
+
     <div id="toast-container" class="fixed top-16 left-1/2 transform -translate-x-1/2 z-[9999] flex flex-col gap-2 w-11/12 max-w-sm pointer-events-none"></div>
     <div id="confirm-modal" class="hidden fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/60"><div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center"><div class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl"><i class="fa-solid fa-triangle-exclamation"></i></div><h3 class="text-lg font-bold text-slate-800 mb-1">নিশ্চিত?</h3><p id="confirm-msg" class="text-slate-500 text-sm mb-6">মুছে ফেলা হবে।</p><div class="flex gap-3"><button onclick="window.closeConfirm()" class="flex-1 bg-slate-100 font-bold py-2.5 rounded-xl">বাতিল</button><button onclick="window.executeConfirm()" class="flex-1 bg-red-600 text-white font-bold py-2.5 rounded-xl">হ্যাঁ, মুছুন</button></div></div></div>
 
@@ -299,7 +304,7 @@
         // EXACT DATE CALCULATION LOGIC
         const calculateNextDateExact = (dateStr, addedMonths) => {
             const d = new Date(dateStr);
-            d.setMonth(d.getMonth() + parseInt(addedMonths)); // Exact exact date addition
+            d.setMonth(d.getMonth() + parseInt(addedMonths)); 
             const yr = d.getFullYear();
             const mo = String(d.getMonth() + 1).padStart(2, '0');
             const da = String(d.getDate()).padStart(2, '0');
@@ -362,7 +367,6 @@
                 updateUI(); 
             }));
             
-            // Global sorting by timestamp for exact history accuracy
             unsubscribeListeners.push(onSnapshot(collection(db, 'artifacts', APP_ID, 'public', 'data', 'maintenanceLog'), snap => { 
                 maintenanceLog = snap.docs.map(d => ({ ...d.data(), id: d.id })).sort((a,b) => {
                     const timeA = a.timestamp || parseInt(a.id.split('_')[1]) || new Date(a.doneDate).getTime();
@@ -405,6 +409,7 @@
             });
         };
 
+        // Modal for Single Vehicle KM
         window.openKmModal = (id, ba, km) => { document.getElementById('km-update-vid').value=id; document.getElementById('km-modal-bano').innerHTML=`<i class="fa-solid fa-truck-side mr-1"></i> BA No: ${ba}`; document.getElementById('km-update-val').value=km||''; document.getElementById('km-update-modal').classList.remove('hidden'); };
         window.closeKmModal = () => document.getElementById('km-update-modal').classList.add('hidden');
 
@@ -414,11 +419,48 @@
             if(vIndex > -1) { vehicles[vIndex].currentKm = newKm; try { await setDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'vehicles', vId), vehicles[vIndex]); window.showToast('মিটার আপডেট হয়েছে!'); window.manualSyncToSheets(); window.closeKmModal(); } catch(err) { window.showToast('আপডেট ফেইল', true); } }
         });
 
+        // NEW: QUICK KM UPDATE MODAL
+        window.openQuickKmModal = () => {
+            const select = document.getElementById('quick-km-vehicle');
+            select.innerHTML = '<option value="" disabled selected>গাড়ি নির্বাচন করুন...</option>' + vehicles.map(v => `<option value="${v.id}">${v.baNo} (${v.type})</option>`).join('');
+            document.getElementById('quick-km-val').value = '';
+            document.getElementById('quick-km-modal').classList.remove('hidden');
+        };
+        window.closeQuickKmModal = () => document.getElementById('quick-km-modal').classList.add('hidden');
+
+        document.getElementById('quick-km-vehicle').addEventListener('change', (e) => {
+            const v = vehicles.find(x => x.id === e.target.value);
+            if (v) document.getElementById('quick-km-val').value = v.currentKm || 0;
+        });
+
+        document.getElementById('form-quick-km').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const vId = document.getElementById('quick-km-vehicle').value;
+            const newKm = parseInt(document.getElementById('quick-km-val').value);
+            const vIndex = vehicles.findIndex(v => v.id === vId);
+            if(vIndex > -1) { 
+                vehicles[vIndex].currentKm = newKm; 
+                try { 
+                    await setDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'vehicles', vId), vehicles[vIndex]); 
+                    window.showToast('মিটার সফলভাবে আপডেট হয়েছে!'); 
+                    window.manualSyncToSheets(); 
+                    window.closeQuickKmModal(); 
+                } catch(err) { 
+                    window.showToast('আপডেট ফেইল', true); 
+                } 
+            }
+        });
+
         const handleDbWrite = async (cName, id, data, msg) => { try { await setDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', cName, id), data); window.showToast(msg); window.manualSyncToSheets(); } catch(e) { window.showToast("সমস্যা হয়েছে", true); } };
         
         document.getElementById('form-vehicle').addEventListener('submit', (e) => { 
             e.preventDefault(); const baNo = document.getElementById('veh-ba').value.trim(); 
-            if (vehicles.some(v => v.baNo === baNo)) return window.showToast('আগে যুক্ত করা হয়েছে!', true); 
+            
+            // DUPLICATE CHECK: VEHICLE
+            if (vehicles.some(v => v.baNo.toLowerCase() === baNo.toLowerCase())) {
+                return window.showToast('এই বিএ নম্বরের গাড়িটি আগে যুক্ত করা হয়েছে!', true); 
+            }
+            
             const newId = 'veh_' + Date.now();
             handleDbWrite('vehicles', newId, { id: newId, baNo, type: document.getElementById('veh-type').value, currentKm: 0, addedDate: new Date().toISOString() }, 'গাড়ি যুক্ত হয়েছে'); 
             e.target.reset(); document.getElementById('add-veh-modal').classList.add('hidden'); 
@@ -428,10 +470,17 @@
         document.getElementById('form-maintenance').addEventListener('submit', async (e) => { 
             e.preventDefault(); 
             const vId = document.getElementById('maint-vehicle').value, rId = document.getElementById('maint-type').value, dStr = document.getElementById('maint-date').value, km = parseInt(document.getElementById('maint-km').value); 
+            
+            // DUPLICATE CHECK: MAINTENANCE
+            const isDuplicate = maintenanceLog.some(m => m.vehicleId === vId && m.typeId === rId && m.doneDate === dStr);
+            if (isDuplicate) {
+                return window.showToast('এই গাড়ির জন্য একই তারিখে এই কাজের এন্ট্রিটি ইতিমধ্যে দেওয়া হয়েছে!', true);
+            }
+
             const rule = taskRules.find(r => r.id === rId); const vData = vehicles.find(v => v.id === vId); 
             
             const nextDateTarget = calculateNextDateExact(dStr, rule.months);
-            const nextKmTarget = km + parseInt(rule.km); // Target KM = Last Done KM + Rule KM
+            const nextKmTarget = km + parseInt(rule.km);
             
             if((vData.currentKm || 0) < km) { vData.currentKm = km; await setDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'vehicles', vData.id), vData); } 
             
@@ -441,13 +490,29 @@
         });
         
         document.getElementById('form-rule').addEventListener('submit', (e)=>{ 
-            e.preventDefault(); const newId = 'rule_' + Date.now();
-            handleDbWrite('taskRules', newId, { id: newId, name:document.getElementById('rule-name').value, months:parseInt(document.getElementById('rule-months').value), km:parseInt(document.getElementById('rule-km').value) }, 'নিয়ম যোগ হয়েছে'); e.target.reset(); 
+            e.preventDefault(); 
+            const rName = document.getElementById('rule-name').value.trim();
+            
+            // DUPLICATE CHECK: TASK RULE
+            if (taskRules.some(r => r.name.toLowerCase() === rName.toLowerCase())) {
+                return window.showToast('এই কাজের নিয়মটি ইতিমধ্যে যুক্ত করা আছে!', true);
+            }
+
+            const newId = 'rule_' + Date.now();
+            handleDbWrite('taskRules', newId, { id: newId, name: rName, months:parseInt(document.getElementById('rule-months').value), km:parseInt(document.getElementById('rule-km').value) }, 'নিয়ম যোগ হয়েছে'); e.target.reset(); 
         });
         
         document.getElementById('form-vtype').addEventListener('submit', (e)=>{ 
-            e.preventDefault(); const newId = 'vt_' + Date.now();
-            handleDbWrite('vehicleTypes', newId, { id: newId, name:document.getElementById('vtype-name').value }, 'ধরন যোগ হয়েছে'); e.target.reset(); 
+            e.preventDefault(); 
+            const vtName = document.getElementById('vtype-name').value.trim();
+            
+            // DUPLICATE CHECK: VEHICLE TYPE
+            if (vehicleTypes.some(vt => vt.name.toLowerCase() === vtName.toLowerCase())) {
+                return window.showToast('এই ধরনটি ইতিমধ্যে যুক্ত করা আছে!', true);
+            }
+
+            const newId = 'vt_' + Date.now();
+            handleDbWrite('vehicleTypes', newId, { id: newId, name: vtName }, 'ধরন যোগ হয়েছে'); e.target.reset(); 
         });
 
         window.deleteRule = (id) => window.showConfirm('নিয়মটি মুছে ফেলতে চান?', () => handleDbDelete('taskRules', id));
@@ -470,13 +535,17 @@
             document.getElementById('edit-rule-modal').classList.remove('hidden');
         };
 
-        // Edit Rule - Automatically recalculates existing logs for this rule
         document.getElementById('form-edit-rule').addEventListener('submit', async (e) => {
             e.preventDefault();
             const id = document.getElementById('edit-rule-id').value;
-            const newName = document.getElementById('edit-rule-name').value;
+            const newName = document.getElementById('edit-rule-name').value.trim();
             const newMonths = parseInt(document.getElementById('edit-rule-months').value);
             const newKm = parseInt(document.getElementById('edit-rule-km').value);
+
+            // DUPLICATE CHECK: EDIT RULE
+            if (taskRules.some(r => r.id !== id && r.name.toLowerCase() === newName.toLowerCase())) {
+                return window.showToast('এই নামের আরেকটি নিয়ম ইতিমধ্যে আছে!', true);
+            }
 
             try {
                 await updateDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'taskRules', id), {
@@ -493,7 +562,7 @@
                         typeName: newName,
                         nextDate: updatedNextDate,
                         nextKm: updatedNextKm,
-                        timestamp: Date.now() // updating timestamp brings it to the top
+                        timestamp: Date.now()
                     });
                 }
 
@@ -514,9 +583,16 @@
         document.getElementById('form-edit-vtype').addEventListener('submit', async (e) => {
             e.preventDefault();
             const id = document.getElementById('edit-vtype-id').value;
+            const newName = document.getElementById('edit-vtype-name').value.trim();
+
+            // DUPLICATE CHECK: EDIT VEHICLE TYPE
+            if (vehicleTypes.some(vt => vt.id !== id && vt.name.toLowerCase() === newName.toLowerCase())) {
+                return window.showToast('এই ধরনটি ইতিমধ্যে যুক্ত করা আছে!', true);
+            }
+
             try {
                 await updateDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'vehicleTypes', id), {
-                    name: document.getElementById('edit-vtype-name').value
+                    name: newName
                 });
                 window.showToast('ধরন আপডেট হয়েছে');
                 document.getElementById('edit-vtype-modal').classList.add('hidden');
@@ -539,6 +615,11 @@
             const newBa = document.getElementById('edit-veh-ba').value.trim();
             const newType = document.getElementById('edit-veh-type').value;
             
+            // DUPLICATE CHECK: EDIT VEHICLE
+            if (vehicles.some(v => v.id !== id && v.baNo.toLowerCase() === newBa.toLowerCase())) {
+                return window.showToast('এই বিএ নম্বরের অন্য একটি গাড়ি ইতিমধ্যে আছে!', true);
+            }
+
             try {
                 await updateDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'vehicles', id), {
                     baNo: newBa,
@@ -560,6 +641,7 @@
             const m = maintenanceLog.find(x => x.id === id);
             if(!m) return;
             document.getElementById('edit-maint-id').value = id;
+            document.getElementById('edit-maint-vid').value = m.vehicleId;
             document.getElementById('edit-maint-type').innerHTML = taskRules.map(r => `<option value="${r.id}" ${r.id===m.typeId?'selected':''}>${r.name}</option>`).join('');
             document.getElementById('edit-maint-date').value = m.doneDate;
             document.getElementById('edit-maint-km').value = m.doneKm;
@@ -569,9 +651,16 @@
         document.getElementById('form-edit-maint').addEventListener('submit', async (e) => {
             e.preventDefault();
             const id = document.getElementById('edit-maint-id').value;
+            const vId = document.getElementById('edit-maint-vid').value;
             const rId = document.getElementById('edit-maint-type').value;
             const dStr = document.getElementById('edit-maint-date').value;
             const km = parseInt(document.getElementById('edit-maint-km').value);
+
+            // DUPLICATE CHECK: EDIT MAINTENANCE
+            const isDuplicate = maintenanceLog.some(m => m.id !== id && m.vehicleId === vId && m.typeId === rId && m.doneDate === dStr);
+            if (isDuplicate) {
+                return window.showToast('এই গাড়ির জন্য একই তারিখে এই কাজের এন্ট্রি ইতিমধ্যে আছে!', true);
+            }
 
             const m = maintenanceLog.find(x => x.id === id);
             const rule = taskRules.find(r => r.id === rId);
@@ -587,7 +676,7 @@
                     doneKm: km,
                     nextDate: nextDateTarget,
                     nextKm: nextKmTarget,
-                    timestamp: Date.now() // Updating timestamp bumps this record to the top of Recent History
+                    timestamp: Date.now() 
                 });
                 
                 const v = vehicles.find(x => x.id === m.vehicleId);
@@ -612,7 +701,6 @@
 
         function formatDate(dStr) { if(!dStr) return ''; return new Date(dStr).toLocaleDateString('bn-BD', { day: 'numeric', month: 'short', year: 'numeric' }); }
         
-        // Compact DD-MM-YY formatting for tables (Matches Handwritten Image)
         function formatShortDate(dStr) {
             if(!dStr) return '';
             const d = new Date(dStr);
@@ -643,7 +731,6 @@
             });
         }
 
-        // Generic Template
         const getPDFTemplate = (title, subtitle, tableHeaders, tableRows) => `
             <div style="width: 794px; min-height: 1122px; padding: 40px; box-sizing: border-box; position: relative; font-family:'Hind Siliguri', sans-serif; color:#1e293b; background: white; margin: 0;">
                 <style>@import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap');</style>
@@ -665,7 +752,6 @@
                 </div>
             </div>`;
 
-        // SPECIFIC GRID TEMPLATE (MIMICS HANDWRITTEN REGISTER)
         const getRegisterPDFTemplate = (title, tableHeaders, tableRows) => `
             <div style="width: 794px; min-height: 1122px; padding: 30px; box-sizing: border-box; position: relative; font-family:'Hind Siliguri', sans-serif; color:#000; background: white; margin: 0;">
                 <style>@import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap');</style>
@@ -681,9 +767,6 @@
                 </div>
             </div>`;
 
-        // ==========================================
-        // NEW FEATURE: DOWNLOAD SPECIFIC TASK REGISTER PDF
-        // ==========================================
         window.downloadTaskRegisterReport = (taskId) => {
             const rule = taskRules.find(r => r.id === taskId);
             if (!rule) return;
@@ -691,13 +774,11 @@
             let rows = '';
             let sl = 1;
 
-            // Sort vehicles by category just like All Vehicles view
             const grouped = {}; 
             vehicles.forEach(v => { if(!grouped[v.type]) grouped[v.type] = []; grouped[v.type].push(v); });
             
             Object.keys(grouped).sort(sortCategories).forEach(type => {
                 grouped[type].forEach(v => {
-                    // Get latest log for this specific task
                     const vLogs = maintenanceLog.filter(m => m.vehicleId === v.id && m.typeId === taskId).sort((a,b) => new Date(b.doneDate) - new Date(a.doneDate));
                     const latestLog = vLogs.length > 0 ? vLogs[0] : null;
 
@@ -938,7 +1019,6 @@
             document.getElementById('maint-type').innerHTML = '<option value="" disabled selected>কাজের ধরন নির্বাচন করুন...</option>' + taskRules.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
             document.getElementById('veh-type').innerHTML = vehicleTypes.map(v => `<option value="${v.name}">${v.name}</option>`).join('');
             
-            // NEW UI: ADDED PDF REGISTER BUTTON IN RULES LIST
             document.getElementById('rules-list').innerHTML = taskRules.map(r => `
                 <li class="flex justify-between items-center py-2.5 border-b border-slate-100 last:border-0">
                     <div>
