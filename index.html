@@ -250,6 +250,7 @@
         </div>
     </div>
 
+    <!-- Edit/Add Modals -->
     <div id="add-veh-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 transition-opacity bg-slate-900/60"><div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl"><div class="flex justify-between items-center mb-5"><h3 class="font-bold text-lg text-slate-800">নতুন গাড়ি যোগ</h3><button onclick="document.getElementById('add-veh-modal').classList.add('hidden')" class="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500"><i class="fa-solid fa-xmark"></i></button></div><form id="form-vehicle" class="space-y-4"><div><label class="block text-xs font-bold text-slate-500 mb-1.5">বিএ নম্বর (BA No)</label><input type="text" id="veh-ba" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"></div><div><label class="block text-xs font-bold text-slate-500 mb-1.5">গাড়ির ধরন</label><select id="veh-type" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"></select></div><button type="submit" class="w-full bg-blue-600 text-white font-bold py-3.5 rounded-xl shadow-md mt-2">সংরক্ষণ করুন</button></form></div></div>
     
     <div id="edit-veh-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 transition-opacity bg-slate-900/60"><div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl"><div class="flex justify-between items-center mb-5"><h3 class="font-bold text-lg text-slate-800">গাড়ি আপডেট</h3><button onclick="document.getElementById('edit-veh-modal').classList.add('hidden')" class="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500"><i class="fa-solid fa-xmark"></i></button></div><form id="form-edit-vehicle" class="space-y-4"><input type="hidden" id="edit-veh-id"><div><label class="block text-xs font-bold text-slate-500 mb-1.5">বিএ নম্বর (BA No)</label><input type="text" id="edit-veh-ba" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"></div><div><label class="block text-xs font-bold text-slate-500 mb-1.5">গাড়ির ধরন</label><select id="edit-veh-type" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"></select></div><button type="submit" class="w-full bg-blue-600 text-white font-bold py-3.5 rounded-xl shadow-md mt-2">আপডেট করুন</button></form></div></div>
@@ -826,28 +827,33 @@
         }
 
         // ==========================================
-        // 100% FIXED PDF ENGINE - NO BLANK PAGE, NO CUT-OFF, FIXED SCROLL BUG
+        // 100% BULLETPROOF PDF ENGINE
+        // Fixes Blank Page (Scroll Bug), Hidden Container issue, Right-side Cutoff, and Font Breakage
         // ==========================================
         function generatePDF(htmlContent, fileName) {
             window.showToast("পিডিএফ প্রস্তুত হচ্ছে, অপেক্ষা করুন...");
             
-            // ১. স্ক্রল বাগ ফিক্স: পেজের নিচে স্ক্রল করা থাকলে পিডিএফ ব্ল্যাংক আসে, তাই স্ক্রল টপ করা হলো
-            window.scrollTo(0, 0); 
+            // 1. Save original scroll position and scroll to top 
+            // (html2canvas captures blank pages if the document is scrolled down)
+            const originalScrollY = window.scrollY;
+            window.scrollTo(0, 0);
 
-            // ২. একটি অস্থায়ী DOM এলিমেন্ট তৈরি করা হচ্ছে
-            // বাগ ফিক্স: আগে top:0/left:0 রেখে শুধু z-index:-9999 দিয়ে এলিমেন্টটি "পেছনে" রাখা হয়েছিল।
-            // কিন্তু body-এর নিজস্ব stacking context না থাকায় negative z-index এটিকে পেজের ফিক্সড
-            // হেডার/মোডাল/লগইন-ওভারলের (যাদের z-index 10-10000) *নিচে* চাপা দিয়ে দিচ্ছিল — ফলে
-            // html2canvas নিজের বক্সের বদলে উপরের সাদা/অস্বচ্ছ এলিমেন্ট ক্যাপচার করছিল, তাই PDF ব্ল্যাংক আসছিল।
-            // সমাধান: এলিমেন্টটিকে ভিউপোর্টের সম্পূর্ণ বাইরে (left: -9999px) সরানো হলো যাতে
-            // কোনো ফিক্সড/মোডাল UI-এর সাথে ওভারল্যাপ না হয় এবং z-index ট্রিকের দরকার না পড়ে।
+            // 2. Create the wrapper element
             const tempContainer = document.createElement('div');
-            tempContainer.style.width = '794px'; // A4 size exact width
+            
+            // 3. IMPORTANT CSS: 
+            // Use absolute positioning behind the main app (z-index: -1000).
+            // Do NOT use display:none, opacity:0, or left:-9999px because html2canvas ignores those.
             tempContainer.style.position = 'absolute';
             tempContainer.style.top = '0px';
-            tempContainer.style.left = '-9999px';
+            tempContainer.style.left = '0px';
+            tempContainer.style.width = '794px'; // Strict A4 Width
+            tempContainer.style.minHeight = '1123px';
+            tempContainer.style.zIndex = '-1000'; // Behind the main app background
             tempContainer.style.backgroundColor = '#ffffff';
+            tempContainer.style.color = '#000000';
             tempContainer.innerHTML = htmlContent;
+            
             document.body.appendChild(tempContainer);
 
             const opt = { 
@@ -858,29 +864,34 @@
                     scale: 2, 
                     useCORS: true,
                     scrollY: 0,
-                    scrollX: 0
+                    scrollX: 0,
+                    windowWidth: 794 // Ensures the internal iframe canvas doesn't cut off
                 }, 
                 jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } 
             };
             
-            // ৪. setTimeout: ব্রাউজারকে ফন্ট এবং টেবিল সাজানোর জন্য ৮০০ মিলি-সেকেন্ড সময় দেওয়া হলো
+            // 4. Delay to allow browser to calculate layout and apply fonts securely
             setTimeout(() => {
                 html2pdf().set(opt).from(tempContainer).save().then(() => {
                     window.showToast("পিডিএফ সফলভাবে ডাউনলোড হয়েছে!");
-                    document.body.removeChild(tempContainer); // কাজ শেষে মুছে ফেলা হলো
+                    document.body.removeChild(tempContainer);
+                    window.scrollTo(0, originalScrollY); // Restore scroll position
                 }).catch(err => {
                     console.error("PDF Error:", err); 
                     window.showToast("পিডিএফ তৈরিতে সমস্যা হয়েছে!", true);
-                    document.body.removeChild(tempContainer);
+                    if (document.body.contains(tempContainer)) {
+                        document.body.removeChild(tempContainer);
+                    }
+                    window.scrollTo(0, originalScrollY);
                 });
             }, 800);
         }
 
         const getPDFTemplate = (title, subtitle, tableHeaders, tableRows) => `
-            <div style="font-family:'Hind Siliguri', 'Kalpurush', sans-serif; color:#1e293b; background: white; width: 100%; box-sizing: border-box;">
+            <div style="font-family:'Hind Siliguri', 'Kalpurush', sans-serif; color:#1e293b; background: white; width: 100%; box-sizing: border-box; padding: 10px;">
                 <style>
                     table { width: 100%; border-collapse: collapse; table-layout: fixed; margin-top: 10px; }
-                    th, td { padding: 6px 8px; border: 1px solid #cbd5e1; font-size: 11px; word-wrap: break-word; overflow-wrap: break-word; text-align: left; }
+                    th, td { padding: 8px; border: 1px solid #cbd5e1; font-size: 11px; word-wrap: break-word; overflow-wrap: break-word; text-align: left; }
                     th { background-color: #f1f5f9; font-weight: bold; color: #0f172a; border-bottom: 2px solid #94a3b8; }
                     tr { page-break-inside: avoid !important; }
                 </style>
@@ -902,7 +913,7 @@
             </div>`;
 
         const getRegisterPDFTemplate = (title, tableHeaders, tableRows) => `
-            <div style="font-family:'Hind Siliguri', 'Kalpurush', sans-serif; color:#000; background: white; width: 100%; box-sizing: border-box;">
+            <div style="font-family:'Hind Siliguri', 'Kalpurush', sans-serif; color:#000; background: white; width: 100%; box-sizing: border-box; padding: 10px;">
                 <style>
                     table { width: 100%; border-collapse: collapse; table-layout: fixed; }
                     th, td { padding: 6px; border: 1px solid #000; font-size: 11px; word-wrap: break-word; overflow-wrap: break-word; text-align: center; }
