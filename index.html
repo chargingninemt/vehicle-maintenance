@@ -817,7 +817,7 @@
 
         function formatDate(dStr) { if(!dStr) return ''; return new Date(dStr).toLocaleDateString('bn-BD', { day: 'numeric', month: 'short', year: 'numeric' }); }
         
-        function formatShortDate(dStr) {
+       function formatShortDate(dStr) {
             if(!dStr) return '';
             const d = new Date(dStr);
             const dd = String(d.getDate()).padStart(2, '0');
@@ -827,100 +827,70 @@
         }
 
         // ==========================================
-        // ROBUST PDF ENGINE - BLANK PAGE & CUT-OFF BUG FIXED
+        // 100% FIXED PDF ENGINE - NO BLANK PAGE, NO CUT-OFF
         // ==========================================
         function generatePDF(htmlContent, fileName) {
             window.showToast("পিডিএফ প্রস্তুত হচ্ছে, অপেক্ষা করুন...");
             
-            const originalScrollY = window.scrollY;
-            window.scrollTo(0, 0);
-
-            const tempContainer = document.createElement('div');
-            tempContainer.innerHTML = htmlContent;
-            
-            // FIX 1: left -9999px causes blank renders in html2canvas. 
-            // Instead, place it at 0,0 but hide it BEHIND the main app container using z-index.
-            tempContainer.style.position = 'absolute';
-            tempContainer.style.top = '0';
-            tempContainer.style.left = '0';
-            tempContainer.style.width = '800px'; 
-            tempContainer.style.backgroundColor = '#ffffff';
-            tempContainer.style.zIndex = '-100'; 
-            
-            document.body.appendChild(tempContainer);
-
             const opt = { 
-                margin: [0.3, 0.3, 0.3, 0.3], 
+                margin: [0.4, 0.4, 0.4, 0.4], 
                 filename: fileName, 
-                image: { type: 'jpeg', quality: 1.0 }, 
+                image: { type: 'jpeg', quality: 0.98 }, 
                 html2canvas: { 
                     scale: 2, 
                     useCORS: true,
-                    scrollY: 0, 
-                    scrollX: 0,
-                    windowWidth: 800 
+                    letterRendering: true
                 }, 
-                pagebreak: { mode: ['css', 'legacy'], avoid: 'tr' }, 
                 jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } 
             };
             
-            // FIX 2: Give the browser a tiny delay (300ms) to load fonts and apply CSS before capturing
-            setTimeout(() => {
-                html2pdf().set(opt).from(tempContainer).save().then(() => {
-                    window.showToast("পিডিএফ সফলভাবে ডাউনলোড হয়েছে!");
-                    document.body.removeChild(tempContainer); 
-                    window.scrollTo(0, originalScrollY); 
-                }).catch(err => {
-                    console.error("PDF Error:", err); 
-                    window.showToast("পিডিএফ তৈরিতে সমস্যা হয়েছে!", true);
-                    if (document.body.contains(tempContainer)) {
-                        document.body.removeChild(tempContainer); 
-                    }
-                    window.scrollTo(0, originalScrollY);
-                });
-            }, 300);
+            // Direct HTML string rendering bypasses the hidden div and scroll offset bug entirely!
+            html2pdf().set(opt).from(htmlContent).save().then(() => {
+                window.showToast("পিডিএফ সফলভাবে ডাউনলোড হয়েছে!");
+            }).catch(err => {
+                console.error("PDF Error:", err); 
+                window.showToast("পিডিএফ তৈরিতে সমস্যা হয়েছে!", true);
+            });
         }
 
-        // FIX 3: Removed the "transform: translate..." watermark. html2canvas has a known bug 
-        // where it miscalculates bounding boxes for transformed elements, causing blank/shrunk PDFs.
         const getPDFTemplate = (title, subtitle, tableHeaders, tableRows) => `
-            <div style="width: 100%; padding: 10px; box-sizing: border-box; font-family:'Hind Siliguri', sans-serif; color:#1e293b; background: white; margin: 0;">
+            <div style="font-family:'Hind Siliguri', sans-serif; color:#1e293b; background: white;">
                 <style>
                     @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap');
+                    table { width: 100%; border-collapse: collapse; table-layout: fixed; margin-top: 10px; }
+                    th, td { padding: 6px 8px; border: 1px solid #cbd5e1; font-size: 11px; word-wrap: break-word; overflow-wrap: break-word; text-align: left; }
+                    th { background-color: #f1f5f9; font-weight: bold; color: #0f172a; border-bottom: 2px solid #94a3b8; }
                     tr { page-break-inside: avoid !important; }
-                    table { table-layout: fixed; width: 100%; border-collapse: collapse; }
-                    td, th { padding: 8px; border-bottom: 1px solid #e2e8f0; font-size: 13px; word-wrap: break-word; overflow-wrap: break-word; }
-                    th { background-color: #f1f5f9; font-weight: bold; color: #0f172a; text-align: left; }
                 </style>
                 <div>
-                    <div style="text-align:center; border-bottom:3px solid #059669; padding-bottom:10px; margin-bottom:15px">
-                        <h2 style="color:#059669; font-size:22px; margin:0; font-weight:bold;">৯ ইস্ট বেঙ্গল রেজিমেন্ট</h2>
-                        <p style="margin:4px 0 0 0; font-size:15px; font-weight:bold;">${title}</p>
-                        <p style="margin:4px 0 0 0; font-size:12px; color:#64748b">তারিখ: ${formatDate(new Date().toISOString().split('T')[0])}</p>
+                    <div style="text-align:center; border-bottom:2px solid #059669; padding-bottom:10px; margin-bottom:15px">
+                        <h2 style="color:#059669; font-size:20px; margin:0; font-weight:bold;">৯ ইস্ট বেঙ্গল রেজিমেন্ট</h2>
+                        <p style="margin:4px 0 0 0; font-size:14px; font-weight:bold;">${title}</p>
+                        <p style="margin:4px 0 0 0; font-size:11px; color:#64748b">তারিখ: ${formatDate(new Date().toISOString().split('T')[0])}</p>
                     </div>
-                    ${subtitle ? `<div style="background:#f8fafc; padding:12px; border-radius:6px; margin-bottom:15px; border:1px solid #e2e8f0">${subtitle}</div>` : ''}
+                    ${subtitle ? `<div style="background:#f8fafc; padding:10px; border-radius:6px; margin-bottom:10px; border:1px solid #e2e8f0; font-size: 12px;">${subtitle}</div>` : ''}
                     <table>
                         <thead><tr>${tableHeaders}</tr></thead>
                         <tbody>${tableRows}</tbody>
                     </table>
-                    <div style="margin-top:50px; text-align:right">
-                        <p style="border-top:1px solid #000; display:inline-block; padding-top:5px; margin:0; font-weight:bold; font-size:13px;">এমটি এনসিও / অফিসার স্বাক্ষর</p>
+                    <div style="margin-top:30px; text-align:right">
+                        <p style="border-top:1px solid #000; display:inline-block; padding-top:5px; margin:0; font-size: 12px; font-weight: bold;">এমটি এনসিও / অফিসার স্বাক্ষর</p>
                     </div>
                 </div>
             </div>`;
 
         const getRegisterPDFTemplate = (title, tableHeaders, tableRows) => `
-            <div style="width: 100%; padding: 10px; box-sizing: border-box; font-family:'Hind Siliguri', sans-serif; color:#000; background: white; margin: 0;">
+            <div style="font-family:'Hind Siliguri', sans-serif; color:#000; background: white;">
                 <style>
                     @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap');
-                    tr { page-break-inside: avoid !important; }
-                    table { table-layout: fixed; width: 100%; border-collapse: collapse; }
-                    td, th { padding: 6px; border: 1px solid #000; font-size: 12px; text-align:center; word-wrap: break-word; overflow-wrap: break-word; }
+                    table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+                    th, td { padding: 6px; border: 1px solid #000; font-size: 10px; word-wrap: break-word; overflow-wrap: break-word; text-align: center; }
                     th { background-color: #f8fafc; font-weight: bold; }
+                    tr { page-break-inside: avoid !important; }
                 </style>
                 <div>
-                    <div style="text-align:center; margin-bottom:20px;">
-                        <h2 style="font-size:22px; margin:0; font-weight: bold; border-bottom: 2px solid #000; display: inline-block; padding-bottom: 3px;">${title}</h2>
+                    <div style="text-align:center; margin-bottom:15px;">
+                        <h2 style="font-size:18px; margin:0; font-weight: bold; border-bottom: 2px solid #000; display: inline-block; padding-bottom: 3px;">${title}</h2>
                     </div>
                     <table>
                         <thead><tr>${tableHeaders}</tr></thead>
@@ -948,7 +918,7 @@
                         rows += `
                             <tr>
                                 <td>${sl++}</td>
-                                <td style="font-weight:bold;">${v.baNo}</td>
+                                <td style="font-weight:bold; font-size:12px;">${v.baNo}</td>
                                 <td>${formatShortDate(latestLog.doneDate)}</td>
                                 <td>${latestLog.doneKm}</td>
                                 <td style="color:#059669; font-weight:bold;">${formatShortDate(latestLog.nextDate)}</td>
@@ -960,7 +930,7 @@
                         rows += `
                             <tr>
                                 <td>${sl++}</td>
-                                <td style="font-weight:bold;">${v.baNo}</td>
+                                <td style="font-weight:bold; font-size:12px;">${v.baNo}</td>
                                 <td style="color:#94a3b8;" colspan="4">কোনো কাজ রেকর্ড করা হয়নি</td>
                                 <td></td>
                             </tr>
@@ -974,13 +944,13 @@
             }
 
             const headers = `
-                <th style="width: 8%;">ক্র.নং</th>
-                <th style="width: 18%;">বিএ নং</th>
-                <th style="width: 16%;">বর্তমান তারিখ</th>
-                <th style="width: 16%;">বদলীর কি.মি</th>
-                <th style="width: 16%;">পরবর্তী তারিখ</th>
-                <th style="width: 16%;">বদলীর কি.মি</th>
-                <th style="width: 10%;">মন্তব্য</th>
+                <th style="width:8%;">ক্র.নং</th>
+                <th style="width:16%;">বিএ নং</th>
+                <th style="width:16%;">বর্তমান তারিখ</th>
+                <th style="width:15%;">বদলীর কি.মি</th>
+                <th style="width:16%;">পরবর্তী তারিখ</th>
+                <th style="width:15%;">বদলীর কি.মি</th>
+                <th style="width:14%;">মন্তব্য</th>
             `;
 
             const title = `${rule.name} - ${rule.months} মাস / ${rule.km} কি.মি`;
