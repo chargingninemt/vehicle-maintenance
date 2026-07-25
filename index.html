@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- html2pdf.js -->
+    <!-- html2pdf.js (Optional for other features, kept for compatibility) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <!-- SheetJS for Excel Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -34,12 +34,10 @@
     <div id="login-screen" class="fixed inset-0 z-[100] flex items-center justify-center login-bg px-4 transition-opacity duration-300">
         <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-8 transform transition-all">
             <div class="text-center mb-8">
-                <!-- Permanent SVG Logo Setup -->
-                <div class="w-24 h-24 mx-auto mb-4 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center shadow-md border-4 border-emerald-100">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-12 h-12">
-                        <path fill-rule="evenodd" d="M12.516 2.17a.75.75 0 00-1.032 0 11.209 11.209 0 00-7.877 3.08.75.75 0 00-.222.583c.094 3.79.791 7.218 1.957 10.155.85 2.146 1.986 4.024 3.327 5.568.397.458.825.885 1.282 1.277a.75.75 0 001.03 0 15.004 15.004 0 001.283-1.277c1.34-1.544 2.476-3.422 3.327-5.568 1.166-2.937 1.863-6.365 1.957-10.155a.75.75 0 00-.222-.583 11.209 11.209 0 00-7.877-3.08zM12 11.25a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
-                        <path d="M8.25 12h7.5a.75.75 0 01.75.75v1.5a.75.75 0 01-.75.75h-7.5a.75.75 0 01-.75-.75v-1.5a.75.75 0 01.75-.75z" />
-                    </svg>
+                <!-- Custom Logo Setup (From GitHub) -->
+                <div class="w-24 h-24 mx-auto mb-4 bg-white rounded-full flex items-center justify-center shadow-md border-4 border-emerald-100 overflow-hidden">
+                    <!-- আপনার গিটহাবের ছবির লিংকটি নিচের src এর ভেতরে দিন -->
+                    <img src="YOUR_GITHUB_IMAGE_LINK_HERE" alt="9 EB Logo" class="w-full h-full object-cover">
                 </div>
                 <h1 class="text-2xl font-bold text-emerald-800">৯ ইস্ট বেঙ্গল রেজিমেন্ট</h1>
                 <p class="text-slate-500 text-sm mt-1">এমটি (MT) মেইনটেন্যান্স ট্র্যাকার</p>
@@ -73,8 +71,9 @@
         <header class="bg-white shadow-sm sticky top-0 z-40">
             <div class="px-4 py-3 flex justify-between items-center max-w-5xl mx-auto">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center shadow-sm border-2 border-emerald-500">
-                        <i class="fa-solid fa-truck-fast"></i>
+                    <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm border-2 border-emerald-500 overflow-hidden">
+                        <!-- হেডারের ছোট লোগো, এখানেও ছবির লিংকটি দিন -->
+                        <img src="YOUR_GITHUB_IMAGE_LINK_HERE" alt="Logo" class="w-full h-full object-cover">
                     </div>
                     <div>
                         <h1 class="font-bold text-lg text-slate-800 leading-tight">৯ ইস্ট বেঙ্গল (Smart MT)</h1>
@@ -829,16 +828,6 @@
         // 100% FIXED PDF ENGINE - NO BLANK PAGE, NO CUT-OFF, FIXED SCROLL BUG
         // ==========================================
         function generatePDF(htmlContent, fileName) {
-            // === সম্পূর্ণ নতুন পদ্ধতি: html2canvas বাদ, ব্রাউজারের নিজস্ব প্রিন্ট ইঞ্জিন ===
-            // html2canvas + off-screen/z-index পজিশনিং দিয়ে বারবার চেষ্টা করেও ব্ল্যাংক পেজ
-            // সমস্যা থেকেই যাচ্ছিল। তাই এবার সম্পূর্ণ ভিন্ন, নির্ভরযোগ্য পদ্ধতি ব্যবহার করা হলো:
-            // রিপোর্টটি একটি নতুন ট্যাবে খোলা হচ্ছে এবং ব্রাউজারের নিজস্ব Print ডায়ালগ চালু করা
-            // হচ্ছে, যেখানে "Save as PDF" (প্রিন্টার হিসেবে) বেছে নিলেই সঠিক PDF তৈরি হবে।
-            // এই পদ্ধতিতে html2canvas/ফন্ট-লোড/z-index/স্ক্রল সংক্রান্ত কোনো সমস্যাই থাকে না,
-            // কারণ ব্রাউজার নিজেই সরাসরি HTML রেন্ডার করে প্রিন্ট করছে, কোনো ক্যানভাস স্ক্রিনশট নয়।
-
-            // পপ-আপ উইন্ডোটি ব্যবহারকারীর ক্লিকের সাথে সাথেই (synchronously) খোলা হচ্ছে,
-            // নাহলে ব্রাউজার এটিকে পপ-আপ ব্লকার দিয়ে আটকে দিতে পারে।
             const printWindow = window.open('', '_blank');
             if (!printWindow) {
                 window.showToast('পপ-আপ ব্লকার সক্রিয় আছে! ব্রাউজারের ঠিকানা-বারে পপ-আপ আইকনে ক্লিক করে এই সাইটের জন্য পপ-আপ অনুমতি দিন, তারপর আবার চেষ্টা করুন।', true);
@@ -867,7 +856,6 @@
 ${htmlContent}
 <script>
     window.onload = function () {
-        // ফন্ট সম্পূর্ণ লোড হওয়া পর্যন্ত অপেক্ষা করে তারপর প্রিন্ট ডায়ালগ খোলা হচ্ছে
         var ready = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
         ready.then(function () {
             setTimeout(function () {
