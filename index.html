@@ -556,7 +556,7 @@
             handleDbWrite('maintenanceLog', newId, { id: newId, vehicleId: vId, vehicleBa: vData.baNo, typeId: rId, typeName: rule.name, doneDate: dStr, doneKm: km, nextDate: nextDateTarget, nextKm: nextKmTarget, timestamp: Date.now() }, 'রেকর্ড সেভ হয়েছে'); 
             e.target.reset(); 
         });
-        
+
         document.getElementById('form-rule').addEventListener('submit', (e)=>{ 
             e.preventDefault(); 
             const rName = document.getElementById('rule-name').value.trim();
@@ -827,36 +827,47 @@
         }
 
         // ==========================================
-        // 100% FIXED PDF ENGINE - NO BLANK PAGE, NO CUT-OFF
+        // 100% FIXED PDF ENGINE - NO BLANK PAGE, NO CUT-OFF, FIXED FONT
         // ==========================================
         function generatePDF(htmlContent, fileName) {
             window.showToast("পিডিএফ প্রস্তুত হচ্ছে, অপেক্ষা করুন...");
             
+            // Temporary DOM Element to ensure styles/fonts are loaded properly and width is fixed
+            const tempContainer = document.createElement('div');
+            tempContainer.style.width = '794px'; // A4 size exact width (96dpi)
+            tempContainer.style.position = 'absolute';
+            tempContainer.style.left = '-9999px'; 
+            tempContainer.style.top = '0';
+            tempContainer.style.backgroundColor = '#ffffff';
+            tempContainer.innerHTML = htmlContent;
+            document.body.appendChild(tempContainer);
+
             const opt = { 
                 margin: [0.4, 0.4, 0.4, 0.4], 
                 filename: fileName, 
-                image: { type: 'jpeg', quality: 0.98 }, 
+                image: { type: 'jpeg', quality: 1.0 }, 
                 html2canvas: { 
                     scale: 2, 
                     useCORS: true,
-                    letterRendering: true
+                    windowWidth: 794 // Prevents right side truncation
+                    // letterRendering: true <-- Removed. Because it breaks Bengali compound characters.
                 }, 
                 jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } 
             };
             
-            // Direct HTML string rendering bypasses the hidden div and scroll offset bug entirely!
-            html2pdf().set(opt).from(htmlContent).save().then(() => {
+            html2pdf().set(opt).from(tempContainer).save().then(() => {
                 window.showToast("পিডিএফ সফলভাবে ডাউনলোড হয়েছে!");
+                document.body.removeChild(tempContainer); 
             }).catch(err => {
                 console.error("PDF Error:", err); 
                 window.showToast("পিডিএফ তৈরিতে সমস্যা হয়েছে!", true);
+                document.body.removeChild(tempContainer);
             });
         }
 
         const getPDFTemplate = (title, subtitle, tableHeaders, tableRows) => `
-            <div style="font-family:'Hind Siliguri', sans-serif; color:#1e293b; background: white;">
+            <div style="font-family:'Hind Siliguri', 'Kalpurush', sans-serif; color:#1e293b; background: white; width: 100%; box-sizing: border-box;">
                 <style>
-                    @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap');
                     table { width: 100%; border-collapse: collapse; table-layout: fixed; margin-top: 10px; }
                     th, td { padding: 6px 8px; border: 1px solid #cbd5e1; font-size: 11px; word-wrap: break-word; overflow-wrap: break-word; text-align: left; }
                     th { background-color: #f1f5f9; font-weight: bold; color: #0f172a; border-bottom: 2px solid #94a3b8; }
@@ -873,18 +884,17 @@
                         <thead><tr>${tableHeaders}</tr></thead>
                         <tbody>${tableRows}</tbody>
                     </table>
-                    <div style="margin-top:30px; text-align:right">
+                    <div style="margin-top:40px; text-align:right">
                         <p style="border-top:1px solid #000; display:inline-block; padding-top:5px; margin:0; font-size: 12px; font-weight: bold;">এমটি এনসিও / অফিসার স্বাক্ষর</p>
                     </div>
                 </div>
             </div>`;
 
         const getRegisterPDFTemplate = (title, tableHeaders, tableRows) => `
-            <div style="font-family:'Hind Siliguri', sans-serif; color:#000; background: white;">
+            <div style="font-family:'Hind Siliguri', 'Kalpurush', sans-serif; color:#000; background: white; width: 100%; box-sizing: border-box;">
                 <style>
-                    @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap');
                     table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-                    th, td { padding: 6px; border: 1px solid #000; font-size: 10px; word-wrap: break-word; overflow-wrap: break-word; text-align: center; }
+                    th, td { padding: 6px; border: 1px solid #000; font-size: 11px; word-wrap: break-word; overflow-wrap: break-word; text-align: center; }
                     th { background-color: #f8fafc; font-weight: bold; }
                     tr { page-break-inside: avoid !important; }
                 </style>
@@ -1007,7 +1017,6 @@
             
             document.getElementById('vd-pdf-btn').onclick = () => window.downloadVehicleReport(currentOpenVehicleId);
         };
-
 
         window.openAllVehiclesModal = () => {
             const tbody = document.getElementById('all-vehicles-tbody');
