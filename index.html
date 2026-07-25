@@ -10,6 +10,9 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- html2pdf.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- SheetJS for Excel Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Kalpurush&family=Hind+Siliguri:wght@400;500;600;700&display=swap');
         body { font-family: 'Hind Siliguri', 'Kalpurush', sans-serif; background-color: #f3f4f6; -webkit-tap-highlight-color: transparent; }
@@ -31,23 +34,30 @@
     <div id="login-screen" class="fixed inset-0 z-[100] flex items-center justify-center login-bg px-4 transition-opacity duration-300">
         <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-8 transform transition-all">
             <div class="text-center mb-8">
-                <div class="w-24 h-24 mx-auto mb-4 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center shadow-md border-4 border-emerald-100 text-4xl">
-                    <i class="fa-solid fa-truck-shield"></i>
+                <!-- Permanent SVG Logo Setup -->
+                <div class="w-24 h-24 mx-auto mb-4 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center shadow-md border-4 border-emerald-100">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-12 h-12">
+                        <path fill-rule="evenodd" d="M12.516 2.17a.75.75 0 00-1.032 0 11.209 11.209 0 00-7.877 3.08.75.75 0 00-.222.583c.094 3.79.791 7.218 1.957 10.155.85 2.146 1.986 4.024 3.327 5.568.397.458.825.885 1.282 1.277a.75.75 0 001.03 0 15.004 15.004 0 001.283-1.277c1.34-1.544 2.476-3.422 3.327-5.568 1.166-2.937 1.863-6.365 1.957-10.155a.75.75 0 00-.222-.583 11.209 11.209 0 00-7.877-3.08zM12 11.25a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
+                        <path d="M8.25 12h7.5a.75.75 0 01.75.75v1.5a.75.75 0 01-.75.75h-7.5a.75.75 0 01-.75-.75v-1.5a.75.75 0 01.75-.75z" />
+                    </svg>
                 </div>
                 <h1 class="text-2xl font-bold text-emerald-800">৯ ইস্ট বেঙ্গল রেজিমেন্ট</h1>
                 <p class="text-slate-500 text-sm mt-1">এমটি (MT) মেইনটেন্যান্স ট্র্যাকার</p>
             </div>
             
-            <form id="login-form" class="space-y-5">
+            <form id="login-form" class="space-y-4">
                 <div>
                     <label class="block text-sm font-bold text-slate-700 mb-1.5"><i class="fa-solid fa-envelope mr-1 text-slate-400"></i> ইমেইল</label>
                     <input type="email" id="login-email" required placeholder="admin@9eb.com" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none">
                 </div>
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-1.5"><i class="fa-solid fa-lock mr-1 text-slate-400"></i> পাসওয়ার্ড</label>
+                    <div class="flex justify-between items-center mb-1.5">
+                        <label class="block text-sm font-bold text-slate-700"><i class="fa-solid fa-lock mr-1 text-slate-400"></i> পাসওয়ার্ড</label>
+                        <button type="button" onclick="window.resetPassword()" class="text-xs text-emerald-600 font-bold hover:underline">ভুলে গেছেন?</button>
+                    </div>
                     <input type="password" id="login-password" required placeholder="••••••••" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none">
                 </div>
-                <button type="submit" id="login-btn" class="w-full grad-primary text-white font-bold py-3.5 rounded-xl shadow-lg active:scale-95 transition-all mt-4">
+                <button type="submit" id="login-btn" class="w-full grad-primary text-white font-bold py-3.5 rounded-xl shadow-lg active:scale-95 transition-all mt-6">
                     লগইন করুন
                 </button>
                 <div id="login-error" class="hidden text-center text-red-500 text-sm font-semibold mt-2 bg-red-50 py-2 rounded-lg">ইমেইল বা পাসওয়ার্ড ভুল!</div>
@@ -72,7 +82,7 @@
                     </div>
                 </div>
                 <div class="flex gap-2">
-                    <button onclick="window.manualSyncToSheets()" class="w-10 h-10 rounded-full bg-slate-50 text-slate-600 hover:bg-emerald-50 hover:text-emerald-600 shadow-sm flex items-center justify-center transition" title="গুগল শিট আপডেট"><i class="fa-solid fa-cloud-arrow-up"></i></button>
+                    <button onclick="window.debouncedSync()" class="w-10 h-10 rounded-full bg-slate-50 text-slate-600 hover:bg-emerald-50 hover:text-emerald-600 shadow-sm flex items-center justify-center transition" title="গুগল শিট আপডেট"><i class="fa-solid fa-cloud-arrow-up"></i></button>
                     <button onclick="window.logoutUser()" class="w-10 h-10 rounded-full bg-red-50 text-red-500 hover:bg-red-500 hover:text-white shadow-sm flex items-center justify-center transition" title="লগআউট"><i class="fa-solid fa-right-from-bracket"></i></button>
                 </div>
             </div>
@@ -166,7 +176,12 @@
 
                 <!-- Settings -->
                 <section id="sec-settings" class="hidden animate-fade-in">
-                    <h3 class="font-bold text-slate-800 mb-4 ml-1"><i class="fa-solid fa-sliders text-purple-500 mr-2"></i>অ্যাপ সেটআপ</h3>
+                    <div class="flex justify-between items-center mb-4 ml-1 border-b border-slate-200 pb-3">
+                        <h3 class="font-bold text-slate-800"><i class="fa-solid fa-sliders text-purple-500 mr-2"></i>অ্যাপ সেটআপ ও ব্যাকআপ</h3>
+                        <button onclick="window.exportToExcel()" class="bg-green-600 hover:bg-green-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition shadow flex items-center">
+                            <i class="fa-solid fa-file-excel mr-1.5"></i> এক্সেল ডাউনলোড
+                        </button>
+                    </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
                             <h4 class="font-bold text-slate-700 mb-3 border-b pb-2">কাজের নিয়ম যুক্ত করুন</h4>
@@ -258,11 +273,11 @@
     <!-- Core Scripts -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, doc, setDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, signInAnonymously, signInWithCustomToken, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, doc, setDoc, deleteDoc, updateDoc, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // ==========================================
-        // CONFIGS
+        // CONFIGS (YOUR CREDENTIALS ADDED)
         // ==========================================
         let firebaseConfig = {
             apiKey: "AIzaSyBF4ebAsfoKgd9wgNIeNJ9QRKpMSXr-w9g",
@@ -281,9 +296,15 @@
         }
 
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzxW6l1uO1MiNf-Pv_aYl2BnapuDzYoYZubwrGECexfxJgBvDLUaDRJheWlGMDgtUKk3w/exec"; 
+        
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+
+        // OFFLINE SUPPORT
+        enableIndexedDbPersistence(db).catch((err) => {
+            console.log("Offline persistence error:", err.code);
+        });
 
         if(isCanvas) {
             const initAuth = async () => {
@@ -301,10 +322,19 @@
         let unsubscribeListeners = [];
         let currentOpenVehicleId = null; 
 
-        // EXACT DATE CALCULATION LOGIC
+        // HELPER: Unique ID Generator
+        const generateId = (prefix) => {
+            return prefix + '_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9);
+        };
+
+        // EXACT DATE CALCULATION LOGIC (OVERFLOW FIXED)
         const calculateNextDateExact = (dateStr, addedMonths) => {
             const d = new Date(dateStr);
-            d.setMonth(d.getMonth() + parseInt(addedMonths)); 
+            const targetMonth = d.getMonth() + Number(addedMonths);
+            d.setMonth(targetMonth);
+            if (d.getMonth() !== targetMonth % 12) {
+                d.setDate(0); 
+            }
             const yr = d.getFullYear();
             const mo = String(d.getMonth() + 1).padStart(2, '0');
             const da = String(d.getDate()).padStart(2, '0');
@@ -331,6 +361,21 @@
             setTimeout(()=>t.remove(), 3000);
         };
 
+        // --- DEBOUNCED SYNC ---
+        let syncTimeout = null;
+        window.debouncedSync = () => {
+            clearTimeout(syncTimeout);
+            syncTimeout = setTimeout(() => {
+                window.manualSyncToSheets();
+            }, 3000); 
+        };
+
+        window.manualSyncToSheets = async () => {
+            if(!SCRIPT_URL || SCRIPT_URL.includes("YOUR_GOOGLE")) return;
+            document.getElementById('sync-status').innerHTML = '<i class="fa-solid fa-rotate fa-spin"></i> সিঙ্ক হচ্ছে...';
+            try { await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ vehicles, maintenanceLog, taskRules, vehicleTypes }) }); document.getElementById('sync-status').innerHTML = '<i class="fa-solid fa-check text-emerald-500"></i> শিট আপডেটেড'; } catch(e){ document.getElementById('sync-status').innerHTML = '<i class="fa-solid fa-xmark text-red-500"></i> সিঙ্ক ফেইল'; }
+        };
+
         // --- AUTH LOGIC ---
         const loginScreen = document.getElementById('login-screen');
         const mainApp = document.getElementById('main-app');
@@ -349,6 +394,17 @@
         });
 
         window.logoutUser = () => signOut(auth).then(() => window.showToast("সফলভাবে লগআউট হয়েছেন"));
+        
+        window.resetPassword = () => {
+            const email = document.getElementById('login-email').value.trim();
+            if(!email) {
+                window.showToast("অনুগ্রহ করে ইমেইল বক্সে আপনার ইমেইলটি লিখুন", true);
+                return;
+            }
+            sendPasswordResetEmail(auth, email)
+                .then(() => window.showToast("পাসওয়ার্ড রিসেট লিংক আপনার ইমেইলে পাঠানো হয়েছে!"))
+                .catch((error) => window.showToast("ইমেইল পাঠানো সম্ভব হয়নি। সঠিক ইমেইল দিন।", true));
+        };
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
@@ -415,7 +471,12 @@
         document.getElementById('form-km-update').addEventListener('submit', async (e) => {
             e.preventDefault(); const vId = document.getElementById('km-update-vid').value; const newKm = parseInt(document.getElementById('km-update-val').value);
             const vIndex = vehicles.findIndex(v => v.id === vId);
-            if(vIndex > -1) { vehicles[vIndex].currentKm = newKm; try { await setDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'vehicles', vId), vehicles[vIndex]); window.showToast('মিটার আপডেট হয়েছে!'); window.manualSyncToSheets(); window.closeKmModal(); } catch(err) { window.showToast('আপডেট ফেইল', true); } }
+            if(vIndex > -1) { 
+                vehicles[vIndex].currentKm = newKm; 
+                vehicles[vIndex].updatedBy = auth.currentUser?.email || 'admin';
+                vehicles[vIndex].updatedAt = Date.now();
+                try { await setDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'vehicles', vId), vehicles[vIndex]); window.showToast('মিটার আপডেট হয়েছে!'); window.debouncedSync(); window.closeKmModal(); } catch(err) { window.showToast('আপডেট ফেইল', true); } 
+            }
         });
 
         // QUICK KM UPDATE MODAL
@@ -439,10 +500,12 @@
             const vIndex = vehicles.findIndex(v => v.id === vId);
             if(vIndex > -1) { 
                 vehicles[vIndex].currentKm = newKm; 
+                vehicles[vIndex].updatedBy = auth.currentUser?.email || 'admin';
+                vehicles[vIndex].updatedAt = Date.now();
                 try { 
                     await setDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'vehicles', vId), vehicles[vIndex]); 
                     window.showToast('মিটার সফলভাবে আপডেট হয়েছে!'); 
-                    window.manualSyncToSheets(); 
+                    window.debouncedSync(); 
                     window.closeQuickKmModal(); 
                 } catch(err) { 
                     window.showToast('আপডেট ফেইল', true); 
@@ -450,7 +513,15 @@
             }
         });
 
-        const handleDbWrite = async (cName, id, data, msg) => { try { await setDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', cName, id), data); window.showToast(msg); window.manualSyncToSheets(); } catch(e) { window.showToast("সমস্যা হয়েছে", true); } };
+        const handleDbWrite = async (cName, id, data, msg) => { 
+            try { 
+                data.updatedBy = auth.currentUser?.email || 'admin';
+                data.updatedAt = Date.now();
+                await setDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', cName, id), data); 
+                window.showToast(msg); 
+                window.debouncedSync(); 
+            } catch(e) { window.showToast("সমস্যা হয়েছে", true); } 
+        };
         
         document.getElementById('form-vehicle').addEventListener('submit', (e) => { 
             e.preventDefault(); const baNo = document.getElementById('veh-ba').value.trim(); 
@@ -459,14 +530,15 @@
                 return window.showToast('এই বিএ নম্বরের গাড়িটি আগে যুক্ত করা হয়েছে!', true); 
             }
             
-            const newId = 'veh_' + Date.now();
+            const newId = generateId('veh');
             handleDbWrite('vehicles', newId, { id: newId, baNo, type: document.getElementById('veh-type').value, currentKm: 0, addedDate: new Date().toISOString() }, 'গাড়ি যুক্ত হয়েছে'); 
             e.target.reset(); document.getElementById('add-veh-modal').classList.add('hidden'); 
         });
         
         document.getElementById('form-maintenance').addEventListener('submit', async (e) => { 
             e.preventDefault(); 
-            const vId = document.getElementById('maint-vehicle').value, rId = document.getElementById('maint-type').value, dStr = document.getElementById('maint-date').value, km = parseInt(document.getElementById('maint-km').value); 
+            const vId = document.getElementById('maint-vehicle').value, rId = document.getElementById('maint-type').value, dStr = document.getElementById('maint-date').value;
+            const km = Number(document.getElementById('maint-km').value); 
             
             const isDuplicate = maintenanceLog.some(m => m.vehicleId === vId && m.typeId === rId && m.doneDate === dStr);
             if (isDuplicate) {
@@ -475,12 +547,16 @@
 
             const rule = taskRules.find(r => r.id === rId); const vData = vehicles.find(v => v.id === vId); 
             
-            const nextDateTarget = calculateNextDateExact(dStr, rule.months);
-            const nextKmTarget = km + parseInt(rule.km);
+            const nextDateTarget = calculateNextDateExact(dStr, Number(rule.months));
+            const nextKmTarget = km + Number(rule.km);
             
-            if((vData.currentKm || 0) < km) { vData.currentKm = km; await setDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'vehicles', vData.id), vData); } 
+            if((vData.currentKm || 0) < km) { 
+                vData.currentKm = km; 
+                vData.updatedBy = auth.currentUser?.email || 'admin';
+                await setDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'vehicles', vData.id), vData); 
+            } 
             
-            const newId = 'rec_' + Date.now();
+            const newId = generateId('rec');
             handleDbWrite('maintenanceLog', newId, { id: newId, vehicleId: vId, vehicleBa: vData.baNo, typeId: rId, typeName: rule.name, doneDate: dStr, doneKm: km, nextDate: nextDateTarget, nextKm: nextKmTarget, timestamp: Date.now() }, 'রেকর্ড সেভ হয়েছে'); 
             e.target.reset(); 
         });
@@ -493,8 +569,8 @@
                 return window.showToast('এই কাজের নিয়মটি ইতিমধ্যে যুক্ত করা আছে!', true);
             }
 
-            const newId = 'rule_' + Date.now();
-            handleDbWrite('taskRules', newId, { id: newId, name: rName, months:parseInt(document.getElementById('rule-months').value), km:parseInt(document.getElementById('rule-km').value) }, 'নিয়ম যোগ হয়েছে'); e.target.reset(); 
+            const newId = generateId('rule');
+            handleDbWrite('taskRules', newId, { id: newId, name: rName, months:Number(document.getElementById('rule-months').value), km:Number(document.getElementById('rule-km').value) }, 'নিয়ম যোগ হয়েছে'); e.target.reset(); 
         });
         
         document.getElementById('form-vtype').addEventListener('submit', (e)=>{ 
@@ -505,17 +581,37 @@
                 return window.showToast('এই ধরনটি ইতিমধ্যে যুক্ত করা আছে!', true);
             }
 
-            const newId = 'vt_' + Date.now();
+            const newId = generateId('vt');
             handleDbWrite('vehicleTypes', newId, { id: newId, name: vtName }, 'ধরন যোগ হয়েছে'); e.target.reset(); 
         });
 
-        window.deleteRule = (id) => window.showConfirm('নিয়মটি মুছে ফেলতে চান?', () => handleDbDelete('taskRules', id));
-        window.deleteVehicleType = (id) => window.showConfirm('ধরনটি মুছে ফেলতে চান?', () => handleDbDelete('vehicleTypes', id));
-        window.deleteMaintenance = (id) => window.showConfirm('রেকর্ডটি মুছে ফেলতে চান?', () => handleDbDelete('maintenanceLog', id));
-        window.deleteVehicle = (id) => window.showConfirm('গাড়ি ও এর সব রেকর্ড মুছবেন?', async () => { await handleDbDelete('vehicles', id); maintenanceLog.forEach(m => { if(m.vehicleId===id) handleDbDelete('maintenanceLog', m.id); }); });
+        // --- SAFE DELETION ---
+        window.deleteRule = (id) => window.showConfirm('নিয়মটি মুছে ফেলতে চান?', async () => {
+            await deleteDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'taskRules', id));
+            window.debouncedSync(); window.showToast('সফলভাবে মুছে ফেলা হয়েছে');
+        });
+        window.deleteVehicleType = (id) => window.showConfirm('ধরনটি মুছে ফেলতে চান?', async () => {
+            await deleteDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'vehicleTypes', id));
+            window.debouncedSync(); window.showToast('সফলভাবে মুছে ফেলা হয়েছে');
+        });
+        window.deleteMaintenance = (id) => window.showConfirm('রেকর্ডটি মুছে ফেলতে চান?', async () => {
+            await deleteDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'maintenanceLog', id));
+            window.debouncedSync(); window.showToast('সফলভাবে মুছে ফেলা হয়েছে');
+            if(currentOpenVehicleId) renderVehicleDetails();
+        });
         
-        const handleDbDelete = async (cName, id) => { await deleteDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', cName, id)); window.manualSyncToSheets(); window.showToast('সফলভাবে মুছে ফেলা হয়েছে'); };
-
+        window.deleteVehicle = (id) => window.showConfirm('গাড়ি ও এর সব রেকর্ড মুছবেন?', async () => { 
+            try {
+                await deleteDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'vehicles', id)); 
+                const logsToDelete = maintenanceLog.filter(m => m.vehicleId === id);
+                for (const m of logsToDelete) {
+                    await deleteDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'maintenanceLog', m.id));
+                }
+                window.debouncedSync(); 
+                window.showToast('গাড়ি এবং এর সকল রেকর্ড মুছে ফেলা হয়েছে');
+            } catch(e) { window.showToast('মুছতে সমস্যা হয়েছে', true); }
+        });
+        
         window.editRule = (id) => {
             const r = taskRules.find(x => x.id === id);
             if(!r) return;
@@ -530,8 +626,8 @@
             e.preventDefault();
             const id = document.getElementById('edit-rule-id').value;
             const newName = document.getElementById('edit-rule-name').value.trim();
-            const newMonths = parseInt(document.getElementById('edit-rule-months').value);
-            const newKm = parseInt(document.getElementById('edit-rule-km').value);
+            const newMonths = Number(document.getElementById('edit-rule-months').value);
+            const newKm = Number(document.getElementById('edit-rule-km').value);
 
             if (taskRules.some(r => r.id !== id && r.name.toLowerCase() === newName.toLowerCase())) {
                 return window.showToast('এই নামের আরেকটি নিয়ম ইতিমধ্যে আছে!', true);
@@ -541,13 +637,14 @@
                 await updateDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'taskRules', id), {
                     name: newName,
                     months: newMonths,
-                    km: newKm
+                    km: newKm,
+                    updatedBy: auth.currentUser?.email || 'admin'
                 });
                 
                 const mLogsToUpdate = maintenanceLog.filter(m => m.typeId === id);
-                for(let m of mLogsToUpdate) {
+                for(const m of mLogsToUpdate) {
                     const updatedNextDate = calculateNextDateExact(m.doneDate, newMonths);
-                    const updatedNextKm = m.doneKm + newKm;
+                    const updatedNextKm = Number(m.doneKm) + newKm;
                     await updateDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'maintenanceLog', m.id), {
                         typeName: newName,
                         nextDate: updatedNextDate,
@@ -558,7 +655,7 @@
 
                 window.showToast('নিয়ম এবং পূর্বের রেকর্ড আপডেট হয়েছে!');
                 document.getElementById('edit-rule-modal').classList.add('hidden');
-                window.manualSyncToSheets();
+                window.debouncedSync();
             } catch(err) { window.showToast('আপডেট ফেইল', true); }
         });
 
@@ -581,11 +678,12 @@
 
             try {
                 await updateDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'vehicleTypes', id), {
-                    name: newName
+                    name: newName,
+                    updatedBy: auth.currentUser?.email || 'admin'
                 });
                 window.showToast('ধরন আপডেট হয়েছে');
                 document.getElementById('edit-vtype-modal').classList.add('hidden');
-                window.manualSyncToSheets();
+                window.debouncedSync();
             } catch(err) { window.showToast('আপডেট ফেইল', true); }
         });
 
@@ -611,17 +709,18 @@
             try {
                 await updateDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'vehicles', id), {
                     baNo: newBa,
-                    type: newType
+                    type: newType,
+                    updatedBy: auth.currentUser?.email || 'admin'
                 });
                 
                 const mLogs = maintenanceLog.filter(m => m.vehicleId === id);
-                mLogs.forEach(async (m) => {
+                for (const m of mLogs) {
                     await updateDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'maintenanceLog', m.id), { vehicleBa: newBa });
-                });
+                }
 
                 window.showToast('গাড়ি আপডেট হয়েছে');
                 document.getElementById('edit-veh-modal').classList.add('hidden');
-                window.manualSyncToSheets();
+                window.debouncedSync();
             } catch(err) { window.showToast('আপডেট ফেইল', true); }
         });
 
@@ -642,7 +741,7 @@
             const vId = document.getElementById('edit-maint-vid').value;
             const rId = document.getElementById('edit-maint-type').value;
             const dStr = document.getElementById('edit-maint-date').value;
-            const km = parseInt(document.getElementById('edit-maint-km').value);
+            const km = Number(document.getElementById('edit-maint-km').value);
 
             const isDuplicate = maintenanceLog.some(m => m.id !== id && m.vehicleId === vId && m.typeId === rId && m.doneDate === dStr);
             if (isDuplicate) {
@@ -652,8 +751,8 @@
             const m = maintenanceLog.find(x => x.id === id);
             const rule = taskRules.find(r => r.id === rId);
 
-            const nextDateTarget = calculateNextDateExact(dStr, rule.months);
-            const nextKmTarget = km + parseInt(rule.km);
+            const nextDateTarget = calculateNextDateExact(dStr, Number(rule.months));
+            const nextKmTarget = km + Number(rule.km);
 
             try {
                 await updateDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'maintenanceLog', id), {
@@ -663,7 +762,8 @@
                     doneKm: km,
                     nextDate: nextDateTarget,
                     nextKm: nextKmTarget,
-                    timestamp: Date.now() 
+                    timestamp: Date.now(),
+                    updatedBy: auth.currentUser?.email || 'admin'
                 });
                 
                 const v = vehicles.find(x => x.id === m.vehicleId);
@@ -673,18 +773,60 @@
 
                 window.showToast('রেকর্ড আপডেট হয়েছে');
                 document.getElementById('edit-maint-modal').classList.add('hidden');
-                window.manualSyncToSheets();
+                window.debouncedSync();
                 if(currentOpenVehicleId) renderVehicleDetails();
             } catch(err) { window.showToast('আপডেট ফেইল', true); }
         });
 
         // ==========================================
+        // EXPORT TO EXCEL FEATURE
+        // ==========================================
+        window.exportToExcel = () => {
+            window.showToast('এক্সেল ফাইল তৈরি হচ্ছে...');
+            try {
+                const wb = XLSX.utils.book_new();
 
-        window.manualSyncToSheets = async () => {
-            if(!SCRIPT_URL || SCRIPT_URL.includes("YOUR_GOOGLE")) return;
-            document.getElementById('sync-status').innerHTML = '<i class="fa-solid fa-rotate fa-spin"></i> সিঙ্ক হচ্ছে...';
-            try { await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ vehicles, maintenanceLog, taskRules, vehicleTypes }) }); document.getElementById('sync-status').innerHTML = '<i class="fa-solid fa-check text-emerald-500"></i> শিট আপডেটেড'; } catch(e){ document.getElementById('sync-status').innerHTML = '<i class="fa-solid fa-xmark text-red-500"></i> সিঙ্ক ফেইল'; }
+                // Vehicles Data
+                const vData = vehicles.map(v => ({
+                    'বিএ নম্বর': v.baNo,
+                    'গাড়ির ধরন': v.type,
+                    'বর্তমান মিটার (কি.মি)': v.currentKm || 0,
+                    'যোগ করার তারিখ': formatDate(v.addedDate)
+                }));
+                const wsVehicles = XLSX.utils.json_to_sheet(vData);
+                XLSX.utils.book_append_sheet(wb, wsVehicles, "গাড়ি সমূহ");
+
+                // Maintenance Logs Data
+                const mData = maintenanceLog.map(m => ({
+                    'বিএ নম্বর': m.vehicleBa,
+                    'কাজের ধরন': m.typeName,
+                    'কাজের তারিখ': formatDate(m.doneDate),
+                    'বদলি কি.মি': m.doneKm,
+                    'পরবর্তী টার্গেট তারিখ': formatDate(m.nextDate),
+                    'পরবর্তী টার্গেট কি.মি': m.nextKm,
+                    'এন্ট্রি কারী': m.updatedBy || 'admin'
+                }));
+                const wsLogs = XLSX.utils.json_to_sheet(mData);
+                XLSX.utils.book_append_sheet(wb, wsLogs, "সকল কাজের রেকর্ড");
+
+                // Rules Data
+                const rData = taskRules.map(r => ({
+                    'কাজের নাম': r.name,
+                    'মেয়াদ (মাস)': r.months,
+                    'মেয়াদ (কি.মি)': r.km
+                }));
+                const wsRules = XLSX.utils.json_to_sheet(rData);
+                XLSX.utils.book_append_sheet(wb, wsRules, "সেটআপ রুলস");
+
+                XLSX.writeFile(wb, "9EB_MT_Tracker_Backup.xlsx");
+                window.showToast('সফলভাবে ডাউনলোড হয়েছে!');
+            } catch (err) {
+                console.error(err);
+                window.showToast('ডাউনলোড ফেইল হয়েছে', true);
+            }
         };
+
+        // ==========================================
 
         function formatDate(dStr) { if(!dStr) return ''; return new Date(dStr).toLocaleDateString('bn-BD', { day: 'numeric', month: 'short', year: 'numeric' }); }
         
@@ -698,52 +840,54 @@
         }
 
         // ==========================================
-        // ROBUST PDF ENGINE - BUG FIXED
+        // ROBUST PDF ENGINE
         // ==========================================
         function generatePDF(htmlContent, fileName) {
             window.showToast("পিডিএফ প্রস্তুত হচ্ছে, অপেক্ষা করুন...");
             
-            // Fix: Create a hidden temporary container to hold the HTML content.
-            // This prevents html2canvas from capturing the current scroll offset of the window.
             const tempContainer = document.createElement('div');
             tempContainer.innerHTML = htmlContent;
             tempContainer.style.position = 'absolute';
             tempContainer.style.top = '0';
-            tempContainer.style.left = '-9999px'; // Hide off-screen
-            tempContainer.style.width = '794px';  // Fix A4 width
+            tempContainer.style.left = '-9999px'; 
+            tempContainer.style.width = '794px'; 
             tempContainer.style.backgroundColor = 'white';
             tempContainer.style.zIndex = '-9999';
             document.body.appendChild(tempContainer);
 
             const opt = { 
-                margin: 0, 
+                margin: 0.1, 
                 filename: fileName, 
                 image: { type: 'jpeg', quality: 1.0 }, 
                 html2canvas: { 
                     scale: 2, 
                     useCORS: true,
-                    scrollY: 0, // Critical Fix: Forces canvas to start from top
+                    scrollY: 0, 
                     scrollX: 0,
                     windowY: 0
                 }, 
+                pagebreak: { mode: 'css', avoid: 'tr' }, // Page break fix
                 jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } 
             };
             
             html2pdf().set(opt).from(tempContainer).save().then(() => {
                 window.showToast("পিডিএফ সফলভাবে ডাউনলোড হয়েছে!");
-                document.body.removeChild(tempContainer); // Clean up container
+                document.body.removeChild(tempContainer); 
             }).catch(err => {
                 console.error("PDF Error:", err); 
                 window.showToast("পিডিএফ তৈরিতে সমস্যা হয়েছে!", true);
                 if (document.body.contains(tempContainer)) {
-                    document.body.removeChild(tempContainer); // Clean up container on error
+                    document.body.removeChild(tempContainer); 
                 }
             });
         }
 
         const getPDFTemplate = (title, subtitle, tableHeaders, tableRows) => `
-            <div style="width: 794px; min-height: 1122px; padding: 40px; box-sizing: border-box; position: relative; font-family:'Hind Siliguri', sans-serif; color:#1e293b; background: white; margin: 0;">
-                <style>@import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap');</style>
+            <div style="width: 794px; padding: 40px; box-sizing: border-box; position: relative; font-family:'Hind Siliguri', sans-serif; color:#1e293b; background: white; margin: 0;">
+                <style>
+                    @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap');
+                    tr { page-break-inside: avoid !important; }
+                </style>
                 <div style="position: absolute; top: 400px; left: 50%; transform: translate(-50%, -50%) rotate(-35deg); font-size: 80px; color: rgba(5, 150, 105, 0.06); font-weight: bold; white-space: nowrap; z-index: 0; pointer-events: none;">CHARGING NINE</div>
                 <div style="position: relative; z-index: 10;">
                     <div style="text-align:center; border-bottom:3px solid #059669; padding-bottom:15px; margin-bottom:20px">
@@ -763,8 +907,11 @@
             </div>`;
 
         const getRegisterPDFTemplate = (title, tableHeaders, tableRows) => `
-            <div style="width: 794px; min-height: 1122px; padding: 30px; box-sizing: border-box; position: relative; font-family:'Hind Siliguri', sans-serif; color:#000; background: white; margin: 0;">
-                <style>@import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap');</style>
+            <div style="width: 794px; padding: 30px; box-sizing: border-box; position: relative; font-family:'Hind Siliguri', sans-serif; color:#000; background: white; margin: 0;">
+                <style>
+                    @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap');
+                    tr { page-break-inside: avoid !important; }
+                </style>
                 <div style="position: absolute; top: 400px; left: 50%; transform: translate(-50%, -50%) rotate(-35deg); font-size: 80px; color: rgba(5, 150, 105, 0.04); font-weight: bold; white-space: nowrap; z-index: 0; pointer-events: none;">CHARGING NINE</div>
                 <div style="position: relative; z-index: 10;">
                     <div style="text-align:center; margin-bottom:20px;">
@@ -836,8 +983,6 @@
             generatePDF(htmlContent, `Register_${rule.name}.pdf`);
         };
 
-
-        // ==========================================
         window.openVehicleDetailsModal = (vId) => {
             currentOpenVehicleId = vId;
             renderVehicleDetails();
@@ -1115,7 +1260,17 @@
             });
 
             if(chartInstance) chartInstance.destroy();
-            chartInstance = new Chart(document.getElementById('mtChart').getContext('2d'), { type: 'doughnut', data: { labels: ['ঠিক আছে', 'আসন্ন', 'বকেয়া'], datasets: [{ data: [okVehicles||(vehicles.length===0?1:0), upVehicles, ovVehicles], backgroundColor: ['#10b981', '#f59e0b', '#ef4444'], borderWidth: 0, cutout: '75%' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { usePointStyle: true, boxWidth: 8, font: {family: "'Hind Siliguri', sans-serif"} } } } } });
+            
+            const hasData = vehicles.length > 0;
+            const cLabels = hasData ? ['ঠিক আছে', 'আসন্ন', 'বকেয়া'] : ['কোনো গাড়ি নেই'];
+            const cData = hasData ? [okVehicles, upVehicles, ovVehicles] : [1];
+            const cColors = hasData ? ['#10b981', '#f59e0b', '#ef4444'] : ['#e2e8f0'];
+
+            chartInstance = new Chart(document.getElementById('mtChart').getContext('2d'), { 
+                type: 'doughnut', 
+                data: { labels: cLabels, datasets: [{ data: cData, backgroundColor: cColors, borderWidth: 0, cutout: '75%' }] }, 
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { usePointStyle: true, boxWidth: 8, font: {family: "'Hind Siliguri', sans-serif"} } }, tooltip: { enabled: hasData } } } 
+            });
 
             const groupedVehicles = {};
             vehicles.forEach(v => { if(!groupedVehicles[v.type]) groupedVehicles[v.type] = []; groupedVehicles[v.type].push(v); });
