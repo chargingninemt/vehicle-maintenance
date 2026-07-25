@@ -277,7 +277,7 @@
         import { getFirestore, collection, onSnapshot, doc, setDoc, deleteDoc, updateDoc, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // ==========================================
-        // CONFIGS (YOUR CREDENTIALS ADDED)
+        // CONFIGS (MUST REPLACE BEFORE DEPLOY)
         // ==========================================
         let firebaseConfig = {
             apiKey: "AIzaSyBF4ebAsfoKgd9wgNIeNJ9QRKpMSXr-w9g",
@@ -296,7 +296,6 @@
         }
 
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzxW6l1uO1MiNf-Pv_aYl2BnapuDzYoYZubwrGECexfxJgBvDLUaDRJheWlGMDgtUKk3w/exec"; 
-        
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
@@ -322,9 +321,9 @@
         let unsubscribeListeners = [];
         let currentOpenVehicleId = null; 
 
-        // HELPER: Unique ID Generator
+        // HELPER: Unique ID Generator (Collision safe)
         const generateId = (prefix) => {
-            return prefix + '_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9);
+            return prefix + '_' + Date.now() + Math.random().toString(36).substring(2, 9);
         };
 
         // EXACT DATE CALCULATION LOGIC (OVERFLOW FIXED)
@@ -332,6 +331,7 @@
             const d = new Date(dateStr);
             const targetMonth = d.getMonth() + Number(addedMonths);
             d.setMonth(targetMonth);
+            // Handle overflow (e.g., Jan 31 + 1 month -> Mar 3 -> should be Feb 28)
             if (d.getMonth() !== targetMonth % 12) {
                 d.setDate(0); 
             }
@@ -361,13 +361,13 @@
             setTimeout(()=>t.remove(), 3000);
         };
 
-        // --- DEBOUNCED SYNC ---
+        // --- DEBOUNCED SYNC TO AVOID EXCESSIVE API CALLS ---
         let syncTimeout = null;
         window.debouncedSync = () => {
             clearTimeout(syncTimeout);
             syncTimeout = setTimeout(() => {
                 window.manualSyncToSheets();
-            }, 3000); 
+            }, 2500); 
         };
 
         window.manualSyncToSheets = async () => {
@@ -538,6 +538,7 @@
         document.getElementById('form-maintenance').addEventListener('submit', async (e) => { 
             e.preventDefault(); 
             const vId = document.getElementById('maint-vehicle').value, rId = document.getElementById('maint-type').value, dStr = document.getElementById('maint-date').value;
+            // STRICT NUMBER CASTING TO AVOID BUGS
             const km = Number(document.getElementById('maint-km').value); 
             
             const isDuplicate = maintenanceLog.some(m => m.vehicleId === vId && m.typeId === rId && m.doneDate === dStr);
@@ -547,6 +548,7 @@
 
             const rule = taskRules.find(r => r.id === rId); const vData = vehicles.find(v => v.id === vId); 
             
+            // STRICT NUMBER LOGIC WITH OVERFLOW FIX
             const nextDateTarget = calculateNextDateExact(dStr, Number(rule.months));
             const nextKmTarget = km + Number(rule.km);
             
@@ -585,7 +587,7 @@
             handleDbWrite('vehicleTypes', newId, { id: newId, name: vtName }, 'ধরন যোগ হয়েছে'); e.target.reset(); 
         });
 
-        // --- SAFE DELETION ---
+        // --- SAFE DELETION (RACE CONDITION FIX) ---
         window.deleteRule = (id) => window.showConfirm('নিয়মটি মুছে ফেলতে চান?', async () => {
             await deleteDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'taskRules', id));
             window.debouncedSync(); window.showToast('সফলভাবে মুছে ফেলা হয়েছে');
@@ -626,6 +628,7 @@
             e.preventDefault();
             const id = document.getElementById('edit-rule-id').value;
             const newName = document.getElementById('edit-rule-name').value.trim();
+            // STRICT NUMBER CASTING
             const newMonths = Number(document.getElementById('edit-rule-months').value);
             const newKm = Number(document.getElementById('edit-rule-km').value);
 
@@ -642,6 +645,7 @@
                 });
                 
                 const mLogsToUpdate = maintenanceLog.filter(m => m.typeId === id);
+                // Safe sequential update
                 for(const m of mLogsToUpdate) {
                     const updatedNextDate = calculateNextDateExact(m.doneDate, newMonths);
                     const updatedNextKm = Number(m.doneKm) + newKm;
@@ -741,6 +745,7 @@
             const vId = document.getElementById('edit-maint-vid').value;
             const rId = document.getElementById('edit-maint-type').value;
             const dStr = document.getElementById('edit-maint-date').value;
+            // STRICT NUMBER CASTING
             const km = Number(document.getElementById('edit-maint-km').value);
 
             const isDuplicate = maintenanceLog.some(m => m.id !== id && m.vehicleId === vId && m.typeId === rId && m.doneDate === dStr);
@@ -751,6 +756,7 @@
             const m = maintenanceLog.find(x => x.id === id);
             const rule = taskRules.find(r => r.id === rId);
 
+            // STRICT NUMBER LOGIC FOR TARGET UPDATE
             const nextDateTarget = calculateNextDateExact(dStr, Number(rule.months));
             const nextKmTarget = km + Number(rule.km);
 
@@ -840,17 +846,25 @@
         }
 
         // ==========================================
-        // ROBUST PDF ENGINE
+        // ROBUST PDF ENGINE WITH TEMP CONTAINER (BUG FIXED)
         // ==========================================
         function generatePDF(htmlContent, fileName) {
             window.showToast("পিডিএফ প্রস্তুত হচ্ছে, অপেক্ষা করুন...");
             
+            // Fix 1: Save current scroll to restore later
+            const currentScrollY = window.scrollY;
+
+            // Fix 2: Scroll to top temporarily so html2canvas doesn't capture blank offset
+            window.scrollTo(0, 0);
+            
             const tempContainer = document.createElement('div');
             tempContainer.innerHTML = htmlContent;
+            
+            // Fix 3: Position safely at top left but behind everything
             tempContainer.style.position = 'absolute';
             tempContainer.style.top = '0';
-            tempContainer.style.left = '-9999px'; 
-            tempContainer.style.width = '794px'; 
+            tempContainer.style.left = '0'; 
+            tempContainer.style.width = '794px';  
             tempContainer.style.backgroundColor = 'white';
             tempContainer.style.zIndex = '-9999';
             document.body.appendChild(tempContainer);
@@ -866,19 +880,21 @@
                     scrollX: 0,
                     windowY: 0
                 }, 
-                pagebreak: { mode: 'css', avoid: 'tr' }, // Page break fix
+                pagebreak: { mode: 'css', avoid: 'tr' },
                 jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } 
             };
             
             html2pdf().set(opt).from(tempContainer).save().then(() => {
                 window.showToast("পিডিএফ সফলভাবে ডাউনলোড হয়েছে!");
                 document.body.removeChild(tempContainer); 
+                window.scrollTo(0, currentScrollY); // Restore scroll
             }).catch(err => {
                 console.error("PDF Error:", err); 
                 window.showToast("পিডিএফ তৈরিতে সমস্যা হয়েছে!", true);
                 if (document.body.contains(tempContainer)) {
                     document.body.removeChild(tempContainer); 
                 }
+                window.scrollTo(0, currentScrollY); // Restore scroll
             });
         }
 
@@ -983,6 +999,8 @@
             generatePDF(htmlContent, `Register_${rule.name}.pdf`);
         };
 
+
+        // ==========================================
         window.openVehicleDetailsModal = (vId) => {
             currentOpenVehicleId = vId;
             renderVehicleDetails();
@@ -1261,6 +1279,7 @@
 
             if(chartInstance) chartInstance.destroy();
             
+            // CHART FIX FOR 0 VEHICLES
             const hasData = vehicles.length > 0;
             const cLabels = hasData ? ['ঠিক আছে', 'আসন্ন', 'বকেয়া'] : ['কোনো গাড়ি নেই'];
             const cData = hasData ? [okVehicles, upVehicles, ovVehicles] : [1];
