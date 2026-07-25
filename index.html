@@ -28,7 +28,7 @@
         .login-bg { background: linear-gradient(rgba(16, 185, 129, 0.9), rgba(5, 150, 105, 0.9)), url('https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&q=80&w=1000') center/cover; }
     </style>
 </head>
-<body class="min-h-screen text-slate-800 flex flex-col relative z-0 bg-gray-100">
+<body class="min-h-screen text-slate-800 flex flex-col relative z-0">
 
     <!-- LOGIN SCREEN -->
     <div id="login-screen" class="fixed inset-0 z-[100] flex items-center justify-center login-bg px-4 transition-opacity duration-300">
@@ -143,6 +143,7 @@
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><i class="fa-solid fa-magnifying-glass text-slate-400"></i></div>
                                 <input type="text" id="search-vehicle" onkeyup="window.filterVehicles()" placeholder="বিএ নম্বর দিয়ে খুঁজুন..." class="w-full pl-9 pr-4 py-2.5 bg-white border border-slate-200 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 outline-none transition text-sm">
                             </div>
+                            <!-- QUICK KM BUTTON -->
                             <button onclick="window.openQuickKmModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2.5 rounded-lg text-sm font-bold active:scale-95 transition shadow-md whitespace-nowrap"><i class="fa-solid fa-gauge-high mr-1"></i> দ্রুত মিটার</button>
                             <button onclick="document.getElementById('add-veh-modal').classList.remove('hidden')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2.5 rounded-lg text-sm font-bold active:scale-95 transition shadow-md whitespace-nowrap"><i class="fa-solid fa-plus mr-1"></i> নতুন গাড়ি</button>
                         </div>
@@ -250,6 +251,7 @@
         </div>
     </div>
 
+    <!-- Edit/Add Modals -->
     <div id="add-veh-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 transition-opacity bg-slate-900/60"><div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl"><div class="flex justify-between items-center mb-5"><h3 class="font-bold text-lg text-slate-800">নতুন গাড়ি যোগ</h3><button onclick="document.getElementById('add-veh-modal').classList.add('hidden')" class="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500"><i class="fa-solid fa-xmark"></i></button></div><form id="form-vehicle" class="space-y-4"><div><label class="block text-xs font-bold text-slate-500 mb-1.5">বিএ নম্বর (BA No)</label><input type="text" id="veh-ba" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"></div><div><label class="block text-xs font-bold text-slate-500 mb-1.5">গাড়ির ধরন</label><select id="veh-type" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"></select></div><button type="submit" class="w-full bg-blue-600 text-white font-bold py-3.5 rounded-xl shadow-md mt-2">সংরক্ষণ করুন</button></form></div></div>
     
     <div id="edit-veh-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 transition-opacity bg-slate-900/60"><div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl"><div class="flex justify-between items-center mb-5"><h3 class="font-bold text-lg text-slate-800">গাড়ি আপডেট</h3><button onclick="document.getElementById('edit-veh-modal').classList.add('hidden')" class="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500"><i class="fa-solid fa-xmark"></i></button></div><form id="form-edit-vehicle" class="space-y-4"><input type="hidden" id="edit-veh-id"><div><label class="block text-xs font-bold text-slate-500 mb-1.5">বিএ নম্বর (BA No)</label><input type="text" id="edit-veh-ba" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"></div><div><label class="block text-xs font-bold text-slate-500 mb-1.5">গাড়ির ধরন</label><select id="edit-veh-type" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"></select></div><button type="submit" class="w-full bg-blue-600 text-white font-bold py-3.5 rounded-xl shadow-md mt-2">আপডেট করুন</button></form></div></div>
@@ -275,7 +277,7 @@
         import { getFirestore, collection, onSnapshot, doc, setDoc, deleteDoc, updateDoc, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // ==========================================
-        // CONFIGS 
+        // CONFIGS (YOUR CREDENTIALS ADDED)
         // ==========================================
         let firebaseConfig = {
             apiKey: "AIzaSyBF4ebAsfoKgd9wgNIeNJ9QRKpMSXr-w9g",
@@ -294,6 +296,7 @@
         }
 
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzxW6l1uO1MiNf-Pv_aYl2BnapuDzYoYZubwrGECexfxJgBvDLUaDRJheWlGMDgtUKk3w/exec"; 
+        
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
@@ -319,12 +322,12 @@
         let unsubscribeListeners = [];
         let currentOpenVehicleId = null; 
 
-        // HELPER: Unique ID Generator (Collision safe)
+        // HELPER: Unique ID Generator
         const generateId = (prefix) => {
-            return prefix + '_' + Date.now() + Math.random().toString(36).substring(2, 9);
+            return prefix + '_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9);
         };
 
-        // EXACT DATE CALCULATION LOGIC 
+        // EXACT DATE CALCULATION LOGIC (OVERFLOW FIXED)
         const calculateNextDateExact = (dateStr, addedMonths) => {
             const d = new Date(dateStr);
             const targetMonth = d.getMonth() + Number(addedMonths);
@@ -358,12 +361,13 @@
             setTimeout(()=>t.remove(), 3000);
         };
 
+        // --- DEBOUNCED SYNC ---
         let syncTimeout = null;
         window.debouncedSync = () => {
             clearTimeout(syncTimeout);
             syncTimeout = setTimeout(() => {
                 window.manualSyncToSheets();
-            }, 2500); 
+            }, 3000); 
         };
 
         window.manualSyncToSheets = async () => {
@@ -475,6 +479,7 @@
             }
         });
 
+        // QUICK KM UPDATE MODAL
         window.openQuickKmModal = () => {
             const select = document.getElementById('quick-km-vehicle');
             select.innerHTML = '<option value="" disabled selected>গাড়ি নির্বাচন করুন...</option>' + vehicles.map(v => `<option value="${v.id}">${v.baNo} (${v.type})</option>`).join('');
@@ -580,6 +585,7 @@
             handleDbWrite('vehicleTypes', newId, { id: newId, name: vtName }, 'ধরন যোগ হয়েছে'); e.target.reset(); 
         });
 
+        // --- SAFE DELETION ---
         window.deleteRule = (id) => window.showConfirm('নিয়মটি মুছে ফেলতে চান?', async () => {
             await deleteDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'taskRules', id));
             window.debouncedSync(); window.showToast('সফলভাবে মুছে ফেলা হয়েছে');
@@ -772,11 +778,15 @@
             } catch(err) { window.showToast('আপডেট ফেইল', true); }
         });
 
+        // ==========================================
+        // EXPORT TO EXCEL FEATURE
+        // ==========================================
         window.exportToExcel = () => {
             window.showToast('এক্সেল ফাইল তৈরি হচ্ছে...');
             try {
                 const wb = XLSX.utils.book_new();
 
+                // Vehicles Data
                 const vData = vehicles.map(v => ({
                     'বিএ নম্বর': v.baNo,
                     'গাড়ির ধরন': v.type,
@@ -786,6 +796,7 @@
                 const wsVehicles = XLSX.utils.json_to_sheet(vData);
                 XLSX.utils.book_append_sheet(wb, wsVehicles, "গাড়ি সমূহ");
 
+                // Maintenance Logs Data
                 const mData = maintenanceLog.map(m => ({
                     'বিএ নম্বর': m.vehicleBa,
                     'কাজের ধরন': m.typeName,
@@ -798,6 +809,7 @@
                 const wsLogs = XLSX.utils.json_to_sheet(mData);
                 XLSX.utils.book_append_sheet(wb, wsLogs, "সকল কাজের রেকর্ড");
 
+                // Rules Data
                 const rData = taskRules.map(r => ({
                     'কাজের নাম': r.name,
                     'মেয়াদ (মাস)': r.months,
@@ -814,9 +826,11 @@
             }
         };
 
+        // ==========================================
+
         function formatDate(dStr) { if(!dStr) return ''; return new Date(dStr).toLocaleDateString('bn-BD', { day: 'numeric', month: 'short', year: 'numeric' }); }
         
-       function formatShortDate(dStr) {
+        function formatShortDate(dStr) {
             if(!dStr) return '';
             const d = new Date(dStr);
             const dd = String(d.getDate()).padStart(2, '0');
@@ -826,102 +840,85 @@
         }
 
         // ==========================================
-        // 100% FIXED PDF ENGINE - NO BLANK PAGE, NO CUT-OFF, FIXED SCROLL BUG
+        // ROBUST PDF ENGINE
         // ==========================================
         function generatePDF(htmlContent, fileName) {
-            // === সম্পূর্ণ নতুন পদ্ধতি: html2canvas বাদ, ব্রাউজারের নিজস্ব প্রিন্ট ইঞ্জিন ===
-            // html2canvas + off-screen/z-index পজিশনিং দিয়ে বারবার চেষ্টা করেও ব্ল্যাংক পেজ
-            // সমস্যা থেকেই যাচ্ছিল। তাই এবার সম্পূর্ণ ভিন্ন, নির্ভরযোগ্য পদ্ধতি ব্যবহার করা হলো:
-            // রিপোর্টটি একটি নতুন ট্যাবে খোলা হচ্ছে এবং ব্রাউজারের নিজস্ব Print ডায়ালগ চালু করা
-            // হচ্ছে, যেখানে "Save as PDF" (প্রিন্টার হিসেবে) বেছে নিলেই সঠিক PDF তৈরি হবে।
-            // এই পদ্ধতিতে html2canvas/ফন্ট-লোড/z-index/স্ক্রল সংক্রান্ত কোনো সমস্যাই থাকে না,
-            // কারণ ব্রাউজার নিজেই সরাসরি HTML রেন্ডার করে প্রিন্ট করছে, কোনো ক্যানভাস স্ক্রিনশট নয়।
+            window.showToast("পিডিএফ প্রস্তুত হচ্ছে, অপেক্ষা করুন...");
+            
+            const tempContainer = document.createElement('div');
+            tempContainer.innerHTML = htmlContent;
+            tempContainer.style.position = 'absolute';
+            tempContainer.style.top = '0';
+            tempContainer.style.left = '-9999px'; 
+            tempContainer.style.width = '794px'; 
+            tempContainer.style.backgroundColor = 'white';
+            tempContainer.style.zIndex = '-9999';
+            document.body.appendChild(tempContainer);
 
-            // পপ-আপ উইন্ডোটি ব্যবহারকারীর ক্লিকের সাথে সাথেই (synchronously) খোলা হচ্ছে,
-            // নাহলে ব্রাউজার এটিকে পপ-আপ ব্লকার দিয়ে আটকে দিতে পারে।
-            const printWindow = window.open('', '_blank');
-            if (!printWindow) {
-                window.showToast('পপ-আপ ব্লকার সক্রিয় আছে! ব্রাউজারের ঠিকানা-বারে পপ-আপ আইকনে ক্লিক করে এই সাইটের জন্য পপ-আপ অনুমতি দিন, তারপর আবার চেষ্টা করুন।', true);
-                return;
-            }
-
-            const docTitle = fileName.replace(/\.pdf$/i, '');
-
-            printWindow.document.open();
-            printWindow.document.write(`<!DOCTYPE html>
-<html lang="bn">
-<head>
-<meta charset="UTF-8">
-<title>${docTitle}</title>
-<style>
-    @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap');
-    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-sizing: border-box; }
-    html, body { margin: 0; padding: 0; background: #ffffff; font-family: 'Hind Siliguri', 'Kalpurush', sans-serif; }
-    @page { size: A4; margin: 12mm; }
-    @media print {
-        body { margin: 0; }
-    }
-</style>
-</head>
-<body>
-${htmlContent}
-<script>
-    window.onload = function () {
-        // ফন্ট সম্পূর্ণ লোড হওয়া পর্যন্ত অপেক্ষা করে তারপর প্রিন্ট ডায়ালগ খোলা হচ্ছে
-        var ready = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
-        ready.then(function () {
-            setTimeout(function () {
-                window.focus();
-                window.print();
-            }, 400);
-        });
-    };
-<\/script>
-</body>
-</html>`);
-            printWindow.document.close();
-
-            window.showToast('প্রিন্ট প্রিভিউ একটি নতুন ট্যাবে খোলা হচ্ছে — সেখানে প্রিন্টার হিসেবে "Save as PDF" বেছে নিয়ে সেভ করুন।');
+            const opt = { 
+                margin: 0.1, 
+                filename: fileName, 
+                image: { type: 'jpeg', quality: 1.0 }, 
+                html2canvas: { 
+                    scale: 2, 
+                    useCORS: true,
+                    scrollY: 0, 
+                    scrollX: 0,
+                    windowY: 0
+                }, 
+                pagebreak: { mode: 'css', avoid: 'tr' }, // Page break fix
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } 
+            };
+            
+            html2pdf().set(opt).from(tempContainer).save().then(() => {
+                window.showToast("পিডিএফ সফলভাবে ডাউনলোড হয়েছে!");
+                document.body.removeChild(tempContainer); 
+            }).catch(err => {
+                console.error("PDF Error:", err); 
+                window.showToast("পিডিএফ তৈরিতে সমস্যা হয়েছে!", true);
+                if (document.body.contains(tempContainer)) {
+                    document.body.removeChild(tempContainer); 
+                }
+            });
         }
+
         const getPDFTemplate = (title, subtitle, tableHeaders, tableRows) => `
-            <div style="font-family:'Hind Siliguri', 'Kalpurush', sans-serif; color:#1e293b; background: white; width: 100%; box-sizing: border-box;">
+            <div style="width: 794px; padding: 40px; box-sizing: border-box; position: relative; font-family:'Hind Siliguri', sans-serif; color:#1e293b; background: white; margin: 0;">
                 <style>
-                    table { width: 100%; border-collapse: collapse; table-layout: fixed; margin-top: 10px; }
-                    th, td { padding: 6px 8px; border: 1px solid #cbd5e1; font-size: 11px; word-wrap: break-word; overflow-wrap: break-word; text-align: left; }
-                    th { background-color: #f1f5f9; font-weight: bold; color: #0f172a; border-bottom: 2px solid #94a3b8; }
+                    @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap');
                     tr { page-break-inside: avoid !important; }
                 </style>
-                <div>
-                    <div style="text-align:center; border-bottom:2px solid #059669; padding-bottom:10px; margin-bottom:15px">
-                        <h2 style="color:#059669; font-size:20px; margin:0; font-weight:bold;">৯ ইস্ট বেঙ্গল রেজিমেন্ট</h2>
-                        <p style="margin:4px 0 0 0; font-size:14px; font-weight:bold;">${title}</p>
-                        <p style="margin:4px 0 0 0; font-size:11px; color:#64748b">তারিখ: ${formatDate(new Date().toISOString().split('T')[0])}</p>
+                <div style="position: absolute; top: 400px; left: 50%; transform: translate(-50%, -50%) rotate(-35deg); font-size: 80px; color: rgba(5, 150, 105, 0.06); font-weight: bold; white-space: nowrap; z-index: 0; pointer-events: none;">CHARGING NINE</div>
+                <div style="position: relative; z-index: 10;">
+                    <div style="text-align:center; border-bottom:3px solid #059669; padding-bottom:15px; margin-bottom:20px">
+                        <h2 style="color:#059669; font-size:24px; margin:0">৯ ইস্ট বেঙ্গল রেজিমেন্ট</h2>
+                        <p style="margin:5px 0 0 0; font-size:16px; font-weight:bold;">${title}</p>
+                        <p style="margin:5px 0 0 0; font-size:12px; color:#64748b">তারিখ: ${formatDate(new Date().toISOString().split('T')[0])}</p>
                     </div>
-                    ${subtitle ? `<div style="background:#f8fafc; padding:10px; border-radius:6px; margin-bottom:10px; border:1px solid #e2e8f0; font-size: 12px;">${subtitle}</div>` : ''}
-                    <table>
-                        <thead><tr>${tableHeaders}</tr></thead>
+                    ${subtitle ? `<div style="background:#f8fafc; padding:15px; border-radius:8px; margin-bottom:20px; border:1px solid #e2e8f0">${subtitle}</div>` : ''}
+                    <table style="width:100%; text-align:left; border-collapse:collapse; font-size:14px">
+                        <thead><tr style="background:#f1f5f9">${tableHeaders}</tr></thead>
                         <tbody>${tableRows}</tbody>
                     </table>
-                    <div style="margin-top:40px; text-align:right">
-                        <p style="border-top:1px solid #000; display:inline-block; padding-top:5px; margin:0; font-size: 12px; font-weight: bold;">এমটি এনসিও / অফিসার স্বাক্ষর</p>
+                    <div style="margin-top:60px; text-align:right">
+                        <p style="border-top:1px solid #000; display:inline-block; padding-top:5px; margin:0">এমটি এনসিও / অফিসার স্বাক্ষর</p>
                     </div>
                 </div>
             </div>`;
 
         const getRegisterPDFTemplate = (title, tableHeaders, tableRows) => `
-            <div style="font-family:'Hind Siliguri', 'Kalpurush', sans-serif; color:#000; background: white; width: 100%; box-sizing: border-box;">
+            <div style="width: 794px; padding: 30px; box-sizing: border-box; position: relative; font-family:'Hind Siliguri', sans-serif; color:#000; background: white; margin: 0;">
                 <style>
-                    table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-                    th, td { padding: 6px; border: 1px solid #000; font-size: 11px; word-wrap: break-word; overflow-wrap: break-word; text-align: center; }
-                    th { background-color: #f8fafc; font-weight: bold; }
+                    @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap');
                     tr { page-break-inside: avoid !important; }
                 </style>
-                <div>
-                    <div style="text-align:center; margin-bottom:15px;">
-                        <h2 style="font-size:18px; margin:0; font-weight: bold; border-bottom: 2px solid #000; display: inline-block; padding-bottom: 3px;">${title}</h2>
+                <div style="position: absolute; top: 400px; left: 50%; transform: translate(-50%, -50%) rotate(-35deg); font-size: 80px; color: rgba(5, 150, 105, 0.04); font-weight: bold; white-space: nowrap; z-index: 0; pointer-events: none;">CHARGING NINE</div>
+                <div style="position: relative; z-index: 10;">
+                    <div style="text-align:center; margin-bottom:20px;">
+                        <h2 style="font-size:24px; margin:0; font-weight: bold; border-bottom: 2px solid #000; display: inline-block; padding-bottom: 3px;">${title}</h2>
                     </div>
-                    <table>
-                        <thead><tr>${tableHeaders}</tr></thead>
+                    <table style="width:100%; text-align:left; border-collapse:collapse; font-size:13px; border: 2px solid #000;">
+                        <thead><tr style="border-bottom: 2px solid #000;">${tableHeaders}</tr></thead>
                         <tbody>${tableRows}</tbody>
                     </table>
                 </div>
@@ -945,22 +942,22 @@ ${htmlContent}
                     if (latestLog) {
                         rows += `
                             <tr>
-                                <td>${sl++}</td>
-                                <td style="font-weight:bold; font-size:12px;">${v.baNo}</td>
-                                <td>${formatShortDate(latestLog.doneDate)}</td>
-                                <td>${latestLog.doneKm}</td>
-                                <td style="color:#059669; font-weight:bold;">${formatShortDate(latestLog.nextDate)}</td>
-                                <td style="color:#059669; font-weight:bold;">${latestLog.nextKm}</td>
-                                <td></td>
+                                <td style="padding:6px; border:1px solid #000; text-align:center; font-weight:bold;">${sl++}</td>
+                                <td style="padding:6px; border:1px solid #000; font-weight:bold; font-size:14px;">${v.baNo}</td>
+                                <td style="padding:6px; border:1px solid #000; text-align:center;">${formatShortDate(latestLog.doneDate)}</td>
+                                <td style="padding:6px; border:1px solid #000; text-align:center;">${latestLog.doneKm}</td>
+                                <td style="padding:6px; border:1px solid #000; text-align:center; color:#059669; font-weight:bold;">${formatShortDate(latestLog.nextDate)}</td>
+                                <td style="padding:6px; border:1px solid #000; text-align:center; color:#059669; font-weight:bold;">${latestLog.nextKm}</td>
+                                <td style="padding:6px; border:1px solid #000;"></td>
                             </tr>
                         `;
                     } else {
                         rows += `
                             <tr>
-                                <td>${sl++}</td>
-                                <td style="font-weight:bold; font-size:12px;">${v.baNo}</td>
-                                <td style="color:#94a3b8;" colspan="4">কোনো কাজ রেকর্ড করা হয়নি</td>
-                                <td></td>
+                                <td style="padding:6px; border:1px solid #000; text-align:center; font-weight:bold;">${sl++}</td>
+                                <td style="padding:6px; border:1px solid #000; font-weight:bold; font-size:14px;">${v.baNo}</td>
+                                <td style="padding:6px; border:1px solid #000; text-align:center; color:#94a3b8;" colspan="4">কোনো কাজ রেকর্ড করা হয়নি</td>
+                                <td style="padding:6px; border:1px solid #000;"></td>
                             </tr>
                         `;
                     }
@@ -972,13 +969,13 @@ ${htmlContent}
             }
 
             const headers = `
-                <th style="width:8%;">ক্র.নং</th>
-                <th style="width:16%;">বিএ নং</th>
-                <th style="width:16%;">বর্তমান তারিখ</th>
-                <th style="width:15%;">বদলীর কি.মি</th>
-                <th style="width:16%;">পরবর্তী তারিখ</th>
-                <th style="width:15%;">বদলীর কি.মি</th>
-                <th style="width:14%;">মন্তব্য</th>
+                <th style="padding:8px; border:1px solid #000; text-align:center;">ক্র.নং</th>
+                <th style="padding:8px; border:1px solid #000;">বিএ নং</th>
+                <th style="padding:8px; border:1px solid #000; text-align:center;">বর্তমান তারিখ</th>
+                <th style="padding:8px; border:1px solid #000; text-align:center;">বদলীর কি.মি</th>
+                <th style="padding:8px; border:1px solid #000; text-align:center;">পরবর্তী তারিখ</th>
+                <th style="padding:8px; border:1px solid #000; text-align:center;">বদলীর কি.মি</th>
+                <th style="padding:8px; border:1px solid #000; text-align:center;">মন্তব্য</th>
             `;
 
             const title = `${rule.name} - ${rule.months} মাস / ${rule.km} কি.মি`;
@@ -986,8 +983,6 @@ ${htmlContent}
             generatePDF(htmlContent, `Register_${rule.name}.pdf`);
         };
 
-
-        // ==========================================
         window.openVehicleDetailsModal = (vId) => {
             currentOpenVehicleId = vId;
             renderVehicleDetails();
@@ -1058,11 +1053,11 @@ ${htmlContent}
             let rows = ''; let sl = 1;
             const grouped = {}; vehicles.forEach(v => { if(!grouped[v.type]) grouped[v.type] = []; grouped[v.type].push(v); });
             Object.keys(grouped).sort(sortCategories).forEach(type => {
-                rows += `<tr><td colspan="4" style="background-color:#d1fae5; color:#065f46; font-weight:bold; text-align:center;">ধরন: ${type}</td></tr>`;
-                grouped[type].forEach(v => { rows += `<tr><td style="text-align:center;">${sl++}</td><td style="font-weight:bold;">${v.baNo}</td><td>${v.type}</td><td style="text-align:right;">${v.currentKm || 0} KM</td></tr>`; });
+                rows += `<tr><td colspan="4" style="padding:8px 10px; background-color:#d1fae5; color:#065f46; font-weight:bold; text-align:center; border-bottom:1px solid #a7f3d0;">ধরন: ${type}</td></tr>`;
+                grouped[type].forEach(v => { rows += `<tr><td style="padding:10px;border-bottom:1px solid #e2e8f0;text-align:center;">${sl++}</td><td style="padding:10px;border-bottom:1px solid #e2e8f0;font-weight:bold;">${v.baNo}</td><td style="padding:10px;border-bottom:1px solid #e2e8f0">${v.type}</td><td style="padding:10px;border-bottom:1px solid #e2e8f0;text-align:right;">${v.currentKm || 0} KM</td></tr>`; });
             });
             if(vehicles.length === 0) rows = `<tr><td colspan="4" style="padding:15px;text-align:center;">কোনো রেকর্ড নেই</td></tr>`;
-            const headers = `<th style="width: 15%; text-align:center;">ক্র.নং</th><th style="width: 30%;">বিএ নম্বর</th><th style="width: 30%;">গাড়ির ধরন</th><th style="width: 25%; text-align:right;">বর্তমান মিটার (কি.মি)</th>`;
+            const headers = `<th style="padding:10px; border-bottom:2px solid #cbd5e1;text-align:center;">ক্র.নং</th><th style="padding:10px; border-bottom:2px solid #cbd5e1;">বিএ নম্বর</th><th style="padding:10px; border-bottom:2px solid #cbd5e1;">গাড়ির ধরন</th><th style="padding:10px; border-bottom:2px solid #cbd5e1;text-align:right;">বর্তমান মিটার (কি.মি)</th>`;
             const html = getPDFTemplate('সকল যানবাহনের তালিকা', null, headers, rows);
             generatePDF(html, 'All_Vehicles_Report.pdf');
         };
@@ -1102,11 +1097,11 @@ ${htmlContent}
             let rows = '';
             const grouped = {}; overdueItemsData.forEach(item => { if(!grouped[item.typeName]) grouped[item.typeName] = []; grouped[item.typeName].push(item); });
             Object.keys(grouped).sort().forEach(type => {
-                rows += `<tr><td colspan="4" style="background-color:#fee2e2; color:#991b1b; font-weight:bold; text-align:center;">কাজ: ${type}</td></tr>`;
-                grouped[type].forEach(item => { rows += `<tr><td style="font-weight:bold;">${item.vehicleBa} <br><span style="font-weight:normal;font-size:11px;color:#64748b">(${item.type})</span></td><td style="font-weight:bold;">${item.currentKm} KM</td><td>${formatDate(item.nextDate)} <br> <span style="font-size:11px">(${item.nextKm} KM)</span></td><td style="color:#dc2626;font-weight:bold;">${item.reason}</td></tr>`; });
+                rows += `<tr><td colspan="4" style="padding:8px 10px; background-color:#fee2e2; color:#991b1b; font-weight:bold; text-align:center; border-bottom:1px solid #fecaca;">কাজ: ${type}</td></tr>`;
+                grouped[type].forEach(item => { rows += `<tr><td style="padding:10px;border-bottom:1px solid #e2e8f0;font-weight:bold;">${item.vehicleBa} <br><span style="font-weight:normal;font-size:11px;color:#64748b">(${item.type})</span></td><td style="padding:10px;border-bottom:1px solid #e2e8f0; font-weight:bold;">${item.currentKm} KM</td><td style="padding:10px;border-bottom:1px solid #e2e8f0">${formatDate(item.nextDate)} <br> <span style="font-size:11px">(${item.nextKm} KM)</span></td><td style="padding:10px;border-bottom:1px solid #e2e8f0;color:#dc2626;font-weight:bold;">${item.reason}</td></tr>`; });
             });
             if(overdueItemsData.length === 0) rows = `<tr><td colspan="4" style="padding:15px;text-align:center;">কোনো ওভারডিউ কাজ নেই</td></tr>`;
-            const headers = `<th style="width: 25%; background:#fee2e2; color:#991b1b;">গাড়ি (ধরন)</th><th style="width: 25%; background:#fee2e2; color:#991b1b;">বর্তমান মিটার</th><th style="width: 25%; background:#fee2e2; color:#991b1b;">লক্ষ্যমাত্রা (তারিখ ও কি.মি)</th><th style="width: 25%; background:#fee2e2; color:#991b1b;">ওভারডিউ স্ট্যাটাস</th>`;
+            const headers = `<th style="padding:10px; border-bottom:2px solid #fca5a5; background:#fee2e2; color:#991b1b;">গাড়ি (ধরন)</th><th style="padding:10px; border-bottom:2px solid #fca5a5; background:#fee2e2; color:#991b1b;">বর্তমান মিটার</th><th style="padding:10px; border-bottom:2px solid #fca5a5; background:#fee2e2; color:#991b1b;">লক্ষ্যমাত্রা (তারিখ ও কি.মি)</th><th style="padding:10px; border-bottom:2px solid #fca5a5; background:#fee2e2; color:#991b1b;">ওভারডিউ স্ট্যাটাস</th>`;
             const html = getPDFTemplate('<span style="color:#dc2626;">ওভারডিউ কাজের তালিকা (জরুরি)</span>', null, headers, rows);
             generatePDF(html, 'Overdue_Maintenance_Report.pdf');
         };
@@ -1147,11 +1142,11 @@ ${htmlContent}
             let rows = '';
             const grouped = {}; upcomingItemsData.forEach(item => { if(!grouped[item.typeName]) grouped[item.typeName] = []; grouped[item.typeName].push(item); });
             Object.keys(grouped).sort().forEach(type => {
-                rows += `<tr><td colspan="4" style="background-color:#fef3c7; color:#92400e; font-weight:bold; text-align:center;">কাজ: ${type}</td></tr>`;
-                grouped[type].forEach(item => { rows += `<tr><td style="font-weight:bold;">${item.vehicleBa} <br><span style="font-weight:normal;font-size:11px;color:#64748b">(${item.type})</span></td><td style="font-weight:bold;">${item.currentKm} KM</td><td>${formatDate(item.nextDate)} <br> <span style="font-size:11px">(${item.nextKm} KM)</span></td><td style="color:#d97706;font-weight:bold;">${item.reason}</td></tr>`; });
+                rows += `<tr><td colspan="4" style="padding:8px 10px; background-color:#fef3c7; color:#92400e; font-weight:bold; text-align:center; border-bottom:1px solid #fde68a;">কাজ: ${type}</td></tr>`;
+                grouped[type].forEach(item => { rows += `<tr><td style="padding:10px;border-bottom:1px solid #e2e8f0;font-weight:bold;">${item.vehicleBa} <br><span style="font-weight:normal;font-size:11px;color:#64748b">(${item.type})</span></td><td style="padding:10px;border-bottom:1px solid #e2e8f0; font-weight:bold;">${item.currentKm} KM</td><td style="padding:10px;border-bottom:1px solid #e2e8f0">${formatDate(item.nextDate)} <br> <span style="font-size:11px">(${item.nextKm} KM)</span></td><td style="padding:10px;border-bottom:1px solid #e2e8f0;color:#d97706;font-weight:bold;">${item.reason}</td></tr>`; });
             });
             if(upcomingItemsData.length === 0) rows = `<tr><td colspan="4" style="padding:15px;text-align:center;">কোনো আসন্ন কাজ নেই</td></tr>`;
-            const headers = `<th style="width: 25%; background:#fef3c7; color:#92400e;">গাড়ি (ধরন)</th><th style="width: 25%; background:#fef3c7; color:#92400e;">বর্তমান মিটার</th><th style="width: 25%; background:#fef3c7; color:#92400e;">লক্ষ্যমাত্রা (তারিখ ও কি.মি)</th><th style="width: 25%; background:#fef3c7; color:#92400e;">আসন্ন স্ট্যাটাস</th>`;
+            const headers = `<th style="padding:10px; border-bottom:2px solid #fcd34d; background:#fef3c7; color:#92400e;">গাড়ি (ধরন)</th><th style="padding:10px; border-bottom:2px solid #fcd34d; background:#fef3c7; color:#92400e;">বর্তমান মিটার</th><th style="padding:10px; border-bottom:2px solid #fcd34d; background:#fef3c7; color:#92400e;">লক্ষ্যমাত্রা (তারিখ ও কি.মি)</th><th style="padding:10px; border-bottom:2px solid #fcd34d; background:#fef3c7; color:#92400e;">আসন্ন স্ট্যাটাস</th>`;
             const html = getPDFTemplate('<span style="color:#d97706;">আসন্ন কাজের তালিকা</span>', null, headers, rows);
             generatePDF(html, 'Upcoming_Maintenance_Report.pdf');
         };
@@ -1165,11 +1160,11 @@ ${htmlContent}
                 return b.id.localeCompare(a.id);
             });
             
-            let rows = logs.map(m => `<tr><td>${formatDate(m.doneDate)}</td><td style="font-weight:bold;">${m.typeName}</td><td>${m.doneKm} KM</td><td style="color:#dc2626;">${formatDate(m.nextDate)}</td><td style="color:#dc2626;">${m.nextKm} KM</td></tr>`).join('');
+            let rows = logs.map(m => `<tr><td style="padding:10px; border-bottom:1px solid #e2e8f0;">${formatDate(m.doneDate)}</td><td style="padding:10px; border-bottom:1px solid #e2e8f0; font-weight:bold;">${m.typeName}</td><td style="padding:10px; border-bottom:1px solid #e2e8f0;">${m.doneKm} KM</td><td style="padding:10px; border-bottom:1px solid #e2e8f0; color:#dc2626;">${formatDate(m.nextDate)}</td><td style="padding:10px; border-bottom:1px solid #e2e8f0; color:#dc2626;">${m.nextKm} KM</td></tr>`).join('');
             if(logs.length === 0) rows = `<tr><td colspan="5" style="padding:15px; text-align:center; color:#64748b;">কোনো রেকর্ড নেই</td></tr>`;
             
-            const subtitle = `<table style="width:100%; border:none; margin:0; padding:0;"><tr><td style="border:none; text-align:left;"><strong>বিএ নম্বর:</strong> ${v.baNo}</td><td style="border:none; text-align:center;"><strong>গাড়ির ধরন:</strong> ${v.type}</td><td style="border:none; text-align:right;"><strong>বর্তমান মিটার:</strong> ${v.currentKm || 0} KM</td></tr></table>`;
-            const headers = `<th style="width: 20%;">কাজের তারিখ</th><th style="width: 25%;">কাজের ধরন</th><th style="width: 15%;">মিটার রিডিং</th><th style="width: 20%;">পরবর্তী তারিখ</th><th style="width: 20%;">পরবর্তী মিটার</th>`;
+            const subtitle = `<table style="width:100%; font-size: 14px;"><tr><td style="text-align:left;"><strong>বিএ নম্বর:</strong> ${v.baNo}</td><td style="text-align:center;"><strong>গাড়ির ধরন:</strong> ${v.type}</td><td style="text-align:right;"><strong>বর্তমান মিটার:</strong> ${v.currentKm || 0} KM</td></tr></table>`;
+            const headers = `<th style="padding:10px; border-bottom:2px solid #cbd5e1;">কাজের তারিখ</th><th style="padding:10px; border-bottom:2px solid #cbd5e1;">কাজের ধরন</th><th style="padding:10px; border-bottom:2px solid #cbd5e1;">মিটার রিডিং</th><th style="padding:10px; border-bottom:2px solid #cbd5e1;">পরবর্তী তারিখ</th><th style="padding:10px; border-bottom:2px solid #cbd5e1;">পরবর্তী মিটার</th>`;
             const html = getPDFTemplate('যানবাহন রক্ষণাবেক্ষণ লগ (এমটি শাখা)', subtitle, headers, rows);
             generatePDF(html, `MT_Report_${v.baNo}.pdf`);
         };
@@ -1266,7 +1261,6 @@ ${htmlContent}
 
             if(chartInstance) chartInstance.destroy();
             
-            // CHART FIX FOR 0 VEHICLES
             const hasData = vehicles.length > 0;
             const cLabels = hasData ? ['ঠিক আছে', 'আসন্ন', 'বকেয়া'] : ['কোনো গাড়ি নেই'];
             const cData = hasData ? [okVehicles, upVehicles, ovVehicles] : [1];
