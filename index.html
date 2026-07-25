@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- html2pdf.js (Optional for other features, kept for compatibility) -->
+    <!-- html2pdf.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <!-- SheetJS for Excel Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -34,10 +34,9 @@
     <div id="login-screen" class="fixed inset-0 z-[100] flex items-center justify-center login-bg px-4 transition-opacity duration-300">
         <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-8 transform transition-all">
             <div class="text-center mb-8">
-                <!-- Custom Logo Setup (From GitHub) -->
-                <div class="w-24 h-24 mx-auto mb-4 bg-white rounded-full flex items-center justify-center shadow-md border-4 border-emerald-100 overflow-hidden">
-                    <!-- আপনার গিটহাবের ছবির লিংকটি নিচের src এর ভেতরে দিন -->
-                    <img src="logo.jpg" alt="9 EB Logo" class="w-full h-full object-cover">
+                <!-- Permanent SVG Logo Setup -->
+                <div class="w-24 h-24 mx-auto mb-4 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center shadow-md border-4 border-emerald-100 overflow-hidden">
+                    <img src="logo.jpg" alt="9 EB Logo" class="w-full h-full object-cover" onerror="this.outerHTML='<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'currentColor\' class=\'w-12 h-12 m-auto mt-5\'><path fill-rule=\'evenodd\' d=\'M12.516 2.17a.75.75 0 00-1.032 0 11.209 11.209 0 00-7.877 3.08.75.75 0 00-.222.583c.094 3.79.791 7.218 1.957 10.155.85 2.146 1.986 4.024 3.327 5.568.397.458.825.885 1.282 1.277a.75.75 0 001.03 0 15.004 15.004 0 001.283-1.277c1.34-1.544 2.476-3.422 3.327-5.568 1.166-2.937 1.863-6.365 1.957-10.155a.75.75 0 00-.222-.583 11.209 11.209 0 00-7.877-3.08zM12 11.25a3 3 0 100-6 3 3 0 000 6z\' clip-rule=\'evenodd\' /><path d=\'M8.25 12h7.5a.75.75 0 01.75.75v1.5a.75.75 0 01-.75.75h-7.5a.75.75 0 01-.75-.75v-1.5a.75.75 0 01.75-.75z\' /></svg>'">
                 </div>
                 <h1 class="text-2xl font-bold text-emerald-800">৯ ইস্ট বেঙ্গল রেজিমেন্ট</h1>
                 <p class="text-slate-500 text-sm mt-1">এমটি (MT) মেইনটেন্যান্স ট্র্যাকার</p>
@@ -71,9 +70,8 @@
         <header class="bg-white shadow-sm sticky top-0 z-40">
             <div class="px-4 py-3 flex justify-between items-center max-w-5xl mx-auto">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm border-2 border-emerald-500 overflow-hidden">
-                        <!-- হেডারের ছোট লোগো, এখানেও ছবির লিংকটি দিন -->
-                        <img src="logo.jpg" alt="Logo" class="w-full h-full object-cover">
+                    <div class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center shadow-sm border-2 border-emerald-500 overflow-hidden">
+                        <img src="logo.jpg" alt="Logo" class="w-full h-full object-cover" onerror="this.outerHTML='<i class=\'fa-solid fa-truck-fast\'></i>'">
                     </div>
                     <div>
                         <h1 class="font-bold text-lg text-slate-800 leading-tight">৯ ইস্ট বেঙ্গল (Smart MT)</h1>
@@ -162,6 +160,11 @@
                                     <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1.5">কাজ করার তারিখ</label><input type="date" id="maint-date" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500"></div>
                                     <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1.5">সর্বশেষ বদলি কি.মি</label><input type="number" id="maint-km" placeholder="KM" required min="0" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500"></div>
                                 </div>
+                                <!-- NEW FIELD: Remarks / Serial Number -->
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1.5">পার্টস/সিরিয়াল নং বা মন্তব্য (ঐচ্ছিক)</label>
+                                    <input type="text" id="maint-remarks" placeholder="যেমন: টায়ার নম্বর, ব্যাটারি নম্বর..." class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 text-sm">
+                                </div>
                                 <button type="submit" class="w-full grad-primary text-white font-bold py-3.5 rounded-xl mt-2 shadow-lg active:scale-95 transition-transform"><i class="fa-solid fa-check-circle mr-2"></i> রেকর্ড সেভ করুন</button>
                             </form>
                         </div>
@@ -182,24 +185,26 @@
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
-                            <h4 class="font-bold text-slate-700 mb-3 border-b pb-2">কাজের নিয়ম যুক্ত করুন</h4>
+                            <h4 class="font-bold text-slate-700 mb-3 border-b pb-2 flex items-center gap-2"><i class="fa-solid fa-clipboard-list text-blue-500"></i> কাজের নিয়ম / রেজিস্টার</h4>
+                            <p class="text-[11px] text-slate-500 mb-4 bg-slate-50 p-2 rounded-lg border border-slate-200">যেকোনো কার্ডে ক্লিক করে সেই কাজের পিডিএফ রেজিস্টার ডাউনলোড করতে পারবেন। (যেমন: টায়ার বদলি)</p>
                             <form id="form-rule" class="space-y-3 mb-4">
-                                <input type="text" id="rule-name" placeholder="কাজের নাম (যেমন: কুল্যান্ট)" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm">
+                                <input type="text" id="rule-name" placeholder="কাজের নাম (যেমন: কুল্যান্ট, টায়ার)" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm">
                                 <div class="flex gap-2">
                                     <input type="number" id="rule-months" placeholder="মাস (যেমন: ৩৬)" required min="1" class="w-1/2 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm">
                                     <input type="number" id="rule-km" placeholder="কি.মি (যেমন: ৬০০০০)" required min="0" class="w-1/2 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm">
                                 </div>
                                 <button type="submit" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-xl text-sm transition">যোগ করুন</button>
                             </form>
-                            <ul id="rules-list" class="space-y-2 max-h-[250px] overflow-y-auto hide-scroll text-sm"></ul>
+                            <!-- Clickable Rule Cards Grid -->
+                            <div id="rules-list" class="grid grid-cols-1 gap-3 max-h-[320px] overflow-y-auto hide-scroll pr-1"></div>
                         </div>
                         <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
-                            <h4 class="font-bold text-slate-700 mb-3 border-b pb-2">গাড়ির ধরন যুক্ত করুন</h4>
+                            <h4 class="font-bold text-slate-700 mb-3 border-b pb-2 flex items-center gap-2"><i class="fa-solid fa-car text-amber-500"></i> গাড়ির ধরন যুক্ত করুন</h4>
                             <form id="form-vtype" class="flex gap-2 mb-4">
                                 <input type="text" id="vtype-name" placeholder="নতুন ধরন লিখুন" required class="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm">
                                 <button type="submit" class="bg-slate-800 hover:bg-slate-700 text-white px-4 rounded-xl text-sm font-bold transition"><i class="fa-solid fa-plus"></i></button>
                             </form>
-                            <ul id="vtypes-list" class="space-y-2 max-h-[250px] overflow-y-auto hide-scroll text-sm"></ul>
+                            <ul id="vtypes-list" class="space-y-2 max-h-[350px] overflow-y-auto hide-scroll text-sm"></ul>
                         </div>
                     </div>
                 </section>
@@ -253,7 +258,7 @@
     
     <div id="edit-veh-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 transition-opacity bg-slate-900/60"><div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl"><div class="flex justify-between items-center mb-5"><h3 class="font-bold text-lg text-slate-800">গাড়ি আপডেট</h3><button onclick="document.getElementById('edit-veh-modal').classList.add('hidden')" class="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500"><i class="fa-solid fa-xmark"></i></button></div><form id="form-edit-vehicle" class="space-y-4"><input type="hidden" id="edit-veh-id"><div><label class="block text-xs font-bold text-slate-500 mb-1.5">বিএ নম্বর (BA No)</label><input type="text" id="edit-veh-ba" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"></div><div><label class="block text-xs font-bold text-slate-500 mb-1.5">গাড়ির ধরন</label><select id="edit-veh-type" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"></select></div><button type="submit" class="w-full bg-blue-600 text-white font-bold py-3.5 rounded-xl shadow-md mt-2">আপডেট করুন</button></form></div></div>
 
-    <div id="edit-maint-modal" class="hidden fixed inset-0 z-[110] flex items-center justify-center p-4 transition-opacity bg-slate-900/60"><div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl"><div class="flex justify-between items-center mb-5"><h3 class="font-bold text-lg text-slate-800">কাজের রেকর্ড আপডেট</h3><button onclick="document.getElementById('edit-maint-modal').classList.add('hidden')" class="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500"><i class="fa-solid fa-xmark"></i></button></div><form id="form-edit-maint" class="space-y-4"><input type="hidden" id="edit-maint-id"><input type="hidden" id="edit-maint-vid"><div><label class="block text-xs font-bold text-slate-500 mb-1.5">কাজের ধরন</label><select id="edit-maint-type" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"></select></div><div class="grid grid-cols-2 gap-3"><div><label class="block text-xs font-bold text-slate-500 mb-1.5">কাজ করার তারিখ</label><input type="date" id="edit-maint-date" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"></div><div><label class="block text-xs font-bold text-slate-500 mb-1.5">সর্বশেষ বদলি কি.মি</label><input type="number" id="edit-maint-km" required min="0" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"></div></div><button type="submit" class="w-full bg-blue-600 text-white font-bold py-3.5 rounded-xl shadow-md mt-2">আপডেট করুন</button></form></div></div>
+    <div id="edit-maint-modal" class="hidden fixed inset-0 z-[110] flex items-center justify-center p-4 transition-opacity bg-slate-900/60"><div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl"><div class="flex justify-between items-center mb-5"><h3 class="font-bold text-lg text-slate-800">কাজের রেকর্ড আপডেট</h3><button onclick="document.getElementById('edit-maint-modal').classList.add('hidden')" class="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500"><i class="fa-solid fa-xmark"></i></button></div><form id="form-edit-maint" class="space-y-4"><input type="hidden" id="edit-maint-id"><input type="hidden" id="edit-maint-vid"><div><label class="block text-xs font-bold text-slate-500 mb-1.5">কাজের ধরন</label><select id="edit-maint-type" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"></select></div><div class="grid grid-cols-2 gap-3"><div><label class="block text-xs font-bold text-slate-500 mb-1.5">কাজ করার তারিখ</label><input type="date" id="edit-maint-date" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"></div><div><label class="block text-xs font-bold text-slate-500 mb-1.5">সর্বশেষ বদলি কি.মি</label><input type="number" id="edit-maint-km" required min="0" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"></div></div><div><label class="block text-xs font-bold text-slate-500 mb-1.5">পার্টস/সিরিয়াল নং বা মন্তব্য (ঐচ্ছিক)</label><input type="text" id="edit-maint-remarks" placeholder="যেমন: টায়ার নম্বর, ব্যাটারি নম্বর..." class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 text-sm"></div><button type="submit" class="w-full bg-blue-600 text-white font-bold py-3.5 rounded-xl shadow-md mt-2">আপডেট করুন</button></form></div></div>
 
     <div id="edit-rule-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 transition-opacity bg-slate-900/60"><div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl"><div class="flex justify-between items-center mb-5"><h3 class="font-bold text-lg text-slate-800">নিয়ম আপডেট</h3><button onclick="document.getElementById('edit-rule-modal').classList.add('hidden')" class="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500"><i class="fa-solid fa-xmark"></i></button></div><form id="form-edit-rule" class="space-y-4"><input type="hidden" id="edit-rule-id"><div><label class="block text-xs font-bold text-slate-500 mb-1.5">কাজের নাম</label><input type="text" id="edit-rule-name" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"></div><div class="grid grid-cols-2 gap-3"><div><label class="block text-xs font-bold text-slate-500 mb-1.5">মাস</label><input type="number" id="edit-rule-months" required min="1" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"></div><div><label class="block text-xs font-bold text-slate-500 mb-1.5">কি.মি</label><input type="number" id="edit-rule-km" required min="0" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"></div></div><button type="submit" class="w-full bg-blue-600 text-white font-bold py-3.5 rounded-xl shadow-md mt-2">আপডেট করুন</button></form></div></div>
 
@@ -337,7 +342,7 @@
             return `${yr}-${mo}-${da}`;
         };
 
-        const categoryOrder = ["জিপ", "পিকআপ", "৩টন", "৩ টন", "ফ্রিজার ভ্যান", "ফ্রিজার", "কোস্টার", "মোটরসাইকেল", "ওয়াটার ট্রেইলার", "ওয়াটার ট্রেইলার"];
+        const categoryOrder = ["জিপ", "পিকআপ", "৩টন", "৩ টন", "ফ্রিজার ভ্যান", "ফ্রিজার", "কোস্টার", "মোট মোটরসাইকেল", "ওয়াটার ট্রেইলার", "ওয়াটার ট্রেইলার"];
         const sortCategories = (a, b) => {
             let cleanA = a.trim(); let cleanB = b.trim();
             let indexA = categoryOrder.indexOf(cleanA); let indexB = categoryOrder.indexOf(cleanB);
@@ -533,6 +538,7 @@
             e.preventDefault(); 
             const vId = document.getElementById('maint-vehicle').value, rId = document.getElementById('maint-type').value, dStr = document.getElementById('maint-date').value;
             const km = Number(document.getElementById('maint-km').value); 
+            const remarks = document.getElementById('maint-remarks').value.trim(); // NEW FIELD
             
             const isDuplicate = maintenanceLog.some(m => m.vehicleId === vId && m.typeId === rId && m.doneDate === dStr);
             if (isDuplicate) {
@@ -551,7 +557,7 @@
             } 
             
             const newId = generateId('rec');
-            handleDbWrite('maintenanceLog', newId, { id: newId, vehicleId: vId, vehicleBa: vData.baNo, typeId: rId, typeName: rule.name, doneDate: dStr, doneKm: km, nextDate: nextDateTarget, nextKm: nextKmTarget, timestamp: Date.now() }, 'রেকর্ড সেভ হয়েছে'); 
+            handleDbWrite('maintenanceLog', newId, { id: newId, vehicleId: vId, vehicleBa: vData.baNo, typeId: rId, typeName: rule.name, doneDate: dStr, doneKm: km, nextDate: nextDateTarget, nextKm: nextKmTarget, remarks: remarks, timestamp: Date.now() }, 'রেকর্ড সেভ হয়েছে'); 
             e.target.reset(); 
         });
         
@@ -725,6 +731,7 @@
             document.getElementById('edit-maint-type').innerHTML = taskRules.map(r => `<option value="${r.id}" ${r.id===m.typeId?'selected':''}>${r.name}</option>`).join('');
             document.getElementById('edit-maint-date').value = m.doneDate;
             document.getElementById('edit-maint-km').value = m.doneKm;
+            document.getElementById('edit-maint-remarks').value = m.remarks || ''; // POPULATE REMARKS
             document.getElementById('edit-maint-modal').classList.remove('hidden');
         };
 
@@ -735,6 +742,7 @@
             const rId = document.getElementById('edit-maint-type').value;
             const dStr = document.getElementById('edit-maint-date').value;
             const km = Number(document.getElementById('edit-maint-km').value);
+            const remarks = document.getElementById('edit-maint-remarks').value.trim(); // GET REMARKS
 
             const isDuplicate = maintenanceLog.some(m => m.id !== id && m.vehicleId === vId && m.typeId === rId && m.doneDate === dStr);
             if (isDuplicate) {
@@ -755,6 +763,7 @@
                     doneKm: km,
                     nextDate: nextDateTarget,
                     nextKm: nextKmTarget,
+                    remarks: remarks, // UPDATE REMARKS
                     timestamp: Date.now(),
                     updatedBy: auth.currentUser?.email || 'admin'
                 });
@@ -792,6 +801,7 @@
                     'বদলি কি.মি': m.doneKm,
                     'পরবর্তী টার্গেট তারিখ': formatDate(m.nextDate),
                     'পরবর্তী টার্গেট কি.মি': m.nextKm,
+                    'পার্টস/সিরিয়াল নং': m.remarks || '', // ADDED
                     'এন্ট্রি কারী': m.updatedBy || 'admin'
                 }));
                 const wsLogs = XLSX.utils.json_to_sheet(mData);
@@ -825,7 +835,7 @@
         }
 
         // ==========================================
-        // 100% FIXED PDF ENGINE - NO BLANK PAGE, NO CUT-OFF, FIXED SCROLL BUG
+        // 100% FIXED PDF ENGINE
         // ==========================================
         function generatePDF(htmlContent, fileName) {
             const printWindow = window.open('', '_blank');
@@ -931,6 +941,7 @@ ${htmlContent}
                     const latestLog = vLogs.length > 0 ? vLogs[0] : null;
 
                     if (latestLog) {
+                        // POPULATE REMARKS IN REGISTER PDF
                         rows += `
                             <tr>
                                 <td>${sl++}</td>
@@ -939,7 +950,7 @@ ${htmlContent}
                                 <td>${latestLog.doneKm}</td>
                                 <td style="color:#059669; font-weight:bold;">${formatShortDate(latestLog.nextDate)}</td>
                                 <td style="color:#059669; font-weight:bold;">${latestLog.nextKm}</td>
-                                <td></td>
+                                <td style="font-size:10px; font-weight:bold;">${latestLog.remarks || ''}</td>
                             </tr>
                         `;
                     } else {
@@ -966,7 +977,7 @@ ${htmlContent}
                 <th style="width:15%;">বদলীর কি.মি</th>
                 <th style="width:16%;">পরবর্তী তারিখ</th>
                 <th style="width:15%;">বদলীর কি.মি</th>
-                <th style="width:14%;">মন্তব্য</th>
+                <th style="width:14%;">মন্তব্য/পার্টস নং</th>
             `;
 
             const title = `${rule.name} - ${rule.months} মাস / ${rule.km} কি.মি`;
@@ -1006,7 +1017,7 @@ ${htmlContent}
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 bg-white border border-slate-100 rounded-full flex items-center justify-center text-emerald-500 shadow-sm"><i class="fa-solid fa-wrench"></i></div>
                             <div>
-                                <h4 class="font-bold text-slate-800 text-sm">${m.typeName}</h4>
+                                <h4 class="font-bold text-slate-800 text-sm">${m.typeName} ${m.remarks ? `<span class="text-[10px] font-bold text-slate-500 bg-slate-200 px-1.5 py-0.5 rounded ml-1 border border-slate-300">নং: ${m.remarks}</span>` : ''}</h4>
                                 <p class="text-xs text-slate-500 mt-0.5">
                                     সর্বশেষ কাজ: <strong>${formatDate(m.doneDate)}</strong> (${m.doneKm} KM)<br>
                                     <span class="text-emerald-600 font-medium mt-1 inline-block">পরবর্তী টার্গেট: ${formatDate(m.nextDate)} <i class="fa-solid fa-arrow-right-long text-[10px] mx-1"></i> ${m.nextKm} KM</span>
@@ -1153,11 +1164,12 @@ ${htmlContent}
                 return b.id.localeCompare(a.id);
             });
             
-            let rows = logs.map(m => `<tr><td>${formatDate(m.doneDate)}</td><td style="font-weight:bold;">${m.typeName}</td><td>${m.doneKm} KM</td><td style="color:#dc2626;">${formatDate(m.nextDate)}</td><td style="color:#dc2626;">${m.nextKm} KM</td></tr>`).join('');
-            if(logs.length === 0) rows = `<tr><td colspan="5" style="padding:15px; text-align:center; color:#64748b;">কোনো রেকর্ড নেই</td></tr>`;
+            // ADDED REMARKS COLUMN IN VEHICLE REPORT PDF
+            let rows = logs.map(m => `<tr><td>${formatDate(m.doneDate)}</td><td style="font-weight:bold;">${m.typeName}</td><td style="font-size:10px; font-weight:bold;">${m.remarks || '-'}</td><td>${m.doneKm} KM</td><td style="color:#dc2626;">${formatDate(m.nextDate)}</td><td style="color:#dc2626;">${m.nextKm} KM</td></tr>`).join('');
+            if(logs.length === 0) rows = `<tr><td colspan="6" style="padding:15px; text-align:center; color:#64748b;">কোনো রেকর্ড নেই</td></tr>`;
             
             const subtitle = `<table style="width:100%; border:none; margin:0; padding:0;"><tr><td style="border:none; text-align:left;"><strong>বিএ নম্বর:</strong> ${v.baNo}</td><td style="border:none; text-align:center;"><strong>গাড়ির ধরন:</strong> ${v.type}</td><td style="border:none; text-align:right;"><strong>বর্তমান মিটার:</strong> ${v.currentKm || 0} KM</td></tr></table>`;
-            const headers = `<th style="width: 20%;">কাজের তারিখ</th><th style="width: 25%;">কাজের ধরন</th><th style="width: 15%;">মিটার রিডিং</th><th style="width: 20%;">পরবর্তী তারিখ</th><th style="width: 20%;">পরবর্তী মিটার</th>`;
+            const headers = `<th style="width: 15%;">কাজের তারিখ</th><th style="width: 22%;">কাজের ধরন</th><th style="width: 15%;">পার্টস/সিরিয়াল নং</th><th style="width: 16%;">মিটার রিডিং</th><th style="width: 16%;">পরবর্তী তারিখ</th><th style="width: 16%;">পরবর্তী মিটার</th>`;
             const html = getPDFTemplate('যানবাহন রক্ষণাবেক্ষণ লগ (এমটি শাখা)', subtitle, headers, rows);
             generatePDF(html, `MT_Report_${v.baNo}.pdf`);
         };
@@ -1167,18 +1179,18 @@ ${htmlContent}
             document.getElementById('maint-type').innerHTML = '<option value="" disabled selected>কাজের ধরন নির্বাচন করুন...</option>' + taskRules.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
             document.getElementById('veh-type').innerHTML = vehicleTypes.map(v => `<option value="${v.name}">${v.name}</option>`).join('');
             
+            // CLICKABLE RULE CARDS IMPLEMENTATION
             document.getElementById('rules-list').innerHTML = taskRules.map(r => `
-                <li class="flex justify-between items-center py-2.5 border-b border-slate-100 last:border-0">
+                <div onclick="window.downloadTaskRegisterReport('${r.id}')" class="bg-white border border-slate-200 p-3 rounded-xl shadow-sm hover:shadow-md hover:border-emerald-300 transition clickable-card cursor-pointer flex justify-between items-center group">
                     <div>
-                        <p class="font-bold text-slate-700">${r.name}</p>
-                        <p class="text-xs text-slate-500">${r.months} মাস | ${r.km}KM</p>
+                        <h4 class="font-bold text-slate-800 group-hover:text-emerald-700 transition">${r.name}</h4>
+                        <p class="text-[11px] text-slate-500 mt-1 font-medium"><i class="fa-regular fa-clock text-slate-400"></i> ${r.months} মাস <span class="mx-1">|</span> <i class="fa-solid fa-gauge-high text-slate-400"></i> ${r.km}KM</p>
                     </div>
-                    <div class="flex gap-1.5">
-                        <button onclick="window.downloadTaskRegisterReport('${r.id}')" class="text-emerald-500 hover:text-white hover:bg-emerald-600 bg-emerald-50 p-2 rounded-lg transition" title="রেজিস্টার পিডিএফ"><i class="fa-solid fa-file-pdf"></i></button>
-                        <button onclick="window.editRule('${r.id}')" class="text-blue-400 hover:text-white hover:bg-blue-500 bg-blue-50 p-2 rounded-lg transition" title="এডিট"><i class="fa-solid fa-pen"></i></button>
-                        <button onclick="window.deleteRule('${r.id}')" class="text-red-400 hover:text-white hover:bg-red-500 bg-red-50 p-2 rounded-lg transition" title="ডিলিট"><i class="fa-solid fa-trash-can"></i></button>
+                    <div class="flex gap-1.5" onclick="event.stopPropagation()">
+                        <button onclick="window.editRule('${r.id}')" class="w-8 h-8 bg-blue-50 text-blue-500 hover:bg-blue-500 hover:text-white rounded-lg transition flex items-center justify-center" title="এডিট"><i class="fa-solid fa-pen text-xs"></i></button>
+                        <button onclick="window.deleteRule('${r.id}')" class="w-8 h-8 bg-red-50 text-red-500 hover:bg-red-500 hover:text-white rounded-lg transition flex items-center justify-center" title="ডিলিট"><i class="fa-solid fa-trash-can text-xs"></i></button>
                     </div>
-                </li>`).join('');
+                </div>`).join('');
             
             document.getElementById('vtypes-list').innerHTML = vehicleTypes.map(v => `<li class="flex justify-between items-center py-2.5 border-b border-slate-100 last:border-0"><p class="font-bold text-slate-700">${v.name}</p><div class="flex gap-1.5"><button onclick="window.editVehicleType('${v.id}')" class="text-blue-400 hover:text-white hover:bg-blue-500 bg-blue-50 p-2 rounded-lg transition" title="এডিট"><i class="fa-solid fa-pen"></i></button><button onclick="window.deleteVehicleType('${v.id}')" class="text-red-400 hover:text-white hover:bg-red-500 bg-red-50 p-2 rounded-lg transition" title="ডিলিট"><i class="fa-solid fa-trash-can"></i></button></div></li>`).join('');
 
@@ -1216,8 +1228,8 @@ ${htmlContent}
                             <h4 class="font-bold text-slate-800 text-sm md:text-base">${m.vehicleBa} <span class="text-xs text-red-600 bg-red-50 px-2 py-0.5 rounded ml-1">${m.typeName}</span></h4>
                             <p class="text-xs font-bold text-red-600 mt-1">${reason}</p>
                             <div class="text-[10px] md:text-[11px] text-slate-500 mt-2 bg-slate-50 p-2 rounded-lg border border-slate-100">
-                                সর্বশেষ বদলি: <span class="font-semibold text-slate-700">${m.doneKm} KM</span> | টার্গেট লক্ষ্যমাত্রা: <span class="font-semibold text-slate-700">${m.nextKm} KM</span><br>
-                                গাড়ির বর্তমান রানিং: <span class="font-bold text-red-600">${currentKm} KM</span>
+                                সর্বশেষ বদলি: <span class="font-semibold text-slate-700">${m.doneKm} KM</span> ${m.remarks ? ` | পার্টস নং: <span class="font-semibold text-slate-700">${m.remarks}</span>` : ''}<br>
+                                টার্গেট লক্ষ্যমাত্রা: <span class="font-semibold text-slate-700">${m.nextKm} KM</span> | বর্তমান রানিং: <span class="font-bold text-red-600">${currentKm} KM</span>
                             </div>
                         </div>
                     </div>`;
@@ -1232,8 +1244,8 @@ ${htmlContent}
                             <h4 class="font-bold text-slate-800 text-sm md:text-base">${m.vehicleBa} <span class="text-xs text-amber-600 bg-amber-50 px-2 py-0.5 rounded ml-1">${m.typeName}</span></h4>
                             <p class="text-xs font-bold text-amber-600 mt-1">${reason}</p>
                             <div class="text-[10px] md:text-[11px] text-slate-500 mt-2 bg-slate-50 p-2 rounded-lg border border-slate-100">
-                                সর্বশেষ বদলি: <span class="font-semibold text-slate-700">${m.doneKm} KM</span> | টার্গেট লক্ষ্যমাত্রা: <span class="font-semibold text-slate-700">${m.nextKm} KM</span><br>
-                                গাড়ির বর্তমান রানিং: <span class="font-bold text-amber-600">${currentKm} KM</span>
+                                সর্বশেষ বদলি: <span class="font-semibold text-slate-700">${m.doneKm} KM</span> ${m.remarks ? ` | পার্টস নং: <span class="font-semibold text-slate-700">${m.remarks}</span>` : ''}<br>
+                                টার্গেট লক্ষ্যমাত্রা: <span class="font-semibold text-slate-700">${m.nextKm} KM</span> | বর্তমান রানিং: <span class="font-bold text-amber-600">${currentKm} KM</span>
                             </div>
                         </div>
                     </div>`;
