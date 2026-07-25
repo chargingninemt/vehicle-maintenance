@@ -846,60 +846,46 @@
         }
 
         // ==========================================
-        // ROBUST PDF ENGINE WITH TEMP CONTAINER (BUG FIXED)
+        // ROBUST PDF ENGINE (PERFECT SCROLL FIX)
         // ==========================================
         function generatePDF(htmlContent, fileName) {
             window.showToast("পিডিএফ প্রস্তুত হচ্ছে, অপেক্ষা করুন...");
             
-            // Fix 1: Save current scroll to restore later
-            const currentScrollY = window.scrollY;
+            // স্ক্রল পজিশন সেভ করে রাখা
+            const originalScrollY = window.scrollY;
 
-            // Fix 2: Scroll to top temporarily so html2canvas doesn't capture blank offset
+            // পেজ একদম টপে নিয়ে যাওয়া (এটি স্লাইডিং ডাউন ও ব্ল্যাঙ্ক পেজ বাগ ফিক্স করবে)
             window.scrollTo(0, 0);
-            
-            const tempContainer = document.createElement('div');
-            tempContainer.innerHTML = htmlContent;
-            
-            // Fix 3: Position safely at top left but behind everything
-            tempContainer.style.position = 'absolute';
-            tempContainer.style.top = '0';
-            tempContainer.style.left = '0'; 
-            tempContainer.style.width = '794px';  
-            tempContainer.style.backgroundColor = 'white';
-            tempContainer.style.zIndex = '-9999';
-            document.body.appendChild(tempContainer);
 
             const opt = { 
-                margin: 0.1, 
+                margin: [0.3, 0.3, 0.3, 0.3], 
                 filename: fileName, 
                 image: { type: 'jpeg', quality: 1.0 }, 
                 html2canvas: { 
                     scale: 2, 
                     useCORS: true,
-                    scrollY: 0, 
-                    scrollX: 0,
+                    scrollY: 0, // ক্যানভাসকে বাধ্য করা যেন সে টপ থেকে রেন্ডার করে
                     windowY: 0
                 }, 
-                pagebreak: { mode: 'css', avoid: 'tr' },
+                pagebreak: { mode: 'css', avoid: 'tr' }, // টেবিলের রো যেন মাঝখান থেকে না কাটে
                 jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } 
             };
             
-            html2pdf().set(opt).from(tempContainer).save().then(() => {
-                window.showToast("পিডিএফ সফলভাবে ডাউনলোড হয়েছে!");
-                document.body.removeChild(tempContainer); 
-                window.scrollTo(0, currentScrollY); // Restore scroll
-            }).catch(err => {
-                console.error("PDF Error:", err); 
-                window.showToast("পিডিএফ তৈরিতে সমস্যা হয়েছে!", true);
-                if (document.body.contains(tempContainer)) {
-                    document.body.removeChild(tempContainer); 
-                }
-                window.scrollTo(0, currentScrollY); // Restore scroll
-            });
+            // সামান্য টাইমআউট দেওয়া হলো যাতে ব্রাউজার টপে যাওয়ার সময় পায়
+            setTimeout(() => {
+                html2pdf().set(opt).from(htmlContent).save().then(() => {
+                    window.showToast("পিডিএফ সফলভাবে ডাউনলোড হয়েছে!");
+                    window.scrollTo(0, originalScrollY); // কাজ শেষে আগের জায়গায় ফেরত
+                }).catch(err => {
+                    console.error("PDF Error:", err); 
+                    window.showToast("পিডিএফ তৈরিতে সমস্যা হয়েছে!", true);
+                    window.scrollTo(0, originalScrollY); // এরর হলেও আগের জায়গায় ফেরত
+                });
+            }, 150); // ১৫০ মিলি-সেকেন্ড ডিলে
         }
 
         const getPDFTemplate = (title, subtitle, tableHeaders, tableRows) => `
-            <div style="width: 794px; padding: 40px; box-sizing: border-box; position: relative; font-family:'Hind Siliguri', sans-serif; color:#1e293b; background: white; margin: 0;">
+            <div style="width: 794px; padding: 40px; box-sizing: border-box; position: relative; font-family:'Hind Siliguri', sans-serif; color:#1e293b; background: white; margin: 0 auto;">
                 <style>
                     @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap');
                     tr { page-break-inside: avoid !important; }
@@ -923,7 +909,7 @@
             </div>`;
 
         const getRegisterPDFTemplate = (title, tableHeaders, tableRows) => `
-            <div style="width: 794px; padding: 30px; box-sizing: border-box; position: relative; font-family:'Hind Siliguri', sans-serif; color:#000; background: white; margin: 0;">
+            <div style="width: 794px; padding: 30px; box-sizing: border-box; position: relative; font-family:'Hind Siliguri', sans-serif; color:#000; background: white; margin: 0 auto;">
                 <style>
                     @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap');
                     tr { page-break-inside: avoid !important; }
