@@ -8,8 +8,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- html2pdf.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <!-- SheetJS for Excel Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
@@ -186,7 +184,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
                             <h4 class="font-bold text-slate-700 mb-3 border-b pb-2 flex items-center gap-2"><i class="fa-solid fa-clipboard-list text-blue-500"></i> কাজের নিয়ম / রেজিস্টার</h4>
-                            <p class="text-[11px] text-slate-500 mb-4 bg-slate-50 p-2 rounded-lg border border-slate-200">যেকোনো কার্ডে ক্লিক করে সেই কাজের পিডিএফ রেজিস্টার ডাউনলোড করতে পারবেন। (যেমন: টায়ার বদলি)</p>
+                            <p class="text-[11px] text-slate-500 mb-4 bg-slate-50 p-2 rounded-lg border border-slate-200">যেকোনো কার্ডে ক্লিক করে সেই কাজের পিডিএফ রেজিস্টার দেখতে পারবেন। (যেমন: টায়ার বদলি)</p>
                             <form id="form-rule" class="space-y-3 mb-4">
                                 <input type="text" id="rule-name" placeholder="কাজের নাম (যেমন: কুল্যান্ট, টায়ার)" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm">
                                 <div class="flex gap-2">
@@ -196,7 +194,7 @@
                                 <button type="submit" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-xl text-sm transition">যোগ করুন</button>
                             </form>
                             <!-- Clickable Rule Cards Grid -->
-                            <div id="rules-list" class="grid grid-cols-1 gap-3 max-h-[320px] overflow-y-auto hide-scroll pr-1"></div>
+                            <div id="rules-list" class="grid grid-cols-1 gap-2 max-h-[320px] overflow-y-auto hide-scroll pr-1"></div>
                         </div>
                         <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
                             <h4 class="font-bold text-slate-700 mb-3 border-b pb-2 flex items-center gap-2"><i class="fa-solid fa-car text-amber-500"></i> গাড়ির ধরন যুক্ত করুন</h4>
@@ -249,6 +247,24 @@
             <div class="p-5 border-t border-slate-100 bg-slate-50 rounded-b-2xl flex justify-end">
                 <button id="vd-pdf-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-xl shadow-md transition">
                     <i class="fa-solid fa-file-pdf mr-2"></i>পিডিএফ রিপোর্ট ডাউনলোড
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NEW MODAL: Task Register Preview -->
+    <div id="register-preview-modal" class="hidden fixed inset-0 z-[110] flex items-center justify-center p-4 transition-opacity bg-slate-900/70">
+        <div class="bg-white w-full max-w-4xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh]">
+            <div class="flex justify-between items-center p-5 border-b border-slate-100 bg-slate-50 rounded-t-2xl">
+                <h3 class="font-bold text-lg text-slate-800" id="reg-preview-title"><i class="fa-solid fa-clipboard-list text-emerald-600 mr-2"></i>রেজিস্টার প্রিভিউ</h3>
+                <button onclick="document.getElementById('register-preview-modal').classList.add('hidden')" class="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center text-slate-600 hover:bg-slate-300 transition"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="overflow-y-auto p-0 md:p-5 flex-1" id="reg-preview-content">
+                <!-- Preview Table injected here -->
+            </div>
+            <div class="p-5 border-t border-slate-100 bg-slate-50 rounded-b-2xl flex justify-end">
+                <button id="reg-preview-download-btn" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-6 rounded-xl shadow-md transition">
+                    <i class="fa-solid fa-file-pdf mr-2"></i>পিডিএফ ডাউনলোড
                 </button>
             </div>
         </div>
@@ -342,7 +358,7 @@
             return `${yr}-${mo}-${da}`;
         };
 
-        const categoryOrder = ["জিপ", "পিকআপ", "৩টন", "৩ টন", "ফ্রিজার ভ্যান", "ফ্রিজার", "কোস্টার", "মোট মোটরসাইকেল", "ওয়াটার ট্রেইলার", "ওয়াটার ট্রেইলার"];
+        const categoryOrder = ["জিপ", "পিকআপ", "৩টন", "৩ টন", "ফ্রিজার ভ্যান", "ফ্রিজার", "কোস্টার", "মোটরসাইকেল", "ওয়াটার ট্রেইলার", "ওয়াটার ট্রেইলার"];
         const sortCategories = (a, b) => {
             let cleanA = a.trim(); let cleanB = b.trim();
             let indexA = categoryOrder.indexOf(cleanA); let indexB = categoryOrder.indexOf(cleanB);
@@ -835,7 +851,7 @@
         }
 
         // ==========================================
-        // 100% FIXED PDF ENGINE
+        // 100% FIXED PDF ENGINE - NO BLANK PAGE, NO CUT-OFF, FIXED SCROLL BUG
         // ==========================================
         function generatePDF(htmlContent, fileName) {
             const printWindow = window.open('', '_blank');
@@ -925,6 +941,72 @@ ${htmlContent}
                 </div>
             </div>`;
 
+        window.previewTaskRegister = (taskId) => {
+            const rule = taskRules.find(r => r.id === taskId);
+            if (!rule) return;
+
+            let rows = '';
+            let sl = 1;
+            const grouped = {};
+            vehicles.forEach(v => { if(!grouped[v.type]) grouped[v.type] = []; grouped[v.type].push(v); });
+
+            Object.keys(grouped).sort(sortCategories).forEach(type => {
+                rows += `<tr class="bg-emerald-100"><td colspan="7" class="p-2 border-b border-emerald-200 font-bold text-emerald-800 text-center"><i class="fa-solid fa-layer-group mr-1"></i> ধরন: ${type}</td></tr>`;
+                grouped[type].forEach(v => {
+                    const vLogs = maintenanceLog.filter(m => m.vehicleId === v.id && m.typeId === taskId).sort((a,b) => new Date(b.doneDate).getTime() - new Date(a.doneDate).getTime());
+                    const latestLog = vLogs.length > 0 ? vLogs[0] : null;
+
+                    if (latestLog) {
+                        rows += `<tr class="hover:bg-slate-50">
+                            <td class="p-2 border-b border-slate-100 text-center text-slate-500">${sl++}</td>
+                            <td class="p-2 border-b border-slate-100 font-bold text-slate-800">${v.baNo}</td>
+                            <td class="p-2 border-b border-slate-100 text-center">${formatShortDate(latestLog.doneDate)}</td>
+                            <td class="p-2 border-b border-slate-100 text-center">${latestLog.doneKm}</td>
+                            <td class="p-2 border-b border-slate-100 text-center font-bold text-emerald-600">${formatShortDate(latestLog.nextDate)}</td>
+                            <td class="p-2 border-b border-slate-100 text-center font-bold text-emerald-600">${latestLog.nextKm}</td>
+                            <td class="p-2 border-b border-slate-100 text-xs font-bold text-slate-600">${latestLog.remarks || '-'}</td>
+                        </tr>`;
+                    } else {
+                        rows += `<tr class="hover:bg-slate-50 text-slate-400">
+                            <td class="p-2 border-b border-slate-100 text-center">${sl++}</td>
+                            <td class="p-2 border-b border-slate-100 font-bold text-slate-500">${v.baNo}</td>
+                            <td colspan="4" class="p-2 border-b border-slate-100 text-center">কোনো কাজ রেকর্ড করা হয়নি</td>
+                            <td class="p-2 border-b border-slate-100 text-center">-</td>
+                        </tr>`;
+                    }
+                });
+            });
+
+            if (vehicles.length === 0) {
+                rows = `<tr><td colspan="7" class="p-4 text-center text-slate-400">কোনো গাড়ি নেই</td></tr>`;
+            }
+
+            document.getElementById('reg-preview-title').innerHTML = `<i class="fa-solid fa-clipboard-list text-emerald-600 mr-2"></i>রেজিস্টার: ${rule.name}`;
+
+            document.getElementById('reg-preview-content').innerHTML = `
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="bg-slate-100 text-slate-600 sticky top-0 shadow-sm">
+                            <th class="p-3 border-b border-slate-200 text-center">ক্র.নং</th>
+                            <th class="p-3 border-b border-slate-200">বিএ নং</th>
+                            <th class="p-3 border-b border-slate-200 text-center">কাজের তারিখ</th>
+                            <th class="p-3 border-b border-slate-200 text-center">বর্তমান কি.মি</th>
+                            <th class="p-3 border-b border-slate-200 text-center">পরবর্তী তারিখ</th>
+                            <th class="p-3 border-b border-slate-200 text-center">পরবর্তী কি.মি</th>
+                            <th class="p-3 border-b border-slate-200">মন্তব্য/পার্টস নং</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">${rows}</tbody>
+                </table>
+            `;
+
+            document.getElementById('reg-preview-download-btn').onclick = () => {
+                window.downloadTaskRegisterReport(taskId);
+            };
+
+            document.getElementById('register-preview-modal').classList.remove('hidden');
+        };
+
         window.downloadTaskRegisterReport = (taskId) => {
             const rule = taskRules.find(r => r.id === taskId);
             if (!rule) return;
@@ -936,12 +1018,13 @@ ${htmlContent}
             vehicles.forEach(v => { if(!grouped[v.type]) grouped[v.type] = []; grouped[v.type].push(v); });
             
             Object.keys(grouped).sort(sortCategories).forEach(type => {
+                rows += `<tr><td colspan="7" style="background-color:#d1fae5; color:#065f46; font-weight:bold; text-align:center; padding: 8px;">গাড়ির ধরন: ${type}</td></tr>`;
+                
                 grouped[type].forEach(v => {
-                    const vLogs = maintenanceLog.filter(m => m.vehicleId === v.id && m.typeId === taskId).sort((a,b) => new Date(b.doneDate) - new Date(a.doneDate));
+                    const vLogs = maintenanceLog.filter(m => m.vehicleId === v.id && m.typeId === taskId).sort((a,b) => new Date(b.doneDate).getTime() - new Date(a.doneDate).getTime());
                     const latestLog = vLogs.length > 0 ? vLogs[0] : null;
 
                     if (latestLog) {
-                        // POPULATE REMARKS IN REGISTER PDF
                         rows += `
                             <tr>
                                 <td>${sl++}</td>
@@ -973,16 +1056,18 @@ ${htmlContent}
             const headers = `
                 <th style="width:8%;">ক্র.নং</th>
                 <th style="width:16%;">বিএ নং</th>
-                <th style="width:16%;">বর্তমান তারিখ</th>
+                <th style="width:16%;">কাজের তারিখ</th>
                 <th style="width:15%;">বদলীর কি.মি</th>
                 <th style="width:16%;">পরবর্তী তারিখ</th>
-                <th style="width:15%;">বদলীর কি.মি</th>
+                <th style="width:15%;">পরবর্তী কি.মি</th>
                 <th style="width:14%;">মন্তব্য/পার্টস নং</th>
             `;
 
             const title = `${rule.name} - ${rule.months} মাস / ${rule.km} কি.মি`;
             const htmlContent = getRegisterPDFTemplate(title, headers, rows);
             generatePDF(htmlContent, `Register_${rule.name}.pdf`);
+            
+            document.getElementById('register-preview-modal').classList.add('hidden');
         };
 
 
@@ -1179,9 +1264,9 @@ ${htmlContent}
             document.getElementById('maint-type').innerHTML = '<option value="" disabled selected>কাজের ধরন নির্বাচন করুন...</option>' + taskRules.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
             document.getElementById('veh-type').innerHTML = vehicleTypes.map(v => `<option value="${v.name}">${v.name}</option>`).join('');
             
-            // CLICKABLE RULE CARDS IMPLEMENTATION
+            // CLICKABLE RULE CARDS IMPLEMENTATION WITH PREVIEW
             document.getElementById('rules-list').innerHTML = taskRules.map(r => `
-                <div onclick="window.downloadTaskRegisterReport('${r.id}')" class="bg-white border border-slate-200 p-3 rounded-xl shadow-sm hover:shadow-md hover:border-emerald-300 transition clickable-card cursor-pointer flex justify-between items-center group">
+                <div onclick="window.previewTaskRegister('${r.id}')" class="bg-white border border-slate-200 p-3 rounded-xl shadow-sm hover:shadow-md hover:border-emerald-300 transition clickable-card cursor-pointer flex justify-between items-center group mb-2">
                     <div>
                         <h4 class="font-bold text-slate-800 group-hover:text-emerald-700 transition">${r.name}</h4>
                         <p class="text-[11px] text-slate-500 mt-1 font-medium"><i class="fa-regular fa-clock text-slate-400"></i> ${r.months} মাস <span class="mx-1">|</span> <i class="fa-solid fa-gauge-high text-slate-400"></i> ${r.km}KM</p>
