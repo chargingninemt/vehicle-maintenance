@@ -28,7 +28,7 @@
         .login-bg { background: linear-gradient(rgba(16, 185, 129, 0.9), rgba(5, 150, 105, 0.9)), url('https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&q=80&w=1000') center/cover; }
     </style>
 </head>
-<body class="min-h-screen text-slate-800 flex flex-col relative z-0">
+<body class="min-h-screen text-slate-800 flex flex-col relative z-0 bg-gray-100">
 
     <!-- LOGIN SCREEN -->
     <div id="login-screen" class="fixed inset-0 z-[100] flex items-center justify-center login-bg px-4 transition-opacity duration-300">
@@ -556,7 +556,7 @@
             handleDbWrite('maintenanceLog', newId, { id: newId, vehicleId: vId, vehicleBa: vData.baNo, typeId: rId, typeName: rule.name, doneDate: dStr, doneKm: km, nextDate: nextDateTarget, nextKm: nextKmTarget, timestamp: Date.now() }, 'রেকর্ড সেভ হয়েছে'); 
             e.target.reset(); 
         });
-
+        
         document.getElementById('form-rule').addEventListener('submit', (e)=>{ 
             e.preventDefault(); 
             const rName = document.getElementById('rule-name').value.trim();
@@ -827,19 +827,33 @@
         }
 
         // ==========================================
-        // 100% FIXED PDF ENGINE - NO BLANK PAGE, NO CUT-OFF, FIXED FONT
+        // 100% BULLETPROOF PDF ENGINE
+        // Fixes Blank Page (Scroll Bug), Hidden Container issue, Right-side Cutoff, and Font Breakage
         // ==========================================
         function generatePDF(htmlContent, fileName) {
             window.showToast("পিডিএফ প্রস্তুত হচ্ছে, অপেক্ষা করুন...");
             
-            // Temporary DOM Element to ensure styles/fonts are loaded properly and width is fixed
+            // 1. Save original scroll position and scroll to top 
+            // (html2canvas captures blank pages if the document is scrolled down)
+            const originalScrollY = window.scrollY;
+            window.scrollTo(0, 0);
+
+            // 2. Create the wrapper element
             const tempContainer = document.createElement('div');
-            tempContainer.style.width = '794px'; // A4 size exact width (96dpi)
+            
+            // 3. IMPORTANT CSS: 
+            // Use absolute positioning behind the main app (z-index: -1000).
+            // Do NOT use display:none, opacity:0, or left:-9999px because html2canvas ignores those.
             tempContainer.style.position = 'absolute';
-            tempContainer.style.left = '-9999px'; 
-            tempContainer.style.top = '0';
+            tempContainer.style.top = '0px';
+            tempContainer.style.left = '0px';
+            tempContainer.style.width = '794px'; // Strict A4 Width
+            tempContainer.style.minHeight = '1123px';
+            tempContainer.style.zIndex = '-1000'; // Behind the main app background
             tempContainer.style.backgroundColor = '#ffffff';
+            tempContainer.style.color = '#000000';
             tempContainer.innerHTML = htmlContent;
+            
             document.body.appendChild(tempContainer);
 
             const opt = { 
@@ -849,27 +863,35 @@
                 html2canvas: { 
                     scale: 2, 
                     useCORS: true,
-                    windowWidth: 794 // Prevents right side truncation
-                    // letterRendering: true <-- Removed. Because it breaks Bengali compound characters.
+                    scrollY: 0,
+                    scrollX: 0,
+                    windowWidth: 794 // Ensures the internal iframe canvas doesn't cut off
                 }, 
                 jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } 
             };
             
-            html2pdf().set(opt).from(tempContainer).save().then(() => {
-                window.showToast("পিডিএফ সফলভাবে ডাউনলোড হয়েছে!");
-                document.body.removeChild(tempContainer); 
-            }).catch(err => {
-                console.error("PDF Error:", err); 
-                window.showToast("পিডিএফ তৈরিতে সমস্যা হয়েছে!", true);
-                document.body.removeChild(tempContainer);
-            });
+            // 4. Delay to allow browser to calculate layout and apply fonts securely
+            setTimeout(() => {
+                html2pdf().set(opt).from(tempContainer).save().then(() => {
+                    window.showToast("পিডিএফ সফলভাবে ডাউনলোড হয়েছে!");
+                    document.body.removeChild(tempContainer);
+                    window.scrollTo(0, originalScrollY); // Restore scroll position
+                }).catch(err => {
+                    console.error("PDF Error:", err); 
+                    window.showToast("পিডিএফ তৈরিতে সমস্যা হয়েছে!", true);
+                    if (document.body.contains(tempContainer)) {
+                        document.body.removeChild(tempContainer);
+                    }
+                    window.scrollTo(0, originalScrollY);
+                });
+            }, 800);
         }
 
         const getPDFTemplate = (title, subtitle, tableHeaders, tableRows) => `
-            <div style="font-family:'Hind Siliguri', 'Kalpurush', sans-serif; color:#1e293b; background: white; width: 100%; box-sizing: border-box;">
+            <div style="font-family:'Hind Siliguri', 'Kalpurush', sans-serif; color:#1e293b; background: white; width: 100%; box-sizing: border-box; padding: 10px;">
                 <style>
                     table { width: 100%; border-collapse: collapse; table-layout: fixed; margin-top: 10px; }
-                    th, td { padding: 6px 8px; border: 1px solid #cbd5e1; font-size: 11px; word-wrap: break-word; overflow-wrap: break-word; text-align: left; }
+                    th, td { padding: 8px; border: 1px solid #cbd5e1; font-size: 11px; word-wrap: break-word; overflow-wrap: break-word; text-align: left; }
                     th { background-color: #f1f5f9; font-weight: bold; color: #0f172a; border-bottom: 2px solid #94a3b8; }
                     tr { page-break-inside: avoid !important; }
                 </style>
@@ -891,7 +913,7 @@
             </div>`;
 
         const getRegisterPDFTemplate = (title, tableHeaders, tableRows) => `
-            <div style="font-family:'Hind Siliguri', 'Kalpurush', sans-serif; color:#000; background: white; width: 100%; box-sizing: border-box;">
+            <div style="font-family:'Hind Siliguri', 'Kalpurush', sans-serif; color:#000; background: white; width: 100%; box-sizing: border-box; padding: 10px;">
                 <style>
                     table { width: 100%; border-collapse: collapse; table-layout: fixed; }
                     th, td { padding: 6px; border: 1px solid #000; font-size: 11px; word-wrap: break-word; overflow-wrap: break-word; text-align: center; }
@@ -1017,6 +1039,7 @@
             
             document.getElementById('vd-pdf-btn').onclick = () => window.downloadVehicleReport(currentOpenVehicleId);
         };
+
 
         window.openAllVehiclesModal = () => {
             const tbody = document.getElementById('all-vehicles-tbody');
