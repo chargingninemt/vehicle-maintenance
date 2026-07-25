@@ -823,7 +823,7 @@
                     'বদলি কি.মি': m.doneKm,
                     'পরবর্তী টার্গেট তারিখ': formatDate(m.nextDate),
                     'পরবর্তী টার্গেট কি.মি': m.nextKm,
-                    'মন্তব্য/পার্টস নং': m.remarks || '', // FIXED HEADER
+                    'মন্তব্য/পার্টস নং': m.remarks || '', // FIXED HEADER AND ORDER
                     'এন্ট্রি কারী': m.updatedBy || 'admin'
                 }));
                 const wsLogs = XLSX.utils.json_to_sheet(mData);
@@ -957,10 +957,12 @@ ${htmlContent}
             const grouped = {};
             vehicles.forEach(v => { if(!grouped[v.type]) grouped[v.type] = []; grouped[v.type].push(v); });
 
+            const ruleNameLower = rule.name.trim().toLowerCase();
+
             Object.keys(grouped).sort(sortCategories).forEach(type => {
                 rows += `<tr class="bg-emerald-100"><td colspan="7" class="p-2 border-b border-emerald-200 font-bold text-emerald-800 text-center"><i class="fa-solid fa-layer-group mr-1"></i> ধরন: ${type}</td></tr>`;
                 grouped[type].forEach(v => {
-                    const vLogs = maintenanceLog.filter(m => m.vehicleId === v.id && (m.typeId === taskId || (m.typeName && m.typeName.trim().toLowerCase() === rule.name.trim().toLowerCase()))).sort((a,b) => new Date(b.doneDate).getTime() - new Date(a.doneDate).getTime());
+                    const vLogs = maintenanceLog.filter(m => m.vehicleId === v.id && (m.typeId === taskId || (m.typeName && m.typeName.trim().toLowerCase() === ruleNameLower))).sort((a,b) => new Date(b.doneDate).getTime() - new Date(a.doneDate).getTime());
                     const latestLog = vLogs.length > 0 ? vLogs[0] : null;
 
                     if (latestLog) {
@@ -1024,11 +1026,14 @@ ${htmlContent}
             const grouped = {}; 
             vehicles.forEach(v => { if(!grouped[v.type]) grouped[v.type] = []; grouped[v.type].push(v); });
             
+            const ruleNameLower = rule.name.trim().toLowerCase();
+
             Object.keys(grouped).sort(sortCategories).forEach(type => {
                 rows += `<tr><td colspan="7" style="background-color:#d1fae5; color:#065f46; font-weight:bold; text-align:center; padding: 8px;">গাড়ির ধরন: ${type}</td></tr>`;
                 
                 grouped[type].forEach(v => {
-                    const vLogs = maintenanceLog.filter(m => m.vehicleId === v.id && (m.typeId === taskId || (m.typeName && m.typeName.trim().toLowerCase() === rule.name.trim().toLowerCase()))).sort((a,b) => new Date(b.doneDate).getTime() - new Date(a.doneDate).getTime());
+                    // ROBUST MATCHING FIXED HERE FOR REGISTER DOWNLOAD
+                    const vLogs = maintenanceLog.filter(m => m.vehicleId === v.id && (m.typeId === taskId || (m.typeName && m.typeName.trim().toLowerCase() === ruleNameLower))).sort((a,b) => new Date(b.doneDate).getTime() - new Date(a.doneDate).getTime());
                     const latestLog = vLogs.length > 0 ? vLogs[0] : null;
 
                     if (latestLog) {
@@ -1060,15 +1065,15 @@ ${htmlContent}
                 rows = `<tr><td colspan="7" style="padding:15px; text-align:center;">কোনো গাড়ি নেই</td></tr>`;
             }
 
-            // FIXED PDF HEADERS
+            // FIXED PDF HEADERS FOR REGISTER
             const headers = `
-                <th style="width:8%;">ক্র.নং</th>
+                <th style="width:6%;">ক্র.নং</th>
                 <th style="width:16%;">বিএ নং</th>
-                <th style="width:16%;">কাজের তারিখ</th>
+                <th style="width:15%;">কাজের তারিখ</th>
                 <th style="width:15%;">বদলীর কি.মি</th>
-                <th style="width:16%;">পরবর্তী তারিখ</th>
+                <th style="width:15%;">পরবর্তী তারিখ</th>
                 <th style="width:15%;">পরবর্তী কি.মি</th>
-                <th style="width:14%;">মন্তব্য/পার্টস নং</th>
+                <th style="width:18%;">মন্তব্য/পার্টস নং</th>
             `;
 
             const title = `${rule.name} - ${rule.months} মাস / ${rule.km} কি.মি`;
@@ -1256,11 +1261,12 @@ ${htmlContent}
                 return b.id.localeCompare(a.id);
             });
             
+            // FIXED HEADER ORDER FOR INDIVIDUAL VEHICLE REPORT
             let rows = logs.map(m => `<tr><td>${formatDate(m.doneDate)}</td><td style="font-weight:bold;">${m.typeName}</td><td>${m.doneKm} KM</td><td style="color:#dc2626;">${formatDate(m.nextDate)}</td><td style="color:#dc2626;">${m.nextKm} KM</td><td style="font-size:10px; font-weight:bold;">${m.remarks || '-'}</td></tr>`).join('');
             if(logs.length === 0) rows = `<tr><td colspan="6" style="padding:15px; text-align:center; color:#64748b;">কোনো রেকর্ড নেই</td></tr>`;
             
             const subtitle = `<table style="width:100%; border:none; margin:0; padding:0;"><tr><td style="border:none; text-align:left;"><strong>বিএ নম্বর:</strong> ${v.baNo}</td><td style="border:none; text-align:center;"><strong>গাড়ির ধরন:</strong> ${v.type}</td><td style="border:none; text-align:right;"><strong>বর্তমান মিটার:</strong> ${v.currentKm || 0} KM</td></tr></table>`;
-            const headers = `<th style="width: 15%;">কাজের তারিখ</th><th style="width: 20%;">কাজের ধরন</th><th style="width: 15%;">মিটার রিডিং</th><th style="width: 16%;">পরবর্তী তারিখ</th><th style="width: 16%;">পরবর্তী মিটার</th><th style="width: 18%;">মন্তব্য/পার্টস নং</th>`;
+            const headers = `<th style="width: 18%;">কাজের তারিখ</th><th style="width: 20%;">কাজের ধরন</th><th style="width: 14%;">মিটার রিডিং</th><th style="width: 16%;">পরবর্তী তারিখ</th><th style="width: 14%;">পরবর্তী মিটার</th><th style="width: 18%;">মন্তব্য/পার্টস নং</th>`;
             const html = getPDFTemplate('যানবাহন রক্ষণাবেক্ষণ লগ (এমটি শাখা)', subtitle, headers, rows);
             generatePDF(html, `MT_Report_${v.baNo}.pdf`);
         };
