@@ -4,10 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>9 EB MT Tracker Pro</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- html2pdf.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- SheetJS for Excel Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
     <style>
@@ -27,9 +30,11 @@
 </head>
 <body class="min-h-screen text-slate-800 flex flex-col relative z-0">
 
+    <!-- LOGIN SCREEN -->
     <div id="login-screen" class="fixed inset-0 z-[100] flex items-center justify-center login-bg px-4 transition-opacity duration-300">
         <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-8 transform transition-all">
             <div class="text-center mb-8">
+                <!-- Permanent SVG Logo Setup -->
                 <div class="w-24 h-24 mx-auto mb-4 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center shadow-md border-4 border-emerald-100">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-12 h-12">
                         <path fill-rule="evenodd" d="M12.516 2.17a.75.75 0 00-1.032 0 11.209 11.209 0 00-7.877 3.08.75.75 0 00-.222.583c.094 3.79.791 7.218 1.957 10.155.85 2.146 1.986 4.024 3.327 5.568.397.458.825.885 1.282 1.277a.75.75 0 001.03 0 15.004 15.004 0 001.283-1.277c1.34-1.544 2.476-3.422 3.327-5.568 1.166-2.937 1.863-6.365 1.957-10.155a.75.75 0 00-.222-.583 11.209 11.209 0 00-7.877-3.08zM12 11.25a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
@@ -63,6 +68,7 @@
         </div>
     </div>
 
+    <!-- MAIN APP CONTAINER -->
     <div id="main-app" class="hidden flex-col min-h-screen pb-24 md:pb-10 relative z-10 bg-gray-100">
         <header class="bg-white shadow-sm sticky top-0 z-40">
             <div class="px-4 py-3 flex justify-between items-center max-w-5xl mx-auto">
@@ -91,6 +97,7 @@
 
         <main class="px-4 mt-6 max-w-lg mx-auto md:max-w-5xl flex flex-col flex-grow w-full">
             <div class="flex-grow">
+                <!-- Dashboard -->
                 <section id="sec-dashboard" class="block animate-fade-in">
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                         <div onclick="window.openAllVehiclesModal()" class="grad-primary rounded-2xl p-4 md:p-5 text-white shadow-lg col-span-2 md:col-span-2 clickable-card transition-all">
@@ -127,6 +134,7 @@
                     </div>
                 </section>
 
+                <!-- Vehicles List -->
                 <section id="sec-vehicles" class="hidden animate-fade-in">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-5">
                         <h3 class="font-bold text-slate-800 text-lg"><i class="fa-solid fa-truck-fleet text-blue-500 mr-2"></i>রেজিমেন্টের গাড়ি ও কি.মি স্ট্যাটাস</h3>
@@ -135,7 +143,6 @@
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><i class="fa-solid fa-magnifying-glass text-slate-400"></i></div>
                                 <input type="text" id="search-vehicle" onkeyup="window.filterVehicles()" placeholder="বিএ নম্বর দিয়ে খুঁজুন..." class="w-full pl-9 pr-4 py-2.5 bg-white border border-slate-200 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 outline-none transition text-sm">
                             </div>
-                            <!-- QUICK KM BUTTON -->
                             <button onclick="window.openQuickKmModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2.5 rounded-lg text-sm font-bold active:scale-95 transition shadow-md whitespace-nowrap"><i class="fa-solid fa-gauge-high mr-1"></i> দ্রুত মিটার</button>
                             <button onclick="document.getElementById('add-veh-modal').classList.remove('hidden')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2.5 rounded-lg text-sm font-bold active:scale-95 transition shadow-md whitespace-nowrap"><i class="fa-solid fa-plus mr-1"></i> নতুন গাড়ি</button>
                         </div>
@@ -144,6 +151,7 @@
                     <div id="vehicles-container" class="flex flex-col w-full"></div>
                 </section>
 
+                <!-- Maintenance Entry -->
                 <section id="sec-add-maintenance" class="hidden animate-fade-in">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
@@ -165,6 +173,7 @@
                     </div>
                 </section>
 
+                <!-- Settings -->
                 <section id="sec-settings" class="hidden animate-fade-in">
                     <div class="flex justify-between items-center mb-4 ml-1 border-b border-slate-200 pb-3">
                         <h3 class="font-bold text-slate-800"><i class="fa-solid fa-sliders text-purple-500 mr-2"></i>অ্যাপ সেটআপ ও ব্যাকআপ</h3>
@@ -213,6 +222,7 @@
         </nav>
     </div>
 
+    <!-- Modals -->
     <div id="all-vehicles-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 transition-opacity bg-slate-900/70"><div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh]"><div class="flex justify-between items-center p-5 border-b border-slate-100 bg-slate-50 rounded-t-2xl"><h3 class="font-bold text-lg text-slate-800"><i class="fa-solid fa-list-ul text-emerald-600 mr-2"></i>সকল যানবাহনের তালিকা</h3><button onclick="document.getElementById('all-vehicles-modal').classList.add('hidden')" class="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center text-slate-600"><i class="fa-solid fa-xmark"></i></button></div><div class="overflow-y-auto p-5 flex-1"><table class="w-full text-left border-collapse text-sm"><thead><tr class="bg-slate-100 text-slate-600"><th class="p-3 border-b border-slate-200 text-center">ক্র.নং</th><th class="p-3 border-b border-slate-200">বিএ নম্বর</th><th class="p-3 border-b border-slate-200">ধরন</th><th class="p-3 border-b border-slate-200 text-right">বর্তমান কি.মি</th></tr></thead><tbody id="all-vehicles-tbody" class="divide-y divide-slate-100"></tbody></table></div><div class="p-5 border-t border-slate-100 bg-slate-50 rounded-b-2xl flex justify-end"><button onclick="window.downloadAllVehiclesReport()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-6 rounded-xl shadow-md"><i class="fa-solid fa-file-pdf mr-2"></i>পিডিএফ ডাউনলোড</button></div></div></div>
     <div id="overdue-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 transition-opacity bg-slate-900/70"><div class="bg-white w-full max-w-3xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh]"><div class="flex justify-between items-center p-5 border-b border-slate-100 bg-red-50 rounded-t-2xl"><h3 class="font-bold text-lg text-red-800"><i class="fa-solid fa-triangle-exclamation mr-2"></i>ওভারডিউ কাজের তালিকা</h3><button onclick="document.getElementById('overdue-modal').classList.add('hidden')" class="w-8 h-8 bg-red-200 rounded-full flex items-center justify-center text-red-800"><i class="fa-solid fa-xmark"></i></button></div><div class="overflow-y-auto p-5 flex-1"><table class="w-full text-left border-collapse text-sm"><thead><tr class="bg-slate-100 text-slate-600"><th class="p-3 border-b border-slate-200">গাড়ি (ধরন)</th><th class="p-3 border-b border-slate-200">বর্তমান মিটার</th><th class="p-3 border-b border-slate-200">লক্ষ্যমাত্রা (তারিখ ও কি.মি)</th><th class="p-3 border-b border-slate-200 text-red-600">স্ট্যাটাস</th></tr></thead><tbody id="overdue-tbody" class="divide-y divide-slate-100"></tbody></table></div><div class="p-5 border-t border-slate-100 bg-slate-50 rounded-b-2xl flex justify-end"><button onclick="window.downloadOverdueReport()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 px-6 rounded-xl shadow-md"><i class="fa-solid fa-file-pdf mr-2"></i>পিডিএফ ডাউনলোড</button></div></div></div>
     <div id="upcoming-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 transition-opacity bg-slate-900/70"><div class="bg-white w-full max-w-3xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh]"><div class="flex justify-between items-center p-5 border-b border-slate-100 bg-amber-50 rounded-t-2xl"><h3 class="font-bold text-lg text-amber-800"><i class="fa-solid fa-clock mr-2"></i>আসন্ন কাজের তালিকা</h3><button onclick="document.getElementById('upcoming-modal').classList.add('hidden')" class="w-8 h-8 bg-amber-200 rounded-full flex items-center justify-center text-amber-800"><i class="fa-solid fa-xmark"></i></button></div><div class="overflow-y-auto p-5 flex-1"><table class="w-full text-left border-collapse text-sm"><thead><tr class="bg-slate-100 text-slate-600"><th class="p-3 border-b border-slate-200">গাড়ি (ধরন)</th><th class="p-3 border-b border-slate-200">বর্তমান মিটার</th><th class="p-3 border-b border-slate-200">লক্ষ্যমাত্রা (তারিখ ও কি.মি)</th><th class="p-3 border-b border-slate-200 text-amber-600">স্ট্যাটাস</th></tr></thead><tbody id="upcoming-tbody" class="divide-y divide-slate-100"></tbody></table></div><div class="p-5 border-t border-slate-100 bg-slate-50 rounded-b-2xl flex justify-end"><button onclick="window.downloadUpcomingReport()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 px-6 rounded-xl shadow-md"><i class="fa-solid fa-file-pdf mr-2"></i>পিডিএফ ডাউনলোড</button></div></div></div>
@@ -259,13 +269,14 @@
     <div id="toast-container" class="fixed top-16 left-1/2 transform -translate-x-1/2 z-[9999] flex flex-col gap-2 w-11/12 max-w-sm pointer-events-none"></div>
     <div id="confirm-modal" class="hidden fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/60"><div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center"><div class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl"><i class="fa-solid fa-triangle-exclamation"></i></div><h3 class="text-lg font-bold text-slate-800 mb-1">নিশ্চিত?</h3><p id="confirm-msg" class="text-slate-500 text-sm mb-6">মুছে ফেলা হবে।</p><div class="flex gap-3"><button onclick="window.closeConfirm()" class="flex-1 bg-slate-100 font-bold py-2.5 rounded-xl">বাতিল</button><button onclick="window.executeConfirm()" class="flex-1 bg-red-600 text-white font-bold py-2.5 rounded-xl">হ্যাঁ, মুছুন</button></div></div></div>
 
+    <!-- Core Scripts -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, signInAnonymously, signInWithCustomToken, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, onSnapshot, doc, setDoc, deleteDoc, updateDoc, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // ==========================================
-        // CONFIGS (MUST REPLACE BEFORE DEPLOY)
+        // CONFIGS 
         // ==========================================
         let firebaseConfig = {
             apiKey: "AIzaSyBF4ebAsfoKgd9wgNIeNJ9QRKpMSXr-w9g",
@@ -309,10 +320,12 @@
         let unsubscribeListeners = [];
         let currentOpenVehicleId = null; 
 
+        // HELPER: Unique ID Generator (Collision safe)
         const generateId = (prefix) => {
             return prefix + '_' + Date.now() + Math.random().toString(36).substring(2, 9);
         };
 
+        // EXACT DATE CALCULATION LOGIC 
         const calculateNextDateExact = (dateStr, addedMonths) => {
             const d = new Date(dateStr);
             const targetMonth = d.getMonth() + Number(addedMonths);
@@ -360,6 +373,7 @@
             try { await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ vehicles, maintenanceLog, taskRules, vehicleTypes }) }); document.getElementById('sync-status').innerHTML = '<i class="fa-solid fa-check text-emerald-500"></i> শিট আপডেটেড'; } catch(e){ document.getElementById('sync-status').innerHTML = '<i class="fa-solid fa-xmark text-red-500"></i> সিঙ্ক ফেইল'; }
         };
 
+        // --- AUTH LOGIC ---
         const loginScreen = document.getElementById('login-screen');
         const mainApp = document.getElementById('main-app');
         const loginBtn = document.getElementById('login-btn');
@@ -421,6 +435,7 @@
 
         function clearDataListeners() { unsubscribeListeners.forEach(u => u()); unsubscribeListeners = []; vehicles = []; maintenanceLog = []; taskRules = []; vehicleTypes = []; }
 
+        // --- APP LOGIC ---
         let pendingConfirm = null;
         window.showConfirm = (msg, cb) => { document.getElementById('confirm-msg').innerText=msg; document.getElementById('confirm-modal').classList.remove('hidden'); pendingConfirm=cb; };
         window.closeConfirm = () => document.getElementById('confirm-modal').classList.add('hidden');
@@ -811,22 +826,32 @@
             return `${dd}-${mm}-${yy}`;
         }
 
+        // ==========================================
+        // ROBUST PDF ENGINE - BLANK PAGE & CUT-OFF FIX (PERFECTED)
+        // ==========================================
         function generatePDF(htmlContent, fileName) {
             window.showToast("পিডিএফ প্রস্তুত হচ্ছে, অপেক্ষা করুন...");
             
-            // Temporary container that is explicitly 800px wide
+            // Step 1: Save current scroll position
+            const currentScrollY = window.scrollY;
+            
+            // Step 2: Temporarily scroll to top (Fixes html2canvas blank page offset bug)
+            window.scrollTo(0, 0);
+
+            // Step 3: Create visible but unnoticeable container
             const tempContainer = document.createElement('div');
             tempContainer.innerHTML = htmlContent;
             tempContainer.style.position = 'absolute';
             tempContainer.style.top = '0';
-            tempContainer.style.left = '-9999px'; 
+            tempContainer.style.left = '0';
             tempContainer.style.width = '800px'; 
             tempContainer.style.backgroundColor = 'white';
-            tempContainer.style.zIndex = '-9999';
+            tempContainer.style.zIndex = '-9999'; // Hidden behind other content
+            
             document.body.appendChild(tempContainer);
 
             const opt = { 
-                margin: [0.3, 0.3, 0.3, 0.3], // Top, Right, Bottom, Left margins (in inches)
+                margin: [0.3, 0.3, 0.3, 0.3], // Adds proper margins
                 filename: fileName, 
                 image: { type: 'jpeg', quality: 1.0 }, 
                 html2canvas: { 
@@ -834,31 +859,39 @@
                     useCORS: true,
                     scrollY: 0, 
                     scrollX: 0,
-                    windowY: 0,
-                    windowWidth: 800 // Forces html2canvas to capture exactly 800px
+                    windowWidth: 800 // Ensures canvas captures exactly 800px width
                 }, 
-                pagebreak: { mode: ['css', 'legacy'], avoid: 'tr' }, // Avoid cutting rows
+                pagebreak: { mode: 'css', avoid: 'tr' }, 
                 jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } 
             };
             
-            html2pdf().set(opt).from(tempContainer).save().then(() => {
-                window.showToast("পিডিএফ সফলভাবে ডাউনলোড হয়েছে!");
-                document.body.removeChild(tempContainer); 
-            }).catch(err => {
-                console.error("PDF Error:", err); 
-                window.showToast("পিডিএফ তৈরিতে সমস্যা হয়েছে!", true);
-                if (document.body.contains(tempContainer)) {
+            // Step 4: Small delay to let browser render CSS, then generate PDF
+            setTimeout(() => {
+                html2pdf().set(opt).from(tempContainer).save().then(() => {
+                    window.showToast("পিডিএফ সফলভাবে ডাউনলোড হয়েছে!");
                     document.body.removeChild(tempContainer); 
-                }
-            });
+                    window.scrollTo(0, currentScrollY); // Restore scroll
+                }).catch(err => {
+                    console.error("PDF Error:", err); 
+                    window.showToast("পিডিএফ তৈরিতে সমস্যা হয়েছে!", true);
+                    if (document.body.contains(tempContainer)) {
+                        document.body.removeChild(tempContainer); 
+                    }
+                    window.scrollTo(0, currentScrollY); // Restore scroll
+                });
+            }, 100);
         }
 
+        // ==========================================
+        // PDF TEMPLATES - WIDTH & OVERFLOW FIXES
+        // ==========================================
         const getPDFTemplate = (title, subtitle, tableHeaders, tableRows) => `
-            <div style="width: 100%; padding: 10px 20px; box-sizing: border-box; position: relative; font-family:'Hind Siliguri', sans-serif; color:#1e293b; background: white; margin: 0;">
+            <div style="width: 100%; max-width: 800px; padding: 20px 10px; box-sizing: border-box; font-family:'Hind Siliguri', sans-serif; color:#1e293b; background: white; margin: 0;">
                 <style>
                     @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap');
                     tr { page-break-inside: avoid !important; }
-                    table { table-layout: auto; width: 100%; word-wrap: break-word; }
+                    table { table-layout: fixed; width: 100%; word-wrap: break-word; }
+                    td, th { padding: 8px; border-bottom: 1px solid #e2e8f0; font-size: 13px; word-wrap: break-word; overflow-wrap: break-word; }
                 </style>
                 <div style="position: absolute; top: 400px; left: 50%; transform: translate(-50%, -50%) rotate(-35deg); font-size: 80px; color: rgba(5, 150, 105, 0.05); font-weight: bold; white-space: nowrap; z-index: 0; pointer-events: none;">CHARGING NINE</div>
                 <div style="position: relative; z-index: 10;">
@@ -868,7 +901,7 @@
                         <p style="margin:4px 0 0 0; font-size:12px; color:#64748b">তারিখ: ${formatDate(new Date().toISOString().split('T')[0])}</p>
                     </div>
                     ${subtitle ? `<div style="background:#f8fafc; padding:12px; border-radius:6px; margin-bottom:15px; border:1px solid #e2e8f0">${subtitle}</div>` : ''}
-                    <table style="width:100%; text-align:left; border-collapse:collapse; font-size:13px">
+                    <table>
                         <thead><tr style="background:#f1f5f9">${tableHeaders}</tr></thead>
                         <tbody>${tableRows}</tbody>
                     </table>
@@ -879,19 +912,20 @@
             </div>`;
 
         const getRegisterPDFTemplate = (title, tableHeaders, tableRows) => `
-            <div style="width: 100%; padding: 10px 20px; box-sizing: border-box; position: relative; font-family:'Hind Siliguri', sans-serif; color:#000; background: white; margin: 0;">
+            <div style="width: 100%; max-width: 800px; padding: 20px 10px; box-sizing: border-box; font-family:'Hind Siliguri', sans-serif; color:#000; background: white; margin: 0;">
                 <style>
                     @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap');
                     tr { page-break-inside: avoid !important; }
-                    table { table-layout: auto; width: 100%; word-wrap: break-word; }
+                    table { table-layout: fixed; width: 100%; word-wrap: break-word; }
+                    td, th { padding: 6px; border: 1px solid #000; font-size: 12px; text-align:center; word-wrap: break-word; overflow-wrap: break-word; }
                 </style>
                 <div style="position: absolute; top: 400px; left: 50%; transform: translate(-50%, -50%) rotate(-35deg); font-size: 80px; color: rgba(5, 150, 105, 0.04); font-weight: bold; white-space: nowrap; z-index: 0; pointer-events: none;">CHARGING NINE</div>
                 <div style="position: relative; z-index: 10;">
                     <div style="text-align:center; margin-bottom:20px;">
                         <h2 style="font-size:22px; margin:0; font-weight: bold; border-bottom: 2px solid #000; display: inline-block; padding-bottom: 3px;">${title}</h2>
                     </div>
-                    <table style="width:100%; text-align:left; border-collapse:collapse; font-size:12px; border: 2px solid #000;">
-                        <thead><tr style="border-bottom: 2px solid #000;">${tableHeaders}</tr></thead>
+                    <table>
+                        <thead><tr>${tableHeaders}</tr></thead>
                         <tbody>${tableRows}</tbody>
                     </table>
                 </div>
@@ -915,22 +949,22 @@
                     if (latestLog) {
                         rows += `
                             <tr>
-                                <td style="padding:6px; border:1px solid #000; text-align:center; font-weight:bold;">${sl++}</td>
-                                <td style="padding:6px; border:1px solid #000; font-weight:bold; font-size:13px;">${v.baNo}</td>
-                                <td style="padding:6px; border:1px solid #000; text-align:center;">${formatShortDate(latestLog.doneDate)}</td>
-                                <td style="padding:6px; border:1px solid #000; text-align:center;">${latestLog.doneKm}</td>
-                                <td style="padding:6px; border:1px solid #000; text-align:center; color:#059669; font-weight:bold;">${formatShortDate(latestLog.nextDate)}</td>
-                                <td style="padding:6px; border:1px solid #000; text-align:center; color:#059669; font-weight:bold;">${latestLog.nextKm}</td>
-                                <td style="padding:6px; border:1px solid #000;"></td>
+                                <td>${sl++}</td>
+                                <td style="font-weight:bold;">${v.baNo}</td>
+                                <td>${formatShortDate(latestLog.doneDate)}</td>
+                                <td>${latestLog.doneKm}</td>
+                                <td style="color:#059669; font-weight:bold;">${formatShortDate(latestLog.nextDate)}</td>
+                                <td style="color:#059669; font-weight:bold;">${latestLog.nextKm}</td>
+                                <td></td>
                             </tr>
                         `;
                     } else {
                         rows += `
                             <tr>
-                                <td style="padding:6px; border:1px solid #000; text-align:center; font-weight:bold;">${sl++}</td>
-                                <td style="padding:6px; border:1px solid #000; font-weight:bold; font-size:13px;">${v.baNo}</td>
-                                <td style="padding:6px; border:1px solid #000; text-align:center; color:#94a3b8;" colspan="4">কোনো কাজ রেকর্ড করা হয়নি</td>
-                                <td style="padding:6px; border:1px solid #000;"></td>
+                                <td>${sl++}</td>
+                                <td style="font-weight:bold;">${v.baNo}</td>
+                                <td style="color:#94a3b8;" colspan="4">কোনো কাজ রেকর্ড করা হয়নি</td>
+                                <td></td>
                             </tr>
                         `;
                     }
@@ -942,13 +976,13 @@
             }
 
             const headers = `
-                <th style="padding:8px; border:1px solid #000; text-align:center;">ক্র.নং</th>
-                <th style="padding:8px; border:1px solid #000;">বিএ নং</th>
-                <th style="padding:8px; border:1px solid #000; text-align:center;">বর্তমান তারিখ</th>
-                <th style="padding:8px; border:1px solid #000; text-align:center;">বদলীর কি.মি</th>
-                <th style="padding:8px; border:1px solid #000; text-align:center;">পরবর্তী তারিখ</th>
-                <th style="padding:8px; border:1px solid #000; text-align:center;">বদলীর কি.মি</th>
-                <th style="padding:8px; border:1px solid #000; text-align:center;">মন্তব্য</th>
+                <th style="width: 8%;">ক্র.নং</th>
+                <th style="width: 18%;">বিএ নং</th>
+                <th style="width: 16%;">বর্তমান তারিখ</th>
+                <th style="width: 16%;">বদলীর কি.মি</th>
+                <th style="width: 16%;">পরবর্তী তারিখ</th>
+                <th style="width: 16%;">বদলীর কি.মি</th>
+                <th style="width: 10%;">মন্তব্য</th>
             `;
 
             const title = `${rule.name} - ${rule.months} মাস / ${rule.km} কি.মি`;
@@ -957,6 +991,7 @@
         };
 
 
+        // ==========================================
         window.openVehicleDetailsModal = (vId) => {
             currentOpenVehicleId = vId;
             renderVehicleDetails();
@@ -1027,11 +1062,11 @@
             let rows = ''; let sl = 1;
             const grouped = {}; vehicles.forEach(v => { if(!grouped[v.type]) grouped[v.type] = []; grouped[v.type].push(v); });
             Object.keys(grouped).sort(sortCategories).forEach(type => {
-                rows += `<tr><td colspan="4" style="padding:8px 10px; background-color:#d1fae5; color:#065f46; font-weight:bold; text-align:center; border-bottom:1px solid #a7f3d0;">ধরন: ${type}</td></tr>`;
-                grouped[type].forEach(v => { rows += `<tr><td style="padding:10px;border-bottom:1px solid #e2e8f0;text-align:center;">${sl++}</td><td style="padding:10px;border-bottom:1px solid #e2e8f0;font-weight:bold;">${v.baNo}</td><td style="padding:10px;border-bottom:1px solid #e2e8f0">${v.type}</td><td style="padding:10px;border-bottom:1px solid #e2e8f0;text-align:right;">${v.currentKm || 0} KM</td></tr>`; });
+                rows += `<tr><td colspan="4" style="background-color:#d1fae5; color:#065f46; font-weight:bold; text-align:center;">ধরন: ${type}</td></tr>`;
+                grouped[type].forEach(v => { rows += `<tr><td style="text-align:center;">${sl++}</td><td style="font-weight:bold;">${v.baNo}</td><td>${v.type}</td><td style="text-align:right;">${v.currentKm || 0} KM</td></tr>`; });
             });
             if(vehicles.length === 0) rows = `<tr><td colspan="4" style="padding:15px;text-align:center;">কোনো রেকর্ড নেই</td></tr>`;
-            const headers = `<th style="padding:10px; border-bottom:2px solid #cbd5e1;text-align:center; width:15%;">ক্র.নং</th><th style="padding:10px; border-bottom:2px solid #cbd5e1; width:30%;">বিএ নম্বর</th><th style="padding:10px; border-bottom:2px solid #cbd5e1; width:30%;">গাড়ির ধরন</th><th style="padding:10px; border-bottom:2px solid #cbd5e1;text-align:right; width:25%;">বর্তমান মিটার (কি.মি)</th>`;
+            const headers = `<th style="width: 15%; text-align:center;">ক্র.নং</th><th style="width: 30%;">বিএ নম্বর</th><th style="width: 30%;">গাড়ির ধরন</th><th style="width: 25%; text-align:right;">বর্তমান মিটার (কি.মি)</th>`;
             const html = getPDFTemplate('সকল যানবাহনের তালিকা', null, headers, rows);
             generatePDF(html, 'All_Vehicles_Report.pdf');
         };
@@ -1071,11 +1106,11 @@
             let rows = '';
             const grouped = {}; overdueItemsData.forEach(item => { if(!grouped[item.typeName]) grouped[item.typeName] = []; grouped[item.typeName].push(item); });
             Object.keys(grouped).sort().forEach(type => {
-                rows += `<tr><td colspan="4" style="padding:8px 10px; background-color:#fee2e2; color:#991b1b; font-weight:bold; text-align:center; border-bottom:1px solid #fecaca;">কাজ: ${type}</td></tr>`;
-                grouped[type].forEach(item => { rows += `<tr><td style="padding:10px;border-bottom:1px solid #e2e8f0;font-weight:bold;">${item.vehicleBa} <br><span style="font-weight:normal;font-size:11px;color:#64748b">(${item.type})</span></td><td style="padding:10px;border-bottom:1px solid #e2e8f0; font-weight:bold;">${item.currentKm} KM</td><td style="padding:10px;border-bottom:1px solid #e2e8f0">${formatDate(item.nextDate)} <br> <span style="font-size:11px">(${item.nextKm} KM)</span></td><td style="padding:10px;border-bottom:1px solid #e2e8f0;color:#dc2626;font-weight:bold;">${item.reason}</td></tr>`; });
+                rows += `<tr><td colspan="4" style="background-color:#fee2e2; color:#991b1b; font-weight:bold; text-align:center;">কাজ: ${type}</td></tr>`;
+                grouped[type].forEach(item => { rows += `<tr><td style="font-weight:bold;">${item.vehicleBa} <br><span style="font-weight:normal;font-size:11px;color:#64748b">(${item.type})</span></td><td style="font-weight:bold;">${item.currentKm} KM</td><td>${formatDate(item.nextDate)} <br> <span style="font-size:11px">(${item.nextKm} KM)</span></td><td style="color:#dc2626;font-weight:bold;">${item.reason}</td></tr>`; });
             });
             if(overdueItemsData.length === 0) rows = `<tr><td colspan="4" style="padding:15px;text-align:center;">কোনো ওভারডিউ কাজ নেই</td></tr>`;
-            const headers = `<th style="padding:10px; border-bottom:2px solid #fca5a5; background:#fee2e2; color:#991b1b;">গাড়ি (ধরন)</th><th style="padding:10px; border-bottom:2px solid #fca5a5; background:#fee2e2; color:#991b1b;">বর্তমান মিটার</th><th style="padding:10px; border-bottom:2px solid #fca5a5; background:#fee2e2; color:#991b1b;">লক্ষ্যমাত্রা (তারিখ ও কি.মি)</th><th style="padding:10px; border-bottom:2px solid #fca5a5; background:#fee2e2; color:#991b1b;">ওভারডিউ স্ট্যাটাস</th>`;
+            const headers = `<th style="width: 25%; background:#fee2e2; color:#991b1b;">গাড়ি (ধরন)</th><th style="width: 25%; background:#fee2e2; color:#991b1b;">বর্তমান মিটার</th><th style="width: 25%; background:#fee2e2; color:#991b1b;">লক্ষ্যমাত্রা (তারিখ ও কি.মি)</th><th style="width: 25%; background:#fee2e2; color:#991b1b;">ওভারডিউ স্ট্যাটাস</th>`;
             const html = getPDFTemplate('<span style="color:#dc2626;">ওভারডিউ কাজের তালিকা (জরুরি)</span>', null, headers, rows);
             generatePDF(html, 'Overdue_Maintenance_Report.pdf');
         };
@@ -1116,11 +1151,11 @@
             let rows = '';
             const grouped = {}; upcomingItemsData.forEach(item => { if(!grouped[item.typeName]) grouped[item.typeName] = []; grouped[item.typeName].push(item); });
             Object.keys(grouped).sort().forEach(type => {
-                rows += `<tr><td colspan="4" style="padding:8px 10px; background-color:#fef3c7; color:#92400e; font-weight:bold; text-align:center; border-bottom:1px solid #fde68a;">কাজ: ${type}</td></tr>`;
-                grouped[type].forEach(item => { rows += `<tr><td style="padding:10px;border-bottom:1px solid #e2e8f0;font-weight:bold;">${item.vehicleBa} <br><span style="font-weight:normal;font-size:11px;color:#64748b">(${item.type})</span></td><td style="padding:10px;border-bottom:1px solid #e2e8f0; font-weight:bold;">${item.currentKm} KM</td><td style="padding:10px;border-bottom:1px solid #e2e8f0">${formatDate(item.nextDate)} <br> <span style="font-size:11px">(${item.nextKm} KM)</span></td><td style="padding:10px;border-bottom:1px solid #e2e8f0;color:#d97706;font-weight:bold;">${item.reason}</td></tr>`; });
+                rows += `<tr><td colspan="4" style="background-color:#fef3c7; color:#92400e; font-weight:bold; text-align:center;">কাজ: ${type}</td></tr>`;
+                grouped[type].forEach(item => { rows += `<tr><td style="font-weight:bold;">${item.vehicleBa} <br><span style="font-weight:normal;font-size:11px;color:#64748b">(${item.type})</span></td><td style="font-weight:bold;">${item.currentKm} KM</td><td>${formatDate(item.nextDate)} <br> <span style="font-size:11px">(${item.nextKm} KM)</span></td><td style="color:#d97706;font-weight:bold;">${item.reason}</td></tr>`; });
             });
             if(upcomingItemsData.length === 0) rows = `<tr><td colspan="4" style="padding:15px;text-align:center;">কোনো আসন্ন কাজ নেই</td></tr>`;
-            const headers = `<th style="padding:10px; border-bottom:2px solid #fcd34d; background:#fef3c7; color:#92400e;">গাড়ি (ধরন)</th><th style="padding:10px; border-bottom:2px solid #fcd34d; background:#fef3c7; color:#92400e;">বর্তমান মিটার</th><th style="padding:10px; border-bottom:2px solid #fcd34d; background:#fef3c7; color:#92400e;">লক্ষ্যমাত্রা (তারিখ ও কি.মি)</th><th style="padding:10px; border-bottom:2px solid #fcd34d; background:#fef3c7; color:#92400e;">আসন্ন স্ট্যাটাস</th>`;
+            const headers = `<th style="width: 25%; background:#fef3c7; color:#92400e;">গাড়ি (ধরন)</th><th style="width: 25%; background:#fef3c7; color:#92400e;">বর্তমান মিটার</th><th style="width: 25%; background:#fef3c7; color:#92400e;">লক্ষ্যমাত্রা (তারিখ ও কি.মি)</th><th style="width: 25%; background:#fef3c7; color:#92400e;">আসন্ন স্ট্যাটাস</th>`;
             const html = getPDFTemplate('<span style="color:#d97706;">আসন্ন কাজের তালিকা</span>', null, headers, rows);
             generatePDF(html, 'Upcoming_Maintenance_Report.pdf');
         };
@@ -1134,11 +1169,11 @@
                 return b.id.localeCompare(a.id);
             });
             
-            let rows = logs.map(m => `<tr><td style="padding:10px; border-bottom:1px solid #e2e8f0;">${formatDate(m.doneDate)}</td><td style="padding:10px; border-bottom:1px solid #e2e8f0; font-weight:bold;">${m.typeName}</td><td style="padding:10px; border-bottom:1px solid #e2e8f0;">${m.doneKm} KM</td><td style="padding:10px; border-bottom:1px solid #e2e8f0; color:#dc2626;">${formatDate(m.nextDate)}</td><td style="padding:10px; border-bottom:1px solid #e2e8f0; color:#dc2626;">${m.nextKm} KM</td></tr>`).join('');
+            let rows = logs.map(m => `<tr><td>${formatDate(m.doneDate)}</td><td style="font-weight:bold;">${m.typeName}</td><td>${m.doneKm} KM</td><td style="color:#dc2626;">${formatDate(m.nextDate)}</td><td style="color:#dc2626;">${m.nextKm} KM</td></tr>`).join('');
             if(logs.length === 0) rows = `<tr><td colspan="5" style="padding:15px; text-align:center; color:#64748b;">কোনো রেকর্ড নেই</td></tr>`;
             
-            const subtitle = `<table style="width:100%; font-size: 14px; table-layout:fixed;"><tr><td style="text-align:left;"><strong>বিএ নম্বর:</strong> ${v.baNo}</td><td style="text-align:center;"><strong>গাড়ির ধরন:</strong> ${v.type}</td><td style="text-align:right;"><strong>বর্তমান মিটার:</strong> ${v.currentKm || 0} KM</td></tr></table>`;
-            const headers = `<th style="padding:10px; border-bottom:2px solid #cbd5e1;">কাজের তারিখ</th><th style="padding:10px; border-bottom:2px solid #cbd5e1;">কাজের ধরন</th><th style="padding:10px; border-bottom:2px solid #cbd5e1;">মিটার রিডিং</th><th style="padding:10px; border-bottom:2px solid #cbd5e1;">পরবর্তী তারিখ</th><th style="padding:10px; border-bottom:2px solid #cbd5e1;">পরবর্তী মিটার</th>`;
+            const subtitle = `<table style="width:100%; border:none; margin:0; padding:0;"><tr><td style="border:none; text-align:left;"><strong>বিএ নম্বর:</strong> ${v.baNo}</td><td style="border:none; text-align:center;"><strong>গাড়ির ধরন:</strong> ${v.type}</td><td style="border:none; text-align:right;"><strong>বর্তমান মিটার:</strong> ${v.currentKm || 0} KM</td></tr></table>`;
+            const headers = `<th style="width: 20%;">কাজের তারিখ</th><th style="width: 25%;">কাজের ধরন</th><th style="width: 15%;">মিটার রিডিং</th><th style="width: 20%;">পরবর্তী তারিখ</th><th style="width: 20%;">পরবর্তী মিটার</th>`;
             const html = getPDFTemplate('যানবাহন রক্ষণাবেক্ষণ লগ (এমটি শাখা)', subtitle, headers, rows);
             generatePDF(html, `MT_Report_${v.baNo}.pdf`);
         };
@@ -1235,6 +1270,7 @@
 
             if(chartInstance) chartInstance.destroy();
             
+            // CHART FIX FOR 0 VEHICLES
             const hasData = vehicles.length > 0;
             const cLabels = hasData ? ['ঠিক আছে', 'আসন্ন', 'বকেয়া'] : ['কোনো গাড়ি নেই'];
             const cData = hasData ? [okVehicles, upVehicles, ovVehicles] : [1];
