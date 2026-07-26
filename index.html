@@ -160,6 +160,7 @@
                                     <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1.5">কাজ করার তারিখ</label><input type="date" id="maint-date" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500"></div>
                                     <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1.5">সর্বশেষ বদলি কি.মি</label><input type="number" id="maint-km" placeholder="KM" required min="0" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500"></div>
                                 </div>
+                                <!-- NEW FIELD: Remarks / Serial Number -->
                                 <div>
                                     <label class="block text-xs font-bold text-slate-500 uppercase mb-1.5">পার্টস/সিরিয়াল নং বা মন্তব্য (ঐচ্ছিক)</label>
                                     <input type="text" id="maint-remarks" placeholder="যেমন: টায়ার নম্বর, ব্যাটারি নম্বর..." class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 text-sm">
@@ -340,7 +341,7 @@
         let unsubscribeListeners = [];
         let currentOpenVehicleId = null; 
 
-        // HELPER: Unique ID Generator
+        // HELPER: Unique ID Generator (Collision safe)
         const generateId = (prefix) => {
             return prefix + '_' + Date.now() + Math.random().toString(36).substring(2, 9);
         };
@@ -357,34 +358,6 @@
             const mo = String(d.getMonth() + 1).padStart(2, '0');
             const da = String(d.getDate()).padStart(2, '0');
             return `${yr}-${mo}-${da}`;
-        };
-
-        // SMART MATCHING ENGINE (ইন্টেলিজেন্ট ডেটা মার্জার)
-        window.isTaskMatch = (log, rule) => {
-            if (log.typeId === rule.id) return true; // Direct ID match
-            if (!log.typeName) return false;
-            
-            const lName = log.typeName.trim().toLowerCase();
-            const rName = rule.name.trim().toLowerCase();
-            if (lName === rName) return true; // Exact String match
-
-            // Aliases to catch renamed/deleted rules automatically (Bengali Synonyms)
-            const aliases = [
-                ['ব্যাটারি', 'ব্যাটারির', 'ব্যাটারী', 'battery'],
-                ['টায়ার', 'টায়ারের', 'টায়ার', 'tyre', 'tire'],
-                ['ইঞ্জিন অয়েল', 'ইঞ্জিন ওয়েল', 'মবিল বদলি', 'ইঞ্জিন অয়েল'], 
-                ['কূলেন্ট', 'কুলেন্ট', 'coolant'],
-                ['গিয়ার অয়েল', 'গিয়ার ওয়েল', 'ট্রান্সমিশন'],
-                ['পাওয়ার স্টিয়ারিং', 'পাওয়ার স্টিয়ারিং'],
-                ['ব্রেক ফ্লুইড', 'ব্রেক অয়েল', 'ব্রেক অয়েল']
-            ];
-
-            for (const group of aliases) {
-                const lMatch = group.some(v => lName.includes(v));
-                const rMatch = group.some(v => rName.includes(v));
-                if (lMatch && rMatch) return true; 
-            }
-            return false;
         };
 
         const categoryOrder = ["জিপ", "পিকআপ", "৩টন", "৩ টন", "ফ্রিজার ভ্যান", "ফ্রিজার", "কোস্টার", "মোটরসাইকেল", "ওয়াটার ট্রেইলার", "ওয়াটার ট্রেইলার"];
@@ -585,6 +558,7 @@
             const km = Number(document.getElementById('maint-km').value); 
             const remarks = document.getElementById('maint-remarks').value.trim(); 
             
+            // ROBUST DUPLICATE CHECK: using typeName as backup if ID changed
             const selectedRuleName = document.getElementById('maint-type').options[document.getElementById('maint-type').selectedIndex].text.trim().toLowerCase();
             const isDuplicate = maintenanceLog.some(m => m.vehicleId === vId && (m.typeId === rId || (m.typeName && m.typeName.trim().toLowerCase() === selectedRuleName)) && m.doneDate === dStr);
             if (isDuplicate) {
@@ -790,6 +764,7 @@
             const km = Number(document.getElementById('edit-maint-km').value);
             const remarks = document.getElementById('edit-maint-remarks').value.trim(); 
 
+            // ROBUST DUPLICATE CHECK
             const selectedRuleName = document.getElementById('edit-maint-type').options[document.getElementById('edit-maint-type').selectedIndex].text.trim().toLowerCase();
             const isDuplicate = maintenanceLog.some(m => m.id !== id && m.vehicleId === vId && (m.typeId === rId || (m.typeName && m.typeName.trim().toLowerCase() === selectedRuleName)) && m.doneDate === dStr);
             if (isDuplicate) {
@@ -848,7 +823,7 @@
                     'বদলি কি.মি': m.doneKm,
                     'পরবর্তী টার্গেট তারিখ': formatDate(m.nextDate),
                     'পরবর্তী টার্গেট কি.মি': m.nextKm,
-                    'মন্তব্য/পার্টস নং': m.remarks || '',
+                    'মন্তব্য/পার্টস নং': m.remarks || '', // FIXED HEADER AND ORDER
                     'এন্ট্রি কারী': m.updatedBy || 'admin'
                 }));
                 const wsLogs = XLSX.utils.json_to_sheet(mData);
@@ -985,10 +960,12 @@ ${htmlContent}
             const grouped = {};
             vehicles.forEach(v => { if(!grouped[v.type]) grouped[v.type] = []; grouped[v.type].push(v); });
 
+            const ruleNameLower = rule.name.trim().toLowerCase();
+
             Object.keys(grouped).sort(sortCategories).forEach(type => {
                 rows += `<tr class="bg-emerald-100"><td colspan="7" class="p-2 border-b border-emerald-200 font-bold text-emerald-800 text-center"><i class="fa-solid fa-layer-group mr-1"></i> ধরন: ${type}</td></tr>`;
                 grouped[type].forEach(v => {
-                    const vLogs = maintenanceLog.filter(m => m.vehicleId === v.id && window.isTaskMatch(m, rule)).sort((a,b) => new Date(b.doneDate).getTime() - new Date(a.doneDate).getTime());
+                    const vLogs = maintenanceLog.filter(m => m.vehicleId === v.id && (m.typeId === taskId || (m.typeName && m.typeName.trim().toLowerCase() === ruleNameLower))).sort((a,b) => new Date(b.doneDate).getTime() - new Date(a.doneDate).getTime());
                     const latestLog = vLogs.length > 0 ? vLogs[0] : null;
 
                     if (latestLog) {
@@ -1052,11 +1029,14 @@ ${htmlContent}
             const grouped = {}; 
             vehicles.forEach(v => { if(!grouped[v.type]) grouped[v.type] = []; grouped[v.type].push(v); });
             
+            const ruleNameLower = rule.name.trim().toLowerCase();
+
             Object.keys(grouped).sort(sortCategories).forEach(type => {
                 rows += `<tr><td colspan="7" style="background-color:#d1fae5; color:#065f46; font-weight:bold; text-align:center; padding: 8px;">গাড়ির ধরন: ${type}</td></tr>`;
                 
                 grouped[type].forEach(v => {
-                    const vLogs = maintenanceLog.filter(m => m.vehicleId === v.id && window.isTaskMatch(m, rule)).sort((a,b) => new Date(b.doneDate).getTime() - new Date(a.doneDate).getTime());
+                    // ROBUST MATCHING FIXED HERE FOR REGISTER DOWNLOAD
+                    const vLogs = maintenanceLog.filter(m => m.vehicleId === v.id && (m.typeId === taskId || (m.typeName && m.typeName.trim().toLowerCase() === ruleNameLower))).sort((a,b) => new Date(b.doneDate).getTime() - new Date(a.doneDate).getTime());
                     const latestLog = vLogs.length > 0 ? vLogs[0] : null;
 
                     if (latestLog) {
@@ -1088,6 +1068,7 @@ ${htmlContent}
                 rows = `<tr><td colspan="7" style="padding:15px; text-align:center;">কোনো গাড়ি নেই</td></tr>`;
             }
 
+            // FIXED PDF HEADERS FOR REGISTER
             const headers = `
                 <th style="width:6%;">ক্র.নং</th>
                 <th style="width:16%;">বিএ নং</th>
@@ -1186,16 +1167,11 @@ ${htmlContent}
         let overdueItemsData = [];
         window.openOverdueModal = () => {
             const today = new Date(); const latestRecords = {};
-            // SMART GROUPING INTEGRATED
+            // ROBUST GROUPING for Alerts based on Name not ID
             maintenanceLog.forEach(m => {
-                const matchedRule = taskRules.find(r => window.isTaskMatch(m, r));
-                const typeKey = matchedRule ? matchedRule.id : (m.typeName || '').trim().toLowerCase();
-                const key = `${m.vehicleId}_${typeKey}`;
-                if (!latestRecords[key] || new Date(m.doneDate) > new Date(latestRecords[key].doneDate)) {
-                    latestRecords[key] = { ...m, _displayName: matchedRule ? matchedRule.name : m.typeName };
-                }
+                const key = `${m.vehicleId}_${(m.typeName || '').trim().toLowerCase()}`;
+                if (!latestRecords[key]) latestRecords[key] = m;
             });
-            
             overdueItemsData = [];
             Object.values(latestRecords).forEach(m => {
                 const v = vehicles.find(x => x.id === m.vehicleId); const currentKm = v ? (v.currentKm || 0) : 0;
@@ -1209,12 +1185,7 @@ ${htmlContent}
             const tbody = document.getElementById('overdue-tbody');
             if (overdueItemsData.length === 0) { tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-emerald-500 font-bold"><i class="fa-solid fa-circle-check mr-2"></i>কোনো ওভারডিউ কাজ নেই!</td></tr>`; } 
             else { 
-                const grouped = {}; 
-                overdueItemsData.forEach(item => { 
-                    const tName = item._displayName || item.typeName;
-                    if(!grouped[tName]) grouped[tName] = []; 
-                    grouped[tName].push(item); 
-                });
+                const grouped = {}; overdueItemsData.forEach(item => { if(!grouped[item.typeName]) grouped[item.typeName] = []; grouped[item.typeName].push(item); });
                 let html = '';
                 Object.keys(grouped).sort().forEach(type => {
                     html += `<tr class="bg-red-100"><td colspan="4" class="p-2 border-b border-red-200 font-bold text-red-800 text-center"><i class="fa-solid fa-triangle-exclamation mr-1"></i> কাজ: ${type}</td></tr>`;
@@ -1227,11 +1198,7 @@ ${htmlContent}
 
         window.downloadOverdueReport = () => {
             let rows = '';
-            const grouped = {}; overdueItemsData.forEach(item => { 
-                const tName = item._displayName || item.typeName;
-                if(!grouped[tName]) grouped[tName] = []; 
-                grouped[tName].push(item); 
-            });
+            const grouped = {}; overdueItemsData.forEach(item => { if(!grouped[item.typeName]) grouped[item.typeName] = []; grouped[item.typeName].push(item); });
             Object.keys(grouped).sort().forEach(type => {
                 rows += `<tr><td colspan="4" style="background-color:#fee2e2; color:#991b1b; font-weight:bold; text-align:center;">কাজ: ${type}</td></tr>`;
                 grouped[type].forEach(item => { rows += `<tr><td style="font-weight:bold;">${item.vehicleBa} <br><span style="font-weight:normal;font-size:11px;color:#64748b">(${item.type})</span></td><td style="font-weight:bold;">${item.currentKm} KM</td><td>${formatDate(item.nextDate)} <br> <span style="font-size:11px">(${item.nextKm} KM)</span></td><td style="color:#dc2626;font-weight:bold;">${item.reason}</td></tr>`; });
@@ -1245,17 +1212,11 @@ ${htmlContent}
         let upcomingItemsData = [];
         window.openUpcomingModal = () => {
             const today = new Date(); const latestRecords = {};
-            
-            // SMART GROUPING INTEGRATED
+            // ROBUST GROUPING for Alerts based on Name not ID
             maintenanceLog.forEach(m => {
-                const matchedRule = taskRules.find(r => window.isTaskMatch(m, r));
-                const typeKey = matchedRule ? matchedRule.id : (m.typeName || '').trim().toLowerCase();
-                const key = `${m.vehicleId}_${typeKey}`;
-                if (!latestRecords[key] || new Date(m.doneDate) > new Date(latestRecords[key].doneDate)) {
-                    latestRecords[key] = { ...m, _displayName: matchedRule ? matchedRule.name : m.typeName };
-                }
+                const key = `${m.vehicleId}_${(m.typeName || '').trim().toLowerCase()}`;
+                if (!latestRecords[key]) latestRecords[key] = m;
             });
-
             upcomingItemsData = [];
             Object.values(latestRecords).forEach(m => {
                 const v = vehicles.find(x => x.id === m.vehicleId); const currentKm = v ? (v.currentKm || 0) : 0;
@@ -1270,12 +1231,7 @@ ${htmlContent}
             const tbody = document.getElementById('upcoming-tbody');
             if (upcomingItemsData.length === 0) { tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-emerald-500 font-bold"><i class="fa-solid fa-circle-check mr-2"></i>কোনো আসন্ন কাজ নেই!</td></tr>`; } 
             else { 
-                const grouped = {}; 
-                upcomingItemsData.forEach(item => { 
-                    const tName = item._displayName || item.typeName;
-                    if(!grouped[tName]) grouped[tName] = []; 
-                    grouped[tName].push(item); 
-                });
+                const grouped = {}; upcomingItemsData.forEach(item => { if(!grouped[item.typeName]) grouped[item.typeName] = []; grouped[item.typeName].push(item); });
                 let html = '';
                 Object.keys(grouped).sort().forEach(type => {
                     html += `<tr class="bg-amber-100"><td colspan="4" class="p-2 border-b border-amber-200 font-bold text-amber-800 text-center"><i class="fa-solid fa-clock mr-1"></i> কাজ: ${type}</td></tr>`;
@@ -1288,11 +1244,7 @@ ${htmlContent}
 
         window.downloadUpcomingReport = () => {
             let rows = '';
-            const grouped = {}; upcomingItemsData.forEach(item => { 
-                const tName = item._displayName || item.typeName;
-                if(!grouped[tName]) grouped[tName] = []; 
-                grouped[tName].push(item); 
-            });
+            const grouped = {}; upcomingItemsData.forEach(item => { if(!grouped[item.typeName]) grouped[item.typeName] = []; grouped[item.typeName].push(item); });
             Object.keys(grouped).sort().forEach(type => {
                 rows += `<tr><td colspan="4" style="background-color:#fef3c7; color:#92400e; font-weight:bold; text-align:center;">কাজ: ${type}</td></tr>`;
                 grouped[type].forEach(item => { rows += `<tr><td style="font-weight:bold;">${item.vehicleBa} <br><span style="font-weight:normal;font-size:11px;color:#64748b">(${item.type})</span></td><td style="font-weight:bold;">${item.currentKm} KM</td><td>${formatDate(item.nextDate)} <br> <span style="font-size:11px">(${item.nextKm} KM)</span></td><td style="color:#d97706;font-weight:bold;">${item.reason}</td></tr>`; });
@@ -1312,6 +1264,7 @@ ${htmlContent}
                 return b.id.localeCompare(a.id);
             });
             
+            // FIXED HEADER ORDER FOR INDIVIDUAL VEHICLE REPORT
             let rows = logs.map(m => `<tr><td>${formatDate(m.doneDate)}</td><td style="font-weight:bold;">${m.typeName}</td><td>${m.doneKm} KM</td><td style="color:#dc2626;">${formatDate(m.nextDate)}</td><td style="color:#dc2626;">${m.nextKm} KM</td><td style="font-size:10px; font-weight:bold;">${m.remarks || '-'}</td></tr>`).join('');
             if(logs.length === 0) rows = `<tr><td colspan="6" style="padding:15px; text-align:center; color:#64748b;">কোনো রেকর্ড নেই</td></tr>`;
             
@@ -1352,13 +1305,8 @@ ${htmlContent}
             
             // SMART DASHBOARD GROUPING INTEGRATED
             maintenanceLog.forEach(m => { 
-                const matchedRule = taskRules.find(r => window.isTaskMatch(m, r));
-                const typeKey = matchedRule ? matchedRule.id : (m.typeName || '').trim().toLowerCase();
-                const key = `${m.vehicleId}_${typeKey}`;
-                
-                if (!latestRecords[key] || new Date(m.doneDate) > new Date(latestRecords[key].doneDate)) {
-                    latestRecords[key] = { ...m, _displayName: matchedRule ? matchedRule.name : m.typeName };
-                }
+                const key = `${m.vehicleId}_${(m.typeName || '').trim().toLowerCase()}`; 
+                if (!latestRecords[key]) latestRecords[key] = m; 
             });
             
             Object.values(latestRecords).forEach(m => {
@@ -1381,11 +1329,11 @@ ${htmlContent}
                     <div ${clickAction} class="bg-white border border-red-100 p-4 rounded-xl shadow-sm mb-3 flex gap-3 hover:shadow-md transition cursor-pointer active:scale-[0.98]" title="গাড়ির সম্পূর্ণ হিস্ট্রি দেখতে ও এডিট করতে ক্লিক করুন">
                         <div class="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center text-red-500 shrink-0"><i class="fa-solid fa-triangle-exclamation"></i></div>
                         <div class="flex-1">
-                            <h4 class="font-bold text-slate-800 text-sm md:text-base">${m.vehicleBa} <span class="text-xs text-red-600 bg-red-50 px-2 py-0.5 rounded ml-1">${m._displayName}</span></h4>
+                            <h4 class="font-bold text-slate-800 text-sm md:text-base">${m.vehicleBa} <span class="text-xs text-red-600 bg-red-50 px-2 py-0.5 rounded ml-1">${m.typeName}</span></h4>
                             <p class="text-xs font-bold text-red-600 mt-1">${reason}</p>
-                            <div class="text-[10px] md:text-[11px] text-slate-500 mt-2 bg-slate-50 p-2 rounded-lg border border-slate-100">
-                                সর্বশেষ বদলি: <span class="font-semibold text-slate-700">${m.doneKm} KM</span> ${m.remarks ? ` | পার্টস নং: <span class="font-semibold text-slate-700">${m.remarks}</span>` : ''}<br>
-                                টার্গেট লক্ষ্যমাত্রা: <span class="font-semibold text-slate-700">${m.nextKm} KM</span> | বর্তমান রানিং: <span class="font-bold text-red-600">${currentKm} KM</span>
+                            <div class="text-[10px] md:text-[11px] text-slate-500 mt-2 bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+                                <span class="text-slate-400"><i class="fa-solid fa-clock-rotate-left mr-1"></i>সর্বশেষ কাজ:</span> <span class="font-semibold text-slate-700">${formatDate(m.doneDate)}</span> (<span class="font-semibold text-slate-700">${m.doneKm} KM</span>) ${m.remarks ? ` | <span class="text-slate-400">পার্টস:</span> <span class="font-semibold text-slate-700">${m.remarks}</span>` : ''}<br>
+                                <span class="text-slate-400"><i class="fa-solid fa-bullseye mr-1"></i>লক্ষ্যমাত্রা:</span> <span class="font-semibold text-slate-700">${formatDate(m.nextDate)}</span> (<span class="font-semibold text-slate-700">${m.nextKm} KM</span>) | <span class="text-slate-400">বর্তমান:</span> <span class="font-bold text-red-600">${currentKm} KM</span>
                             </div>
                         </div>
                     </div>`;
@@ -1397,11 +1345,11 @@ ${htmlContent}
                     <div ${clickAction} class="bg-white border border-amber-100 p-4 rounded-xl shadow-sm mb-3 flex gap-3 hover:shadow-md transition cursor-pointer active:scale-[0.98]" title="গাড়ির সম্পূর্ণ হিস্ট্রি দেখতে ও এডিট করতে ক্লিক করুন">
                         <div class="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center text-amber-500 shrink-0"><i class="fa-solid fa-clock"></i></div>
                         <div class="flex-1">
-                            <h4 class="font-bold text-slate-800 text-sm md:text-base">${m.vehicleBa} <span class="text-xs text-amber-600 bg-amber-50 px-2 py-0.5 rounded ml-1">${m._displayName}</span></h4>
+                            <h4 class="font-bold text-slate-800 text-sm md:text-base">${m.vehicleBa} <span class="text-xs text-amber-600 bg-amber-50 px-2 py-0.5 rounded ml-1">${m.typeName}</span></h4>
                             <p class="text-xs font-bold text-amber-600 mt-1">${reason}</p>
-                            <div class="text-[10px] md:text-[11px] text-slate-500 mt-2 bg-slate-50 p-2 rounded-lg border border-slate-100">
-                                সর্বশেষ বদলি: <span class="font-semibold text-slate-700">${m.doneKm} KM</span> ${m.remarks ? ` | পার্টস নং: <span class="font-semibold text-slate-700">${m.remarks}</span>` : ''}<br>
-                                টার্গেট লক্ষ্যমাত্রা: <span class="font-semibold text-slate-700">${m.nextKm} KM</span> | বর্তমান রানিং: <span class="font-bold text-amber-600">${currentKm} KM</span>
+                            <div class="text-[10px] md:text-[11px] text-slate-500 mt-2 bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+                                <span class="text-slate-400"><i class="fa-solid fa-clock-rotate-left mr-1"></i>সর্বশেষ কাজ:</span> <span class="font-semibold text-slate-700">${formatDate(m.doneDate)}</span> (<span class="font-semibold text-slate-700">${m.doneKm} KM</span>) ${m.remarks ? ` | <span class="text-slate-400">পার্টস:</span> <span class="font-semibold text-slate-700">${m.remarks}</span>` : ''}<br>
+                                <span class="text-slate-400"><i class="fa-solid fa-bullseye mr-1"></i>লক্ষ্যমাত্রা:</span> <span class="font-semibold text-slate-700">${formatDate(m.nextDate)}</span> (<span class="font-semibold text-slate-700">${m.nextKm} KM</span>) | <span class="text-slate-400">বর্তমান:</span> <span class="font-bold text-amber-600">${currentKm} KM</span>
                             </div>
                         </div>
                     </div>`;
@@ -1422,6 +1370,7 @@ ${htmlContent}
 
             if(chartInstance) chartInstance.destroy();
             
+            // CHART FIX FOR 0 VEHICLES
             const hasData = vehicles.length > 0;
             const cLabels = hasData ? ['ঠিক আছে', 'আসন্ন', 'বকেয়া'] : ['কোনো গাড়ি নেই'];
             const cData = hasData ? [okVehicles, upVehicles, ovVehicles] : [1];
