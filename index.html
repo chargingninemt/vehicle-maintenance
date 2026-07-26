@@ -1370,17 +1370,15 @@ ${htmlContent}
                 const isOverdue = diffDays <= 0 || kmRemaining <= 0;
                 const isUpcoming = !isOverdue && ((diffDays > 0 && diffDays <= 30) || (kmRemaining > 0 && kmRemaining <= 500));
 
-                // Find ruleId for the Clickable Event (Register Preview)
-                const matchedRule = taskRules.find(r => window.isTaskMatch(m, r));
-                const ruleIdForClick = matchedRule ? matchedRule.id : m.typeId;
-                const clickAction = ruleIdForClick ? `onclick="window.previewTaskRegister('${ruleIdForClick}')"` : '';
+                // NEW ACTION: Open Vehicle Details to allow Edit/Delete
+                const clickAction = `onclick="window.openVehicleDetailsModal('${v.id}')"`;
 
                 if (isOverdue) {
                     overdueTaskCount++; vehicleStatusMap[v.id] = 'OVERDUE';
                     let reason = (diffDays <= 0 && kmRemaining <= 0) ? "তারিখ ও কি.মি. উভয় পার হয়েছে!" : (kmRemaining <= 0 ? `<i class="fa-solid fa-gauge-high"></i> টার্গেট থেকে ${Math.abs(kmRemaining)} কি.মি. বেশি চলেছে!` : `<i class="fa-regular fa-calendar-xmark"></i> টার্গেট ডেট থেকে ${Math.abs(diffDays)} দিন ওভারডিউ!`);
                     
                     alerts.innerHTML += `
-                    <div ${clickAction} class="bg-white border border-red-100 p-4 rounded-xl shadow-sm mb-3 flex gap-3 hover:shadow-md transition cursor-pointer active:scale-[0.98]" title="রেজিস্টার প্রিভিউ দেখতে ক্লিক করুন">
+                    <div ${clickAction} class="bg-white border border-red-100 p-4 rounded-xl shadow-sm mb-3 flex gap-3 hover:shadow-md transition cursor-pointer active:scale-[0.98]" title="গাড়ির সম্পূর্ণ হিস্ট্রি দেখতে ও এডিট করতে ক্লিক করুন">
                         <div class="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center text-red-500 shrink-0"><i class="fa-solid fa-triangle-exclamation"></i></div>
                         <div class="flex-1">
                             <h4 class="font-bold text-slate-800 text-sm md:text-base">${m.vehicleBa} <span class="text-xs text-red-600 bg-red-50 px-2 py-0.5 rounded ml-1">${m._displayName}</span></h4>
@@ -1396,7 +1394,7 @@ ${htmlContent}
                     let reason = (kmRemaining > 0 && kmRemaining <= 500) && (diffDays > 0 && diffDays <= 30) ? `আর ${diffDays} দিন বা ${kmRemaining} কি.মি.` : ((kmRemaining > 0 && kmRemaining <= 500) ? `আর মাত্র ${kmRemaining} কি.মি. বাকি` : `আর মাত্র ${diffDays} দিন বাকি`);
                     
                     alerts.innerHTML += `
-                    <div ${clickAction} class="bg-white border border-amber-100 p-4 rounded-xl shadow-sm mb-3 flex gap-3 hover:shadow-md transition cursor-pointer active:scale-[0.98]" title="রেজিস্টার প্রিভিউ দেখতে ক্লিক করুন">
+                    <div ${clickAction} class="bg-white border border-amber-100 p-4 rounded-xl shadow-sm mb-3 flex gap-3 hover:shadow-md transition cursor-pointer active:scale-[0.98]" title="গাড়ির সম্পূর্ণ হিস্ট্রি দেখতে ও এডিট করতে ক্লিক করুন">
                         <div class="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center text-amber-500 shrink-0"><i class="fa-solid fa-clock"></i></div>
                         <div class="flex-1">
                             <h4 class="font-bold text-slate-800 text-sm md:text-base">${m.vehicleBa} <span class="text-xs text-amber-600 bg-amber-50 px-2 py-0.5 rounded ml-1">${m._displayName}</span></h4>
