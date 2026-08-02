@@ -409,6 +409,15 @@
             return false;
         };
 
+        // BUGFIX: একই কাজের ধরনে (যেমন টায়ারের রেকর্ড, ব্যাটারির রেকর্ড) একাধিক আলাদা
+        // আইটেম (আলাদা সিরিয়াল/মন্তব্য) থাকলে প্রতিটাকে স্বাধীনভাবে ওভারডিউ-ট্র্যাক করার জন্য
+        // মন্তব্য (remarks) থাকলে সেটাকেও 'latest' নির্ণয়ের কী-তে যুক্ত করা হয়।
+        // remarks ফাঁকা থাকলে আগের আচরণ (শুধু সর্বশেষ এন্ট্রি ম্যাটার করে) অপরিবর্তিত থাকে।
+        const withRemarksKey = (baseKey, m) => {
+            const remarksPart = (m.remarks || '').trim().toLowerCase();
+            return remarksPart ? `${baseKey}::${remarksPart}` : baseKey;
+        };
+
         const categoryOrder = ["জিপ", "পিকআপ", "৩টন", "৩ টন", "ফ্রিজার ভ্যান", "ফ্রিজার", "কোস্টার", "মোটরসাইকেল", "ওয়াটার ট্রেইলার", "ওয়াটার ট্রেইলার"];
         const sortCategories = (a, b) => {
             let cleanA = a.trim(); let cleanB = b.trim();
@@ -1287,8 +1296,9 @@ ${htmlContent}
                 logs.forEach(m => {
                     const rule = taskRules.find(r => window.isTaskMatch(m, r));
                     const typeKey = rule ? rule.id : (m.typeName || '').trim().toLowerCase();
-                    if (!latestMap[typeKey] || new Date(m.doneDate) > new Date(latestMap[typeKey].doneDate)) {
-                        latestMap[typeKey] = m;
+                    const fullKey = withRemarksKey(typeKey, m);
+                    if (!latestMap[fullKey] || new Date(m.doneDate) > new Date(latestMap[fullKey].doneDate)) {
+                        latestMap[fullKey] = m;
                     }
                 });
                 Object.values(latestMap).forEach(m => latestLogIds.add(m.id));
@@ -1381,7 +1391,7 @@ ${htmlContent}
             maintenanceLog.forEach(m => {
                 const matchedRule = taskRules.find(r => window.isTaskMatch(m, r));
                 const typeKey = matchedRule ? matchedRule.id : (m.typeName || '').trim().toLowerCase();
-                const key = `${m.vehicleId}_${typeKey}`;
+                const key = withRemarksKey(`${m.vehicleId}_${typeKey}`, m);
                 if (!latestRecords[key] || new Date(m.doneDate) > new Date(latestRecords[key].doneDate)) {
                     latestRecords[key] = { ...m, _displayName: matchedRule ? matchedRule.name : m.typeName };
                 }
@@ -1443,7 +1453,7 @@ ${htmlContent}
             maintenanceLog.forEach(m => {
                 const matchedRule = taskRules.find(r => window.isTaskMatch(m, r));
                 const typeKey = matchedRule ? matchedRule.id : (m.typeName || '').trim().toLowerCase();
-                const key = `${m.vehicleId}_${typeKey}`;
+                const key = withRemarksKey(`${m.vehicleId}_${typeKey}`, m);
                 if (!latestRecords[key] || new Date(m.doneDate) > new Date(latestRecords[key].doneDate)) {
                     latestRecords[key] = { ...m, _displayName: matchedRule ? matchedRule.name : m.typeName };
                 }
@@ -1516,7 +1526,7 @@ ${htmlContent}
             logs.forEach(m => {
                 const rule = taskRules.find(r => window.isTaskMatch(m, r));
                 const typeName = rule ? rule.name : m.typeName;
-                const key = typeName.trim().toLowerCase();
+                const key = withRemarksKey(typeName.trim().toLowerCase(), m);
                 
                 if (!latestLogsMap[key] || new Date(m.doneDate) > new Date(latestLogsMap[key].doneDate)) {
                     latestLogsMap[key] = { ...m, _displayName: typeName };
@@ -1600,7 +1610,7 @@ ${htmlContent}
             maintenanceLog.forEach(m => { 
                 const matchedRule = taskRules.find(r => window.isTaskMatch(m, r));
                 const typeKey = matchedRule ? matchedRule.id : (m.typeName || '').trim().toLowerCase();
-                const key = `${m.vehicleId}_${typeKey}`;
+                const key = withRemarksKey(`${m.vehicleId}_${typeKey}`, m);
                 
                 if (!latestRecords[key] || new Date(m.doneDate) > new Date(latestRecords[key].doneDate)) {
                     latestRecords[key] = { ...m, _displayName: matchedRule ? matchedRule.name : m.typeName };
