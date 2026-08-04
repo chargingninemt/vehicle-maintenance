@@ -224,7 +224,7 @@
 
             <footer class="mt-12 mb-4 border-t border-slate-200 pt-6 text-center">
                 <p class="text-[11px] text-slate-500 font-medium tracking-wide">&copy; <span id="current-year"></span> ৯ ইস্ট বেঙ্গল রেজিমেন্ট। সর্বস্বত্ব সংরক্ষিত।</p>
-                <p class="text-xs font-bold text-emerald-600 mt-1.5 flex items-center justify-center gap-1.5"><i class="fa-solid fa-laptop-code"></i> Developed by কর্পোরাল আব্দুল্লাহ আল মাহমুদ</p>
+                <p class="text-xs font-bold text-emerald-600 mt-1.5 flex items-center justify-center gap-1.5"><i class="fa-solid fa-laptop-code"></i> ডেভলপড বাই কর্পোরাল আব্দুল্লাহ আল মাহমুদ</p>
             </footer>
         </main>
 
@@ -328,6 +328,9 @@
         }
 
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzxW6l1uO1MiNf-Pv_aYl2BnapuDzYoYZubwrGECexfxJgBvDLUaDRJheWlGMDgtUKk3w/exec"; 
+        // ⚠️ নিরাপত্তা: এই টোকেনটা Apps Script-এর doPost() ফাংশনেও একই থাকতে হবে (নিচের গাইড দেখুন)।
+        // এটা একটা RANDOM, গোপন স্ট্রিং হওয়া উচিত — নিচের প্লেসহোল্ডারটা নিজের একটা র‍্যান্ডম স্ট্রিং দিয়ে বদলে নিন।
+        const SYNC_SECRET_TOKEN = "9eb-mt-a83f9c2e17d64b0a9f3c8e21b7d4f6a1";
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
@@ -513,7 +516,7 @@
         window.manualSyncToSheets = async () => {
             if(!SCRIPT_URL || SCRIPT_URL.includes("YOUR_GOOGLE")) return;
             document.getElementById('sync-status').innerHTML = '<i class="fa-solid fa-rotate fa-spin"></i> সিঙ্ক হচ্ছে...';
-            try { await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ vehicles, maintenanceLog, taskRules, vehicleTypes }) }); document.getElementById('sync-status').innerHTML = '<i class="fa-solid fa-check text-emerald-500"></i> শিট আপডেটেড'; } catch(e){ document.getElementById('sync-status').innerHTML = '<i class="fa-solid fa-xmark text-red-500"></i> সিঙ্ক ফেইল'; }
+            try { await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ token: SYNC_SECRET_TOKEN, vehicles, maintenanceLog, taskRules, vehicleTypes }) }); document.getElementById('sync-status').innerHTML = '<i class="fa-solid fa-check text-emerald-500"></i> শিট আপডেটেড'; } catch(e){ document.getElementById('sync-status').innerHTML = '<i class="fa-solid fa-xmark text-red-500"></i> সিঙ্ক ফেইল'; }
         };
 
         // --- AUTH LOGIC ---
