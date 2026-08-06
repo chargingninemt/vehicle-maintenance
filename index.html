@@ -35,7 +35,7 @@
         <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-8 transform transition-all">
             <div class="text-center mb-8">
                 <div class="w-24 h-24 mx-auto mb-4 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center shadow-md border-4 border-emerald-100 overflow-hidden">
-                    <img src="logo.jpg" alt="9 EB Logo" class="w-full h-full object-cover" onerror="this.outerHTML='<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'currentColor\' class=\'w-12 h-12 m-auto mt-5\'><path fill-rule=\'evenodd\' d=\'M12.516 2.17a.75.75 0 00-1.032 0 11.209 11.209 0 00-7.877 3.08.75.75 0 00-.222.583c.094 3.79.791 7.218 1.957 10.155.85 2.146 1.986 4.024 3.327 5.568.397.458.825.885 1.282 1.277a.75.75 0 001.03 0 15.004 15.004 0 001.283-1.277c1.34-1.544 2.476-3.422 3.327-5.568 1.166-2.937 1.863-6.365 1.957-10.155a.75.75 0 00-.222-.583 11.209 11.209 0 00-7.877-3.08zM12 11.25a3 3 0 100-6 3 3 0 000 6z\' clip-rule=\'evenodd\' /><path d=\'M8.25 12h7.5a.75.75 0 01.75.75v1.5a.75.75 0 01-.75.75h-7.5a.75.75 0 01-.75-.75v-1.5a.75.75 0 01.75-.75z\' /></svg>'">
+                    <img src="logo.jpg" alt="9 EB Logo" class="w-full h-full object-cover" data-fallback-icon="shield">
                 </div>
                 <h1 class="text-2xl font-bold text-emerald-800">৯ ইস্ট বেঙ্গল রেজিমেন্ট</h1>
                 <p class="text-slate-500 text-sm mt-1">এমটি (MT) মেইনটেন্যান্স ট্র্যাকার</p>
@@ -70,7 +70,7 @@
             <div class="px-4 py-3 flex justify-between items-center max-w-5xl mx-auto">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center shadow-sm border-2 border-emerald-500 overflow-hidden">
-                        <img src="logo.jpg" alt="Logo" class="w-full h-full object-cover" onerror="this.outerHTML='<i class=\'fa-solid fa-truck-fast\'></i>'">
+                        <img src="logo.jpg" alt="Logo" class="w-full h-full object-cover" data-fallback-icon="truck">
                     </div>
                     <div>
                         <h1 class="font-bold text-lg text-slate-800 leading-tight">৯ ইস্ট বেঙ্গল (Smart MT)</h1>
@@ -340,10 +340,14 @@
 
         if(isCanvas) {
             const initAuth = async () => {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
+                try {
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                } catch (e) {
+                    console.log('ইনিশিয়াল অথ ব্যর্থ:', e);
                 }
             };
             initAuth();
@@ -367,6 +371,16 @@
             '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
         }[c]));
         window.escapeHTML = escapeHTML;
+
+        // VALIDATION HELPER: সংখ্যা-ইনপুট (কিলোমিটার/মাস) DevTools ম্যানিপুলেশন বা
+        // ব্রাউজার অটোফিল থেকে NaN/negative হয়ে Firestore-এ চলে যাওয়া ঠেকাতে
+        const isValidNumber = (val, { allowZero = true } = {}) => {
+            const n = Number(val);
+            if (val === '' || val === null || val === undefined || Number.isNaN(n) || !Number.isFinite(n)) return false;
+            if (n < 0) return false;
+            if (!allowZero && n === 0) return false;
+            return true;
+        };
 
         // EXACT DATE CALCULATION LOGIC 
         const calculateNextDateExact = (dateStr, addedMonths) => {
@@ -430,6 +444,25 @@
 
         document.getElementById('current-year').innerText = new Date().getFullYear();
         document.getElementById('login-year').innerText = new Date().getFullYear();
+
+        // BUGFIX (অডিট সমস্যা ১৯): লোগো ছবি লোড ব্যর্থ হলে ফলব্যাক আইকন দেখানোর লজিক —
+        // আগে এটা inline onerror অ্যাট্রিবিউটে raw SVG মার্কআপ হিসেবে ছিল (ভঙ্গুর, CSP-অসামঞ্জস্যপূর্ণ)।
+        // এখন সাধারণ addEventListener দিয়ে করা হচ্ছে।
+        function makeFallbackIcon(kind) {
+            if (kind === 'truck') {
+                const i = document.createElement('i');
+                i.className = 'fa-solid fa-truck-fast';
+                return i;
+            }
+            const wrapper = document.createElement('div');
+            wrapper.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-12 h-12 m-auto mt-5"><path fill-rule="evenodd" d="M12.516 2.17a.75.75 0 00-1.032 0 11.209 11.209 0 00-7.877 3.08.75.75 0 00-.222.583c.094 3.79.791 7.218 1.957 10.155.85 2.146 1.986 4.024 3.327 5.568.397.458.825.885 1.282 1.277a.75.75 0 001.03 0 15.004 15.004 0 001.283-1.277c1.34-1.544 2.476-3.422 3.327-5.568 1.166-2.937 1.863-6.365 1.957-10.155a.75.75 0 00-.222-.583 11.209 11.209 0 00-7.877-3.08zM12 11.25a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" /><path d="M8.25 12h7.5a.75.75 0 01.75.75v1.5a.75.75 0 01-.75.75h-7.5a.75.75 0 01-.75-.75v-1.5a.75.75 0 01.75-.75z" /></svg>';
+            return wrapper.firstElementChild;
+        }
+        document.querySelectorAll('img[data-fallback-icon]').forEach(img => {
+            img.addEventListener('error', () => {
+                img.replaceWith(makeFallbackIcon(img.dataset.fallbackIcon));
+            }, { once: true });
+        });
 
         window.showToast = (msg, isErr=false) => {
             const t = document.createElement('div');
@@ -614,6 +647,7 @@
 
         document.getElementById('form-km-update').addEventListener('submit', async (e) => {
             e.preventDefault(); if (guardWrite()) return; const vId = document.getElementById('km-update-vid').value; const newKm = parseInt(document.getElementById('km-update-val').value);
+            if (!isValidNumber(newKm)) return window.showToast('সঠিক কিলোমিটার সংখ্যা দিন', true);
             const vIndex = vehicles.findIndex(v => v.id === vId);
             if(vIndex > -1) { 
                 vehicles[vIndex].currentKm = newKm; 
@@ -640,6 +674,7 @@
             e.preventDefault(); if (guardWrite()) return;
             const vId = document.getElementById('quick-km-vehicle').value;
             const newKm = parseInt(document.getElementById('quick-km-val').value);
+            if (!isValidNumber(newKm)) return window.showToast('সঠিক কিলোমিটার সংখ্যা দিন', true);
             const vIndex = vehicles.findIndex(v => v.id === vId);
             if(vIndex > -1) { 
                 vehicles[vIndex].currentKm = newKm; 
@@ -682,6 +717,7 @@
             e.preventDefault(); if (guardWrite()) return; 
             const vId = document.getElementById('maint-vehicle').value, rId = document.getElementById('maint-type').value, dStr = document.getElementById('maint-date').value;
             const km = Number(document.getElementById('maint-km').value); 
+            if (!isValidNumber(km)) return window.showToast('সঠিক কিলোমিটার সংখ্যা দিন', true);
             const remarks = document.getElementById('maint-remarks').value.trim(); 
             
             const selectedRuleName = document.getElementById('maint-type').options[document.getElementById('maint-type').selectedIndex].text.trim().toLowerCase();
@@ -698,7 +734,12 @@
             if((vData.currentKm || 0) < km) { 
                 vData.currentKm = km; 
                 vData.updatedBy = auth.currentUser?.email || 'admin';
-                await setDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'vehicles', vData.id), vData); 
+                try {
+                    await setDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'vehicles', vData.id), vData); 
+                } catch (err) {
+                    window.showToast('গাড়ির মিটার আপডেট করতে সমস্যা হয়েছে', true);
+                    return;
+                }
             } 
             
             const newId = generateId('rec');
@@ -714,8 +755,12 @@
                 return window.showToast('এই কাজের নিয়মটি ইতিমধ্যে যুক্ত করা আছে!', true);
             }
 
+            const ruleMonths = Number(document.getElementById('rule-months').value);
+            const ruleKm = Number(document.getElementById('rule-km').value);
+            if (!isValidNumber(ruleMonths, { allowZero: false }) || !isValidNumber(ruleKm)) return window.showToast('সঠিক মাস ও কিলোমিটার সংখ্যা দিন', true);
+            
             const newId = generateId('rule');
-            handleDbWrite('taskRules', newId, { id: newId, name: rName, months:Number(document.getElementById('rule-months').value), km:Number(document.getElementById('rule-km').value) }, 'নিয়ম যোগ হয়েছে'); e.target.reset(); 
+            handleDbWrite('taskRules', newId, { id: newId, name: rName, months: ruleMonths, km: ruleKm }, 'নিয়ম যোগ হয়েছে'); e.target.reset(); 
         });
         
         document.getElementById('form-vtype').addEventListener('submit', (e)=>{ 
@@ -785,18 +830,24 @@
                 </div>`).join('');
         }
 
-        window.deleteRule = (id) => window.showConfirm('নিয়মটি মুছে ফেলতে চান?', async () => { if (guardWrite()) return;
-            await deleteDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'taskRules', id));
-            window.debouncedSync(); window.showToast('সফলভাবে মুছে ফেলা হয়েছে');
+        window.deleteRule = (id) => window.showConfirm('নিয়মটি মুছে ফেলতে চান?', async () => { if (guardWrite()) return;
+            try {
+                await deleteDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'taskRules', id));
+                window.debouncedSync(); window.showToast('সফলভাবে মুছে ফেলা হয়েছে');
+            } catch (err) { window.showToast('মুছতে সমস্যা হয়েছে', true); }
         });
         window.deleteVehicleType = (id) => window.showConfirm('ধরনটি মুছে ফেলতে চান?', async () => { if (guardWrite()) return;
-            await deleteDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'vehicleTypes', id));
-            window.debouncedSync(); window.showToast('সফলভাবে মুছে ফেলা হয়েছে');
+            try {
+                await deleteDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'vehicleTypes', id));
+                window.debouncedSync(); window.showToast('সফলভাবে মুছে ফেলা হয়েছে');
+            } catch (err) { window.showToast('মুছতে সমস্যা হয়েছে', true); }
         });
         window.deleteMaintenance = (id) => window.showConfirm('রেকর্ডটি মুছে ফেলতে চান?', async () => { if (guardWrite()) return;
-            await deleteDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'maintenanceLog', id));
-            window.debouncedSync(); window.showToast('সফলভাবে মুছে ফেলা হয়েছে');
-            if(currentOpenVehicleId) renderVehicleDetails();
+            try {
+                await deleteDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'maintenanceLog', id));
+                window.debouncedSync(); window.showToast('সফলভাবে মুছে ফেলা হয়েছে');
+                if(currentOpenVehicleId) renderVehicleDetails();
+            } catch (err) { window.showToast('মুছতে সমস্যা হয়েছে', true); }
         });
         
         window.deleteVehicle = (id) => window.showConfirm('গাড়ি ও এর সব রেকর্ড মুছবেন?', async () => { if (guardWrite()) return; 
@@ -827,6 +878,10 @@
             const newName = document.getElementById('edit-rule-name').value.trim();
             const newMonths = Number(document.getElementById('edit-rule-months').value);
             const newKm = Number(document.getElementById('edit-rule-km').value);
+
+            if (!isValidNumber(newMonths, { allowZero: false }) || !isValidNumber(newKm)) {
+                return window.showToast('সঠিক মাস ও কিলোমিটার সংখ্যা দিন', true);
+            }
 
             if (taskRules.some(r => r.id !== id && r.name.toLowerCase() === newName.toLowerCase())) {
                 return window.showToast('এই নামের আরেকটি নিয়ম ইতিমধ্যে আছে!', true);
@@ -942,6 +997,7 @@
             const rId = document.getElementById('edit-maint-type').value;
             const dStr = document.getElementById('edit-maint-date').value;
             const km = Number(document.getElementById('edit-maint-km').value);
+            if (!isValidNumber(km)) return window.showToast('সঠিক কিলোমিটার সংখ্যা দিন', true);
             const remarks = document.getElementById('edit-maint-remarks').value.trim(); 
 
             const selectedRuleName = document.getElementById('edit-maint-type').options[document.getElementById('edit-maint-type').selectedIndex].text.trim().toLowerCase();
