@@ -15,7 +15,7 @@
     -->
     <meta http-equiv="Content-Security-Policy" content="
         default-src 'self';
-        script-src 'self' 'sha256-Qghf+E9QTOIOUcddRcv5yv9ZyQxYaVtiP8WA1teIsKA=' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.gstatic.com;
+        script-src 'self' 'sha256-pVesDupMJDBFyltGswXqt9qDUbejXBzMO+LEOjrmhRo=' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.gstatic.com;
         style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com;
         font-src https://cdnjs.cloudflare.com https://fonts.gstatic.com data:;
         img-src 'self' data: https:;
@@ -1435,20 +1435,25 @@ ${htmlContent}
             document.getElementById('vd-pdf-btn').onclick = () => window.downloadVehicleReport(currentOpenVehicleId);
         };
 
-        window.openAllVehiclesModal = () => {
+        function renderAllVehiclesTable() {
             const tbody = document.getElementById('all-vehicles-tbody');
-            if (vehicles.length === 0) { tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">কোনো গাড়ি নেই</td></tr>`; } 
+            if (!tbody) return;
+            if (vehicles.length === 0) { tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">কোনো গাড়ি নেই</td></tr>`; } 
             else { 
                 const grouped = {}; vehicles.forEach(v => { if(!grouped[v.type]) grouped[v.type] = []; grouped[v.type].push(v); });
                 let html = ''; let sl = 1;
                 Object.keys(grouped).sort(sortCategories).forEach(type => {
                     html += `<tr class="bg-emerald-50"><td colspan="4" class="p-2 border-b border-emerald-100 font-bold text-emerald-800 text-center"><i class="fa-solid fa-layer-group mr-1"></i> ধরন: ${escapeHTML(type)}</td></tr>`;
                     grouped[type].forEach(v => {
-                        html += `<tr class="hover:bg-slate-50"><td class="p-3 border-b border-slate-100 text-center font-bold text-slate-400">${sl++}</td><td class="p-3 border-b border-slate-100 font-bold text-slate-800">${escapeHTML(v.baNo)}</td><td class="p-3 border-b border-slate-100">${escapeHTML(v.type)}</td><td class="p-3 border-b border-slate-100 text-right font-bold text-emerald-600">${v.currentKm || 0} KM</td></tr>`;
+                        html += `<tr class="hover:bg-slate-50"><td class="p-3 border-b border-slate-100 text-center font-bold text-slate-400">${sl++}</td><td class="p-3 border-b border-slate-100 font-bold text-slate-800">${escapeHTML(v.baNo)}</td><td class="p-3 border-b border-slate-100">${escapeHTML(v.type)}</td><td class="p-3 border-b border-slate-100 text-right font-bold text-emerald-600"><span>${v.currentKm || 0} KM</span>${currentUserRole === 'viewer' ? '' : ` <button data-action="openKmModal" data-args="${dataArgs([v.id, v.baNo, v.currentKm || 0])}" class="ml-1 w-7 h-7 inline-flex items-center justify-center bg-slate-100 text-slate-500 hover:bg-emerald-500 hover:text-white rounded-lg transition align-middle" aria-label="মিটার এডিট করুন" title="মিটার এডিট করুন"><i class="fa-solid fa-pen text-xs"></i></button>`}</td></tr>`;
                     });
                 });
                 tbody.innerHTML = html;
             }
+        }
+
+        window.openAllVehiclesModal = () => {
+            renderAllVehiclesTable();
             document.getElementById('all-vehicles-modal').classList.remove('hidden');
         };
 
@@ -1800,6 +1805,10 @@ ${htmlContent}
                 renderVehicleDetails();
             }
 
+            if(!document.getElementById('all-vehicles-modal').classList.contains('hidden')) {
+                renderAllVehiclesTable();
+            }
+
             window.filterVehicles();
         }
 
@@ -1869,9 +1878,11 @@ ${htmlContent}
                 'confirm-modal',            // z-[10000]
                 'edit-maint-modal',         // z-[110]
                 'register-preview-modal',   // z-[110]
-                'add-veh-modal', 'all-vehicles-modal', 'edit-rule-modal', 'edit-veh-modal',
-                'edit-vtype-modal', 'km-update-modal', 'overdue-modal', 'quick-km-modal',
-                'upcoming-modal', 'vehicle-details-modal' // z-[100]
+                // z-[100] — এই তালিকার মধ্যে যেগুলো নেস্টেড খোলে (যেমন all-vehicles-modal এর
+                // উপর km-update-modal), সেগুলোকে DOM-অর্ডার অনুযায়ী উপরে রাখা হয়েছে
+                'quick-km-modal', 'km-update-modal', 'edit-vtype-modal', 'edit-rule-modal',
+                'edit-veh-modal', 'add-veh-modal', 'vehicle-details-modal', 'upcoming-modal',
+                'overdue-modal', 'all-vehicles-modal'
             ];
 
             // যেসব মোডালের নিজস্ব ক্লিন-আপসহ close ফাংশন আছে (state ঠিক রাখতে সেগুলোই ব্যবহার হবে)
