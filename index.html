@@ -15,11 +15,11 @@
     -->
     <meta http-equiv="Content-Security-Policy" content="
         default-src 'self';
-        script-src 'self' 'sha256-pVesDupMJDBFyltGswXqt9qDUbejXBzMO+LEOjrmhRo=' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.gstatic.com;
+        script-src 'self' 'sha256-Ie4RP/uuWrLSALJ4rHMX3fkoE+h0xq3iLCpqugbMrso=' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.gstatic.com;
         style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com;
         font-src https://cdnjs.cloudflare.com https://fonts.gstatic.com data:;
         img-src 'self' data: https:;
-        connect-src 'self' https://*.googleapis.com https://script.google.com;
+        connect-src 'self' https://*.googleapis.com https://script.google.com https://*.googleusercontent.com;
         object-src 'none';
         base-uri 'self';
         frame-ancestors 'self';
@@ -1127,6 +1127,10 @@
 
             const docTitle = fileName.replace(/\.pdf$/i, '');
 
+            // BUGFIX: popup (about:blank) মূল পেজের CSP ইনহেরিট করে, তাই popup-এর HTML-এ
+            // inline <script> বসালে সেটা ব্লক হয়ে যায় (script hash না মেলায়)। তাই এখন
+            // print-ট্রিগার লজিকটা প্যারেন্ট কনটেক্সট থেকে সরাসরি printWindow.onload হিসেবে
+            // অ্যাসাইন করা হচ্ছে — এতে popup-এর HTML-এ কোনো নতুন <script> টেক্সট বসাতে হয় না।
             printWindow.document.open();
             printWindow.document.write(`<!DOCTYPE html>
 <html lang="bn">
@@ -1145,20 +1149,20 @@
 </head>
 <body>
 ${htmlContent}
-<script>
-    window.onload = function () {
-        var ready = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
-        ready.then(function () {
-            setTimeout(function () {
-                window.focus();
-                window.print();
-            }, 400);
-        });
-    };
-<\/script>
 </body>
 </html>`);
             printWindow.document.close();
+
+            printWindow.onload = function () {
+                const doc = printWindow.document;
+                const ready = (doc.fonts && doc.fonts.ready) ? doc.fonts.ready : Promise.resolve();
+                ready.then(function () {
+                    setTimeout(function () {
+                        printWindow.focus();
+                        printWindow.print();
+                    }, 400);
+                });
+            };
 
             window.showToast('প্রিন্ট প্রিভিউ একটি নতুন ট্যাবে খোলা হচ্ছে — সেখানে প্রিন্টার হিসেবে "Save as PDF" বেছে নিয়ে সেভ করুন।');
         }
