@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>9 EB MT Tracker Pro</title>
+    <meta name="description" content="৯ ইস্ট বেঙ্গল রেজিমেন্ট — এমটি (MT) মেইনটেন্যান্স ট্র্যাকিং সিস্টেম">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23059669'%3E%3Cpath d='M3 13h1V6a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v2h1.5a1.5 1.5 0 0 1 1.34.83L22 12v5h-2a2 2 0 1 1-4 0H10a2 2 0 1 1-4 0H3a1 1 0 0 1-1-1v-2a1 1 0 0 1 1-1zm14-2V6H6v5h11z'/%3E%3C/svg%3E">
     <!--
       ⚠️ CSP রক্ষণাবেক্ষণ নোট (গুরুত্বপূর্ণ):
       নিচের script-src-এ একটা 'sha256-...' হ্যাশ আছে যেটা এই ফাইলের একমাত্র
@@ -15,7 +18,7 @@
     -->
     <meta http-equiv="Content-Security-Policy" content="
         default-src 'self';
-        script-src 'self' 'sha256-Ie4RP/uuWrLSALJ4rHMX3fkoE+h0xq3iLCpqugbMrso=' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.gstatic.com;
+        script-src 'self' 'sha256-dcjoSCas7nySSfBDw4Ij4AXUZhoxSouy2m8ZGjV/G88=' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.gstatic.com;
         style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com;
         font-src https://cdnjs.cloudflare.com https://fonts.gstatic.com data:;
         img-src 'self' data: https:;
@@ -49,8 +52,17 @@
 </head>
 <body class="min-h-screen text-slate-800 flex flex-col relative z-0 bg-gray-100">
 
+    <!-- INITIAL LOADING SPINNER: Firebase auth-state নির্ধারণ না হওয়া পর্যন্ত দেখাবে,
+         যাতে লগইন-করা ইউজারও প্রথমে ভুলভাবে লগইন স্ক্রিন না দেখেন -->
+    <div id="initial-loader" class="fixed inset-0 z-[200] flex items-center justify-center login-bg">
+        <div class="text-white text-center">
+            <i class="fa-solid fa-circle-notch fa-spin text-4xl mb-3"></i>
+            <p class="text-sm font-medium">লোড হচ্ছে...</p>
+        </div>
+    </div>
+
     <!-- LOGIN SCREEN -->
-    <div id="login-screen" class="fixed inset-0 z-[100] flex items-center justify-center login-bg px-4 transition-opacity duration-300">
+    <div id="login-screen" class="hidden fixed inset-0 z-[100] flex items-center justify-center login-bg px-4 transition-opacity duration-300">
         <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-8 transform transition-all">
             <div class="text-center mb-8">
                 <div class="w-24 h-24 mx-auto mb-4 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center shadow-md border-4 border-emerald-100 overflow-hidden">
@@ -407,7 +419,7 @@
 
         // EXACT DATE CALCULATION LOGIC 
         const calculateNextDateExact = (dateStr, addedMonths) => {
-            const d = new Date(dateStr);
+            const d = new Date(dateStr + 'T00:00:00');
             const targetMonth = d.getMonth() + Number(addedMonths);
             d.setMonth(targetMonth);
             if (d.getMonth() !== targetMonth % 12) {
@@ -431,12 +443,12 @@
             // Aliases to catch renamed/deleted rules automatically (Bengali Synonyms)
             const aliases = [
                 ['ব্যাটারি', 'ব্যাটারির', 'ব্যাটারী', 'battery'],
-                ['টায়ার', 'টায়ারের', 'টায়ার', 'tyre', 'tire'],
-                ['ইঞ্জিন অয়েল', 'ইঞ্জিন ওয়েল', 'মবিল বদলি', 'ইঞ্জিন অয়েল'], 
+                ['টায়ার', 'টায়ারের', 'tyre', 'tire'],
+                ['ইঞ্জিন অয়েল', 'ইঞ্জিন ওয়েল', 'মবিল বদলি'],
                 ['কূলেন্ট', 'কুলেন্ট', 'coolant'],
-                ['গিয়ার অয়েল', 'গিয়ার ওয়েল', 'ট্রান্সমিশন'],
-                ['পাওয়ার স্টিয়ারিং', 'পাওয়ার স্টিয়ারিং'],
-                ['ব্রেক ফ্লুইড', 'ব্রেক অয়েল', 'ব্রেক অয়েল']
+                ['গিয়ার অয়েল', 'গিয়ার ওয়েল', 'ট্রান্সমিশন'],
+                ['পাওয়ার স্টিয়ারিং', 'পাওয়ার স্টিয়ারিং অয়েল'],
+                ['ব্রেক ফ্লুইড', 'ব্রেক অয়েল']
             ];
 
             for (const group of aliases) {
@@ -604,6 +616,7 @@
         };
 
         onAuthStateChanged(auth, (user) => {
+            document.getElementById('initial-loader')?.classList.add('hidden');
             if (user) {
                 loginScreen.classList.add('hidden'); mainApp.classList.remove('hidden'); mainApp.classList.add('flex');
                 checkUserRole(user);
